@@ -1,14 +1,14 @@
-interface Props {
-  children: React.ReactNode;
-}
-const layout = ({ children }: Props) => {
-  return (
-    <div>
-      layout admin
-      {children}
-      
-    </div>
-  );
-};
+import { SidebarProvider } from "@/components/ui/sidebar";
+import AdminLayout from "@/features/admin/components/AdminLayout";
 
-export default layout;
+export default function AdminDashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <SidebarProvider>
+      <AdminLayout>{children}</AdminLayout>;
+    </SidebarProvider>
+  );
+}
