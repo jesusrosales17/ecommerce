@@ -14,7 +14,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { IoMdEye, IoMdEyeOff } from "react-icons/io";
 import { useState } from "react";
-import { GoogleAuthButton } from "./GoogleAuthButton";
+import { GoogleAuthButton } from "../../../components/auth/GoogleAuthButton";
 import { LoginFormValues, loginSchema } from "../schemas/loginSchema";
 import { useAuth } from "../hooks/useAuth";
 

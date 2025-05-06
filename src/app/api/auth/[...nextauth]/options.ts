@@ -4,6 +4,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import {PrismaAdapter} from "@next-auth/prisma-adapter";
 import { compare } from "bcrypt";
+import { Role } from "@prisma/client";
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
@@ -13,7 +14,6 @@ export const authOptions: NextAuthOptions = {
       clientSecret: process.env.GOOGLE_CLIENT_SECRET || ""
     }),
     CredentialsProvider({
-      name: "Credentials",
       credentials: {
         email: { label: "Email", type: "text", placeholder: "email" },
         password: { label: "Password", type: "password" }
@@ -38,7 +38,6 @@ export const authOptions: NextAuthOptions = {
           throw new Error("la contraseña es incorrecta");
         }
 
-
         return {
           id: user.id,
           email: user.email,
@@ -49,28 +48,32 @@ export const authOptions: NextAuthOptions = {
     })
   ],
   callbacks: {
+    async session({ session, user, token }) {
+      if (user) {
+        session.user.id = user.id;
+        session.user.role = user.role;
+      } 
+      else if (token) {
+        session.user.id = token.sub as string;
+        session.user.role = token.role as string;
+      }
+      return session;
+    },
     async jwt({ token, user }) {
       if (user) {
-        // Al iniciar sesión, añadir datos del usuario al token
+        token.role = user.role as Role;
         token.id = user.id;
-        token.role = user.role;
       }
       return token;
     },
-    async session({ session, token }) {
-      if (session.user) {
-        // Asignar los datos del token a la sesión
-        session.user.id = token.id;
-        session.user.role = token.role;
-      }
-      return session;
-    }
+  
   },
+
   pages: {
     signIn: "/login",
   },
   session: {
-    strategy: "jwt"
+    strategy: "jwt",
   },
   secret: process.env.NEXTAUTH_SECRET
 };

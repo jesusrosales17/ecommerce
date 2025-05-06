@@ -1,23 +1,19 @@
-import "next-auth";
+import NextAuth from "next-auth";
 import { Role } from "@prisma/client";
 
 declare module "next-auth" {
+  interface User {
+    id: string;
+    role: string;
+  }
+  
   interface Session {
     user: {
       id: string;
-      name?: string | null;
-      email?: string | null;
-      image?: string | null;
-      role?: Role;
+      email: string;
+      name: string;
+      role: string;
     };
-  }
-  
-  interface User {
-    id: string;
-    name?: string | null;
-    email?: string | null;
-    image?: string | null;
-    role?: Role;
   }
 }
 

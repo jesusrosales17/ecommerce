@@ -1,3 +1,4 @@
+
 import { SidebarProvider } from "@/components/ui/sidebar";
 import AdminLayout from "@/features/admin/components/AdminLayout";
 
@@ -8,7 +9,7 @@ export default function AdminDashboardLayout({
 }) {
   return (
     <SidebarProvider>
-      <AdminLayout>{children}</AdminLayout>;
+      <AdminLayout>{children}</AdminLayout>
     </SidebarProvider>
   );
 }

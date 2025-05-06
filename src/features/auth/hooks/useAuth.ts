@@ -1,6 +1,6 @@
 "use client";
 
-import { getSession, signIn } from "next-auth/react";
+import { getSession, signIn, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { LoginFormValues } from "../schemas/loginSchema";
@@ -36,6 +36,7 @@ export const useAuth = (notificationProvider: NotificationAdapter = sonnerNotifi
         
         // Obtener la sesión después de iniciar sesión
         const session = await getSession();
+        console.log("Sesión después de iniciar sesión:", session);
         
         // Redireccionar según el rol
         if (session?.user?.role === "ADMIN") {
@@ -60,8 +61,27 @@ export const useAuth = (notificationProvider: NotificationAdapter = sonnerNotifi
     }
   };
 
+  const logout = async () => {
+    try {
+      setIsLoading(true);
+      await signOut({ redirect: false });
+      notificationProvider.success("Sesión cerrada correctamente");
+      router.push("/login");
+      router.refresh();
+      return true;
+    } catch (error) {
+      const errorMessage = "Ocurrió un error al cerrar sesión";
+      notificationProvider.error(errorMessage);
+      console.error("Error al cerrar sesión:", error);
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return {
     login,
+    logout,
     isLoading,
     error,
   };
