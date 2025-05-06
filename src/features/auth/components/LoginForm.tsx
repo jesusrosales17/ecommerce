@@ -16,6 +16,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { IoLogoGoogle, IoMdEye, IoMdEyeOff } from "react-icons/io";
 import { useState } from "react";
+import { GoogleAuthButton } from "./GoogleAuthButton";
 
 const formSchema = z.object({
   email: z.string().email({
@@ -127,7 +128,7 @@ export function LoginForm() {
           </a>
         </div>
         <Button type="submit" className="w-full h-10 sm:h-11 bg-blue-900 mb-4 ">
-          Submit
+          Iniciar sesión
         </Button>
 
         <div className="flex items-center justify-between mb-4">
@@ -137,13 +138,7 @@ export function LoginForm() {
         </div>
 
         <div className="flex items-center justify-center mt-3 sm:mt-4">
-          <Button
-            variant="outline"
-            className="w-full h-10 sm:h-11 bg-white text-gray-900 border-gray-300 hover:bg-gray-100 text-xs sm:text-sm"
-          >
-            <IoLogoGoogle className="mr-2" size={18} />
-            Iniciar sesión con Google
-          </Button>
+          <GoogleAuthButton />
         </div>
       </form>
     </Form>
