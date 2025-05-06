@@ -36,7 +36,6 @@ export const useAuth = (notificationProvider: NotificationAdapter = sonnerNotifi
         
         // Obtener la sesión después de iniciar sesión
         const session = await getSession();
-        console.log("Sesión después de iniciar sesión:", session);
         
         // Redireccionar según el rol
         if (session?.user?.role === "ADMIN") {

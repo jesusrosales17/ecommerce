@@ -50,10 +50,7 @@ export const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     async session({ session, user, token }) {
-      console.log(
-        "Session Callback:",
-        { session, user, token }
-      )
+     
       if (user) {
         session.user.id = user.id;
         session.user.role = user.role;
