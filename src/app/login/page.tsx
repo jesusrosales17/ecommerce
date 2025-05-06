@@ -5,7 +5,7 @@ import React from "react";
 const page = () => {
   return (
     // grid [40, 60] for left and right sections, ajustado para móviles
-    <main className="max-w-[2000px] mx-auto grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-[45%_55%] h-screen">
+    <main className="max-w-[2000px] mx-auto grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-[45%_55%] h-svh">
       {/* left section */}
       <div className="flex my-4 xl:my-3 flex-col h-full w-full px-4 sm:px-6 sm:w-5/6 md:w-5/6 2xl:w-4/6 mx-auto ">
         {/* Header fixed at top */}

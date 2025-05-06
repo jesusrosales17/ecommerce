@@ -1,7 +1,5 @@
 "use client";
 
-import { z } from "zod";
-
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -14,40 +12,40 @@ import {
 import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { IoLogoGoogle, IoMdEye, IoMdEyeOff } from "react-icons/io";
+import { IoMdEye, IoMdEyeOff } from "react-icons/io";
 import { useState } from "react";
 import { GoogleAuthButton } from "./GoogleAuthButton";
-
-const formSchema = z.object({
-  email: z.string().email({
-    message: "El correo electrónico no es válido.",
-  }),
-  password: z.string().min(6, {
-    message: "La contraseña debe tener al menos 6 caracteres.",
-  }),
-});
+import { LoginFormValues, loginSchema } from "../schemas/loginSchema";
+import { useAuth } from "../hooks/useAuth";
 
 export function LoginForm() {
   const [passwordVisible, setPasswordVisible] = useState<boolean>(false);
+  const { login, isLoading, error } = useAuth();
 
-  const form = useForm({
-    resolver: zodResolver(formSchema),
+  const form = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
     defaultValues: {
       email: "",
       password: "",
     },
   });
 
-  const onSubmit = async (data: any) => {
-    console.log(data);
+  const onSubmit = async (data: LoginFormValues) => {
+    await login(data);
   };
 
   return (
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="space-y-6 sm:space-y-8 w-full"
+        className="space-y-6 sm:space-y-8 w-full "
       >
+        {/* {error && (
+          <div className="p-3 text-sm bg-red-100 border border-red-400 text-red-700 rounded mb-4">
+            {error}
+          </div>
+        )} */}
+
         <FormField
           control={form.control}
           name="email"
@@ -89,7 +87,7 @@ export function LoginForm() {
                   />
                 </FormControl>
                 <Button
-                onClick={() => setPasswordVisible(!passwordVisible)}
+                  onClick={() => setPasswordVisible(!passwordVisible)}
                   type="button"
                   variant={"ghost"}
                   className="w-10  rounded-s-none border h-full inset-y-0 right-0 flex items-center pr-3 text-gray-500 "
@@ -127,8 +125,12 @@ export function LoginForm() {
             Olvidé mi contraseña
           </a>
         </div>
-        <Button type="submit" className="w-full h-10 sm:h-11 bg-blue-900 mb-4 ">
-          Iniciar sesión
+        <Button
+          type="submit"
+          className="w-full h-10 sm:h-11 bg-blue-900 mb-4"
+          disabled={isLoading}
+        >
+          {isLoading ? "Iniciando sesión..." : "Iniciar sesión"}
         </Button>
 
         <div className="flex items-center justify-between mb-4">
