@@ -18,7 +18,7 @@ export const authOptions: NextAuthOptions = {
         email: { label: "Email", type: "text", placeholder: "email" },
         password: { label: "Password", type: "password" }
       },
-      async authorize(credentials) {
+      async authorize(credentials, req) {
         if (!credentials?.email || !credentials?.password) {
           throw new Error("El corre y contraseña son requeridos");
         }
@@ -42,31 +42,55 @@ export const authOptions: NextAuthOptions = {
           id: user.id,
           email: user.email,
           name: user.name,
-          role: user.role
+          role: user.role,
+          image: user.image || undefined // Convert null to undefined
         };
       }
     })
   ],
   callbacks: {
     async session({ session, user, token }) {
+      console.log(
+        "Session Callback:",
+        { session, user, token }
+      )
       if (user) {
         session.user.id = user.id;
         session.user.role = user.role;
+        // Asegurándonos de pasar la imagen si existe
+        if (user.image) {
+          session.user.image = user.image;
+        }
       } 
       else if (token) {
         session.user.id = token.sub as string;
         session.user.role = token.role as string;
+        // Pasando la imagen del token si existe
+        if (token.picture) {
+          session.user.image = token.picture as string;
+        } else if (token.image) {
+          session.user.image = token.image as string;
+        }
       }
       return session;
     },
-    async jwt({ token, user }) {
+    async jwt({ token, user, account, profile }) {
       if (user) {
         token.role = user.role as Role;
         token.id = user.id;
+        // Guardando la imagen en el token si existe
+        if (user.image) {
+          token.image = user.image;
+        }
       }
+      
+      // Para proveedores OAuth como Google, la imagen viene en profile
+      if (account?.provider === "google" && profile?.image) {
+        token.picture = profile.image;
+      }
+      
       return token;
     },
-  
   },
 
   pages: {

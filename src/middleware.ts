@@ -28,14 +28,14 @@ export default async function middleware(request: NextRequestWithAuth) {
   }
 
   // Redireccionar al home si intenta acceder al login estando autenticado
-  if (isAuthenticated && pathname === "/login") {
-    return NextResponse.redirect(new URL("/", request.url));
-  }
+//   if (isAuthenticated && pathname === "/login") {
+//     return NextResponse.redirect(new URL("/", request.url));
+//   }
 
   // Verificar acceso a rutas de administrador
-  if (isAdminRoute && !isAdmin) {
-    return NextResponse.redirect(new URL("/", request.url));
-  }
+//   if (isAdminRoute && !isAdmin) {
+//     return NextResponse.redirect(new URL("/", request.url));
+//   }
 
   // Continuar con la solicitud si pasa todas las verificaciones
   return NextResponse.next();
