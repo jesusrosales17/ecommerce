@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `category` ADD COLUMN `status` ENUM('ACTIVE', 'INACTIVE', 'DELETED') NOT NULL DEFAULT 'ACTIVE';
