@@ -10,15 +10,20 @@ import {
 } from "@/components/ui/table";
 import { Category } from "@prisma/client";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Delete, Edit, Eye, MoreVertical, Trash } from "lucide-react";
+import {  Edit, Eye, MoreVertical, Trash } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useCategoryStore } from "../store/categoryStore";
 
 interface Props {
   categories: Category[];
 }
 
 export  function CategoryTable({ categories }: Props) {
- 
+  const {setCategoryToUpdate} = useCategoryStore();
+
+  const handleEdit = (category: Category) => {
+    setCategoryToUpdate(category);
+  }
 
   return (
     <div className="rounded-md border">
@@ -69,7 +74,9 @@ export  function CategoryTable({ categories }: Props) {
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
 
-                      <DropdownMenuItem>
+                      <DropdownMenuItem
+                      onClick={() => handleEdit(category)}
+                      >
                         <Edit />
                         Editar
                       </DropdownMenuItem>
