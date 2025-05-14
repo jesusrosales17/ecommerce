@@ -8,14 +8,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Category } from "@prisma/client";
 
-export async function CategoryTable() {
-  // Cargar datos desde el servidor usando Prisma
-  const categories = await prisma.category.findMany({
-    orderBy: {
-      createdAt: 'desc',
-    },
-  });
+interface Props {
+  categories: Category[];
+}
+
+export async function CategoryTable({ categories }: Props) {
+ 
 
   return (
     <div className="rounded-md border">

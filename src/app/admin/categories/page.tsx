@@ -1,22 +1,18 @@
 import { CategoryTable } from "@/features/categories/components/CategoryTable";
 import { CategoryDrawer } from "@/features/categories/components/CategoryDrawer";
+import { CategoryPage } from "@/features/categories/components/CategoryPage";
 
-const CategoriesPage = () => {
+export const metadata = {
+  title: "Categorias",
+  description: "Administra las categorias de tu tienda",
+};
+
+const Page = () => {
   return (
     <>
-      <div className="flex md:justify-between gap-4 md:items-center mb-5 flex-col md:flex-row">
-        <div>
-          <h1 className="text-xl">Categorias</h1>
-          <p className="text-sm text-gray-500">
-            Administra las categorias de tu tienda
-          </p>
-        </div>
-        <CategoryDrawer/>
-      </div>
-
-      <CategoryTable />
+    <CategoryPage />
     </>
   );
 };
 
-export default CategoriesPage;
+export default Page;

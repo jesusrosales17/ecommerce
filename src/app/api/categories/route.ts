@@ -1,20 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/libs/prisma";
-import { getServerSession } from "next-auth";
-import { authOptions } from "../auth/[...nextauth]/options";
+import { getSession } from "@/libs/auth/auth";
 
 export async function POST(request: NextRequest) {
   try {
     // Verificar la sesión del usuario
-    const session = await getServerSession(authOptions);
+    const session = await getSession();
     
-    if (!session || session.user.role !== "ADMIN") {
+    if(!session) {
       return NextResponse.json(
-        { error: "No tienes permisos para realizar esta acción" },
-        { status: 403 }
+        { error: "No estás autenticado" },
+        { status: 401 }
       );
     }
-
+  console.log(session) 
+    return NextResponse.json(
+      { message: "Autenticado correctamente" },
+      { status: 200 }
+    );
+    return;
     // Obtener los datos de la categoría del body
     const body = await request.json();
     const { name, description, status } = body;
@@ -52,6 +56,11 @@ export async function GET() {
       orderBy: {
         createdAt: "desc",
       },
+      where: {
+        status: {
+          not: "DELETED",
+        },
+      }
     });
 
     return NextResponse.json(categories);
