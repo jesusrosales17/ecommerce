@@ -1,6 +1,5 @@
 import { ReactNode } from "react";
 import { SidebarAdmin } from "./SidebarAdmin";
-import { Toaster } from "@/components/ui/sonner";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Header } from "./Header";
 import { getSessionServer } from "@/features/auth/utils/auth-server";
@@ -27,8 +26,7 @@ export const AdminLayout = async ({ children }: AdminLayoutProps) => {
           <main className="p-6">{children}</main>
         </div>
 
-        {/* Toaster for notifications */}
-        <Toaster position="top-right" />
+  
       </div>
   );
 };

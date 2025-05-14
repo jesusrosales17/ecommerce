@@ -14,6 +14,7 @@ import { Separator } from "@/components/ui/separator";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { IoMdAdd } from "react-icons/io";
 import { CategoryForm } from "./CategoryForm";
+import { useState } from "react";
 
 interface Props {
   children?: React.ReactNode;
@@ -21,10 +22,11 @@ interface Props {
 
 export function CategoryDrawer({ children }: Props) {
   const isMobile = useIsMobile();
+  const [open, setOpen] = useState(false);
 
   return (
     <>
-      <Drawer direction={isMobile ? "bottom" : "right"}>
+      <Drawer open={open} onOpenChange={setOpen} direction={isMobile ? "bottom" : "right"}>
         <DrawerTrigger asChild className="flex items-center gap-2">
           {children ? (
             children
@@ -48,7 +50,7 @@ export function CategoryDrawer({ children }: Props) {
           </DrawerHeader>
           <Separator className="mb-4" />
           <div className="px-4 h-full">
-            <CategoryForm />
+            <CategoryForm onClose={() => setOpen(false)} />
           </div>
 
           {/* </div> */}

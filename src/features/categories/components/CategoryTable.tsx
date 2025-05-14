@@ -9,12 +9,15 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Category } from "@prisma/client";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Delete, Edit, Eye, MoreVertical, Trash } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface Props {
   categories: Category[];
 }
 
-export async function CategoryTable({ categories }: Props) {
+export  function CategoryTable({ categories }: Props) {
  
 
   return (
@@ -26,6 +29,7 @@ export async function CategoryTable({ categories }: Props) {
             <TableHead>Descripción</TableHead>
             <TableHead>Estado</TableHead>
             <TableHead>Fecha de creación</TableHead>
+            <TableHead>Acciones</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -49,6 +53,33 @@ export async function CategoryTable({ categories }: Props) {
                 </TableCell>
                 <TableCell>
                   {new Date(category.createdAt).toLocaleDateString()}
+                </TableCell>
+                <TableCell width={100}>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant={"ghost"} className="w-8 h-8">
+                      <MoreVertical  width={20} />
+                      </Button>
+                    </DropdownMenuTrigger>
+
+                    <DropdownMenuContent>
+                      <DropdownMenuItem>
+                        <Eye />
+                        Ver detalles
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+
+                      <DropdownMenuItem>
+                        <Edit />
+                        Editar
+                      </DropdownMenuItem>
+
+                      <DropdownMenuItem className="text-red-500">
+                        <Trash />
+                         Eliminar 
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </TableCell>
               </TableRow>
             ))

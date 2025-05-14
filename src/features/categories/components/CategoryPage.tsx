@@ -1,8 +1,22 @@
-import React from 'react'
+'use client'
 import { CategoryTable } from './CategoryTable'
 import { CategoryDrawer } from './CategoryDrawer'
+import { useCategoryStore } from '../store/categoryStore'
+import { Category } from '@prisma/client'
+import { useState } from 'react'
 
-export const CategoryPage = () => {
+interface Props {
+  initialCategories: Category[];
+}
+
+export const CategoryPage = ({initialCategories}: Props) => {
+
+  const {categories, setCategories} = useCategoryStore();
+
+  useState(() => {
+    setCategories(initialCategories);
+  })
+
   return (
     <>
     <div className="flex md:justify-between gap-4 md:items-center mb-5 flex-col md:flex-row">
@@ -15,7 +29,7 @@ export const CategoryPage = () => {
         <CategoryDrawer/>
       </div>
 
-      <CategoryTable categories={[]} />
+      <CategoryTable categories={categories} />
     </>
   )
 }

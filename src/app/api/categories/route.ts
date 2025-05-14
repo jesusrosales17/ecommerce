@@ -1,48 +1,40 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/libs/prisma";
 import { getSession } from "@/libs/auth/auth";
+import { categorySchema } from "@/features/categories/schemas/categorySchema";
+import { z } from "zod";
 
 export async function POST(request: NextRequest) {
   try {
-    // Verificar la sesión del usuario
-    const session = await getSession();
-    
-    if(!session) {
-      return NextResponse.json(
-        { error: "No estás autenticado" },
-        { status: 401 }
-      );
-    }
-  console.log(session) 
-    return NextResponse.json(
-      { message: "Autenticado correctamente" },
-      { status: 200 }
-    );
-    return;
-    // Obtener los datos de la categoría del body
+    // validar los datos
     const body = await request.json();
-    const { name, description, status } = body;
-
-    // Validar datos
-    if (!name) {
-      return NextResponse.json(
-        { error: "El nombre de la categoría es obligatorio" },
-        { status: 400 }
-      );
-    }
-
-    // Crear la categoría en la base de datos
-    const newCategory = await prisma.category.create({
+    const {name,status, description} = categorySchema.parse(body);
+    
+    // guardar la categoria en la bd
+   
+    const category = await prisma.category.create({
       data: {
         name,
-        description,
         status,
+        description,
       },
     });
 
-    return NextResponse.json(newCategory, { status: 201 });
+    return NextResponse.json({
+      message: "Categoría creada correctamente",
+      category,
+    }, { status: 201 });
+
   } catch (error) {
-    console.error("Error al crear la categoría:", error);
+    if(error instanceof z.ZodError) {
+      return NextResponse.json(
+        { 
+          error: error.issues[0].message,
+         },
+        { status: 400 }
+      );
+    }
+    console.log('Error inesperado', error);
     return NextResponse.json(
       { error: "Error al crear la categoría" },
       { status: 500 }

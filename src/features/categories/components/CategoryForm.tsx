@@ -1,4 +1,5 @@
-'use client'
+"use client";
+import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { DrawerFooter, DrawerClose } from "@/components/ui/drawer";
 import {
@@ -8,15 +9,23 @@ import {
   FormControl,
   FormDescription,
   FormMessage,
-  Form
+  Form,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Switch } from "@/components/ui/switch";
 import { categorySchema, CategorySchemaType } from "../schemas/categorySchema";
-import { useForm} from 'react-hook-form';
+import { useForm } from "react-hook-form";
+import { useCategoryStore } from "../store/categoryStore";
+import { sonnerNotificationAdapter } from "@/libs/adapters/sonnerAdapter";
 
-export const CategoryForm = () => {
+interface Props {
+  onClose?: () => void;
+}
+
+export const CategoryForm = ({ onClose }: Props) => {
+  const { addCategory } = useCategoryStore();
+
   const form = useForm<CategorySchemaType>({
     resolver: zodResolver(categorySchema),
     defaultValues: {
@@ -28,9 +37,27 @@ export const CategoryForm = () => {
 
   const onSubmit = async (data: CategorySchemaType) => {
     try {
-      
+      const response = await axios.post("/api/categories", {
+        name: data.name,
+        description: data.description,
+        status: data.status,
+      });
+
+      const { category } = response.data;
+      addCategory(category);
+      sonnerNotificationAdapter.success(response.data.message);
+
+      if (onClose) {
+        onClose();
+      }
+      form.reset();
     } catch (error) {
       console.error("Error:", error);
+      if (axios.isAxiosError(error)) {
+        sonnerNotificationAdapter.error(
+          error?.response?.data.error || "Error al crear la categoria"
+        );
+      }
     }
   };
   return (
