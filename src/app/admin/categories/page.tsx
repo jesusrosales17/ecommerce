@@ -5,7 +5,6 @@ export const metadata = {
   description: "Administra las categorias de tu tienda",
 };
 
-
 const CategoryPage = async () => {
   const base_url = process.env.PUBLIC_URL;
 
@@ -23,10 +22,10 @@ const CategoryPage = async () => {
   }
 
   const categories = await res.json();
-  console.log(categories)
+  console.log(categories);
   return (
     <>
-  <CategoryPageContent initialCategories={categories} />
+      <CategoryPageContent initialCategories={categories} />
     </>
   );
 };
