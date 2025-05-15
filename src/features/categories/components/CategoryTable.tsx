@@ -14,6 +14,7 @@ import {  Edit, Eye, MoreVertical, Trash } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCategoryStore } from "../store/categoryStore";
 
+
 interface Props {
   categories: Category[];
 }

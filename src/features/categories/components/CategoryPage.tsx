@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { IoMdAdd } from "react-icons/io";
 import { CategoryInfoDrawer } from "./CategoryInfoDrawer";
+import { SearchInput } from "@/components/ui/SearchInput";
 
 interface Props {
   initialCategories: Category[];
@@ -14,10 +15,19 @@ interface Props {
 
 export const CategoryPage = ({ initialCategories }: Props) => {
   const { categories, setCategories, setIsOpenDrawer } = useCategoryStore();
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     setCategories(initialCategories);
   }, []);
+
+ useEffect(() => {
+    const filteredCategories = initialCategories.filter((category) =>
+      category.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    setCategories(filteredCategories);
+  
+ }, [searchQuery])
 
   return (
     <>
@@ -37,7 +47,12 @@ export const CategoryPage = ({ initialCategories }: Props) => {
         </Button>
         <CategoryFormDrawer />
       </div>
-
+        <SearchInput
+          placeholder="Buscar categoria"
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          classname="mb-4"
+        />
       <CategoryTable categories={categories} />
       <CategoryInfoDrawer />
     </>
