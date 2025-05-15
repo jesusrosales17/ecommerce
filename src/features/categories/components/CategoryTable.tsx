@@ -53,8 +53,13 @@ export  function CategoryTable({ categories }: Props) {
                 <TableCell>
                   <Badge
                     variant={category.status === "ACTIVE" ? "default" : "secondary"}
+                    className="uppercase"
                   >
-                    {category.status}
+                    {
+                      category.status === "ACTIVE"
+                        ? "Activo"
+                        : "Inactivo"
+                    }
                   </Badge>
                 </TableCell>
                 <TableCell>
