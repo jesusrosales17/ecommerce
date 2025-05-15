@@ -1,4 +1,3 @@
-import prisma from "@/libs/prisma";
 import { Badge } from "@/components/ui/badge";
 import {
   Table,
@@ -46,7 +45,7 @@ export  function CategoryTable({ categories }: Props) {
         <TableBody>
           {categories.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={4} className="text-center py-6 text-gray-500">
+              <TableCell colSpan={5} className="text-center py-6 text-gray-500">
                 No hay categorías para mostrar
               </TableCell>
             </TableRow>

@@ -1,5 +1,4 @@
-
-'use client'
+"use client";
 import { Button } from "@/components/ui/button";
 import {
   Drawer,
@@ -16,15 +15,19 @@ import { IoMdAdd } from "react-icons/io";
 import { CategoryForm } from "./CategoryForm";
 import { useCategoryStore } from "../store/categoryStore";
 
-
-
 export function CategoryFormDrawer() {
   const isMobile = useIsMobile();
-  const {isOpenDrawer, setIsOpenDrawer, categoryToUpdate} = useCategoryStore();
+  const { isOpenDrawer, setIsOpenDrawer, categoryToUpdate } =
+    useCategoryStore();
   return (
     <>
-      <Drawer open={isOpenDrawer} onOpenChange={() => {setIsOpenDrawer(!isOpenDrawer)}} direction={isMobile ? "bottom" : "right"}>
-        
+      <Drawer
+        open={isOpenDrawer}
+        onOpenChange={() => {
+          setIsOpenDrawer(!isOpenDrawer);
+        }}
+        direction={isMobile ? "bottom" : "right"}
+      >
         <DrawerContent>
           {/* <div className={`${isMobile ? "overflow-y-auto" : ""} `}> */}
           <DrawerHeader>
@@ -32,19 +35,14 @@ export function CategoryFormDrawer() {
               {categoryToUpdate ? "Actualizar categoria" : "Nueva categoria"}
             </DrawerTitle>
             <DrawerDescription>
-              
-              {
-                categoryToUpdate ? 
-                "Completa el formulario para  actualizar la categoria"
-                :
-                "Completa el formulario para  registrar una nueva categoria para la tienda"
-              }
-              
+              {categoryToUpdate
+                ? "Completa el formulario para  actualizar la categoria"
+                : "Completa el formulario para  registrar una nueva categoria para la tienda"}
             </DrawerDescription>
           </DrawerHeader>
           <Separator className="mb-4" />
           <div className="px-4 h-full">
-            <CategoryForm onClose={() => setIsOpenDrawer(false)} />
+            <CategoryForm  />
           </div>
 
           {/* </div> */}

@@ -37,15 +37,18 @@ export const useCategoryStore = create<CategoryStore>()((set, get) => ({
             categoryToShow: category,
         })
     },
-    //    drawers
+    //   drawer del formulario
     setIsOpenDrawer: (isOpen) => {
         set({
             isOpenDrawer: isOpen,
+            categoryToUpdate: null,   
         })
     },
+    //   drawer de la info
     setIsOpenInfoDrawer(isOpen) {
         set({
             isOpenInfoDrawer: isOpen,
+            categoryToShow: null,
         })
     },
 
