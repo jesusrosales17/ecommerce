@@ -49,47 +49,6 @@ export const CategoryInfoDrawer = () => {
                   Descripción
                 </h2>
                 <p>{categoryToShow?.description || "-"}</p>
-                <p>{categoryToShow?.description || "-"}</p>
-                <p>{categoryToShow?.description || "-"}</p>
-                <p>{categoryToShow?.description || "-"}</p>
-                <p>{categoryToShow?.description || "-"}</p>
-                <p>{categoryToShow?.description || "-"}</p>
-                <p>{categoryToShow?.description || "-"}</p>
-                <p>{categoryToShow?.description || "-"}</p>
-                <p>{categoryToShow?.description || "-"}</p>
-                <p>{categoryToShow?.description || "-"}</p>
-                <p>{categoryToShow?.description || "-"}</p>
-                <p>{categoryToShow?.description || "-"}</p>
-                <p>{categoryToShow?.description || "-"}</p>
-                <p>{categoryToShow?.description || "-"}</p>
-                <p>{categoryToShow?.description || "-"}</p>
-                <p>{categoryToShow?.description || "-"}</p>
-                <p>{categoryToShow?.description || "-"}</p>
-                <p>{categoryToShow?.description || "-"}</p>
-                <p>{categoryToShow?.description || "-"}</p>
-                <p>{categoryToShow?.description || "-"}</p>
-                <p>{categoryToShow?.description || "-"}</p>
-                <p>{categoryToShow?.description || "-"}</p>
-                <p>{categoryToShow?.description || "-"}</p>
-                <p>{categoryToShow?.description || "-"}</p>
-                <p>{categoryToShow?.description || "-"}</p>
-                <p>{categoryToShow?.description || "-"}</p>
-                <p>{categoryToShow?.description || "-"}</p>
-                <p>{categoryToShow?.description || "-"}</p>
-                <p>{categoryToShow?.description || "-"}</p>
-                <p>{categoryToShow?.description || "-"}</p>
-                <p>{categoryToShow?.description || "-"}</p>
-                <p>{categoryToShow?.description || "-"}</p>
-                <p>{categoryToShow?.description || "-"}</p>
-                <p>{categoryToShow?.description || "-"}</p>
-                <p>{categoryToShow?.description || "-"}</p>
-                <p>{categoryToShow?.description || "-"}</p>
-                <p>{categoryToShow?.description || "-"}</p>
-                <p>{categoryToShow?.description || "-"}</p>
-                <p>{categoryToShow?.description || "-"}</p>
-                <p>{categoryToShow?.description || "-"}</p>
-                <p>{categoryToShow?.description || "-"}</p>
-                <p>fin</p>
               </div>
 
               <div>
