@@ -8,101 +8,131 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Category } from "@prisma/client";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import {  Edit, Eye, MoreVertical, Trash } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Edit, Eye, MoreVertical, Trash } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCategoryStore } from "../store/categoryStore";
-
+import { SearchInput } from "@/components/ui/SearchInput";
+import { useState, useEffect, useMemo } from "react";
 
 interface Props {
   categories: Category[];
 }
 
-export  function CategoryTable({ categories }: Props) {
-  const {setCategoryToUpdate, setIsOpenDrawer, setIsOpenInfoDrawer, setCategoryToShow} = useCategoryStore();
+export function CategoryTable({ categories }: Props) {
+  const {
+    setCategoryToUpdate,
+    setIsOpenDrawer,
+    setIsOpenInfoDrawer,
+    setCategoryToShow,
+  } = useCategoryStore();
+ 
+
+  const [searchQuery, setSearchQuery] = useState("");
 
   const handleEdit = (category: Category) => {
     setIsOpenDrawer(true);
     setCategoryToUpdate(category);
-  }
+  };
   const handleShow = (category: Category) => {
     setIsOpenInfoDrawer(true);
     setCategoryToShow(category);
-  }
+  };
+
+  const filteredCategories = useMemo(() => {
+    return categories.filter((category) =>
+      category.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [categories, searchQuery]); 
 
   return (
-    <div className="rounded-md border">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Nombre</TableHead>
-            <TableHead>Descripción</TableHead>
-            <TableHead>Estado</TableHead>
-            <TableHead>Fecha de creación</TableHead>
-            <TableHead>Acciones</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {categories.length === 0 ? (
+    <div className="">
+      <SearchInput
+          placeholder="Buscar categoria"
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          classname="mb-4"
+        />
+      <div className="rounded-md border" >
+        <Table >
+          <TableHeader>
             <TableRow>
-              <TableCell colSpan={5} className="text-center py-6 text-gray-500">
-                No hay categorías para mostrar
-              </TableCell>
+              <TableHead>Nombre</TableHead>
+              <TableHead>Descripción</TableHead>
+              <TableHead>Estado</TableHead>
+              <TableHead>Fecha de creación</TableHead>
+              <TableHead>Acciones</TableHead>
             </TableRow>
-          ) : (
-            categories.map((category) => (
-              <TableRow key={category.id}>
-                <TableCell className="font-medium">{category.name}</TableCell>
-                <TableCell>{category.description || "-"}</TableCell>
-                <TableCell>
-                  <Badge
-                    variant={category.status === "ACTIVE" ? "default" : "secondary"}
-                    className="uppercase"
-                  >
-                    {
-                      category.status === "ACTIVE"
-                        ? "Activo"
-                        : "Inactivo"
-                    }
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  {new Date(category.createdAt).toLocaleDateString()}
-                </TableCell>
-                <TableCell width={100}>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant={"ghost"} className="w-8 h-8">
-                      <MoreVertical  width={20} />
-                      </Button>
-                    </DropdownMenuTrigger>
-
-                    <DropdownMenuContent>
-                      <DropdownMenuItem onClick={() => handleShow(category)}>
-                        <Eye />
-                        Ver detalles
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-
-                      <DropdownMenuItem
-                      onClick={() => handleEdit(category)}
-                      >
-                        <Edit />
-                        Editar
-                      </DropdownMenuItem>
-
-                      <DropdownMenuItem className="text-red-500">
-                        <Trash />
-                         Eliminar 
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+          </TableHeader>
+          <TableBody>
+            {filteredCategories.length === 0 ? (
+              <TableRow>
+                <TableCell
+                  colSpan={5}
+                  className="text-center py-6 text-gray-500"
+                >
+                  No hay categorías para mostrar
                 </TableCell>
               </TableRow>
-            ))
-          )}
-        </TableBody>
-      </Table>
+            ) : (
+              filteredCategories.map((category) => (
+                <TableRow key={category.id}>
+                  <TableCell className="font-medium">{category.name}</TableCell>
+                  <TableCell>{category.description || "-"}</TableCell>
+                  <TableCell>
+                    <Badge
+                      variant={
+                        category.status === "ACTIVE" ? "default" : "secondary"
+                      }
+                      className="uppercase"
+                    >
+                      {category.status === "ACTIVE" ? "Activo" : "Inactivo"}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    {new Date(category.createdAt).toLocaleDateString("es-MX", {
+                      dateStyle: "medium",
+                    })}
+                  </TableCell>
+                  <TableCell width={100}>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant={"ghost"} className="w-8 h-8">
+                          <MoreVertical width={20} />
+                        </Button>
+                      </DropdownMenuTrigger>
+
+                      <DropdownMenuContent>
+                        <DropdownMenuItem onClick={() => handleShow(category)}>
+                          <Eye />
+                          Ver detalles
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+
+                        <DropdownMenuItem onClick={() => handleEdit(category)}>
+                          <Edit />
+                          Editar
+                        </DropdownMenuItem>
+
+                        <DropdownMenuItem className="text-red-500">
+                          <Trash />
+                          Eliminar
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   );
 }
