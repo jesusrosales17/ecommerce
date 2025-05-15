@@ -16,7 +16,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Switch } from "@/components/ui/switch";
 import { categorySchema, CategorySchemaType } from "../schemas/categorySchema";
 import { useForm } from "react-hook-form";
-import { useCategoryStore } from "../store/categoryStore";
+import { useCategoryStore } from "../store/useCategoryStore";
 import { sonnerNotificationAdapter } from "@/libs/adapters/sonnerAdapter";
 import { useCategoryForm } from "../hooks/useCategoryForm";
 

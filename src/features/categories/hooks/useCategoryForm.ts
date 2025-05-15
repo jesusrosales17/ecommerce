@@ -1,6 +1,6 @@
 "use client";
 
-import { useCategoryStore } from '../store/categoryStore';
+import { useCategoryStore } from '../store/useCategoryStore';
 import { sonnerNotificationAdapter } from '@/libs/adapters/sonnerAdapter';
 import { zodResolver } from '@hookform/resolvers/zod';
 import axios from 'axios';

@@ -13,7 +13,7 @@ import { Separator } from "@/components/ui/separator";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { IoMdAdd } from "react-icons/io";
 import { CategoryForm } from "./CategoryForm";
-import { useCategoryStore } from "../store/categoryStore";
+import { useCategoryStore } from "../store/useCategoryStore";
 
 export function CategoryFormDrawer() {
   const isMobile = useIsMobile();

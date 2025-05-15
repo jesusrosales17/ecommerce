@@ -1,7 +1,7 @@
 "use client";
 import { CategoryTable } from "./CategoryTable";
 import { CategoryFormDrawer } from "./CategoryFormDrawer";
-import { useCategoryStore } from "../store/categoryStore";
+import { useCategoryStore } from "../store/useCategoryStore";
 import { Category } from "@prisma/client";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";

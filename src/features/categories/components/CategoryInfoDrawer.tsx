@@ -5,7 +5,7 @@ import {
   DrawerHeader,
   DrawerTitle,
 } from "@/components/ui/drawer";
-import { useCategoryStore } from "../store/categoryStore";
+import { useCategoryStore } from "../store/useCategoryStore";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
