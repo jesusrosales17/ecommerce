@@ -5,11 +5,19 @@ export const categorySchema = z.object({
         message: "El nombre de la categoría debe tener al menos 3 caracteres",
     }),
     description: z.string().optional(),
-    status: z.enum(["ACTIVE", "INACTIVE"], {
+    status: z.enum(["ACTIVE", "INACTIVE", "DELETED"], {
         errorMap: () => ({ message: "El estado no es valido" }),
     })
 });
 
+// para actualizar la categoria solo anexar el id
+export const categoryUpdateSchema = categorySchema.extend({
+    id: z.string().uuid({
+        message: "El id de la categoría no es válido",
+    }),
+});
+
 export type CategorySchemaType = z.infer<typeof categorySchema>;
+export type CategoryUpdateSchemaType = z.infer<typeof categoryUpdateSchema>;
 
 

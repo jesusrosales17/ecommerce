@@ -7,7 +7,7 @@ export default async function middleware(request: NextRequestWithAuth) {
   const { pathname } = request.nextUrl;
 
   // Rutas públicas que no requieren autenticación
-  const publicRoutes = ["/login"];
+  const publicRoutes = ["/login" ];
   const isPublicRoute = publicRoutes.some((route) => pathname.startsWith(route));
 
   // Rutas protegidas por rol de administrador
@@ -27,18 +27,11 @@ export default async function middleware(request: NextRequestWithAuth) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  // Redireccionar al home si intenta acceder al login estando autenticado
-//   if (isAuthenticated && pathname === "/login") {
-//     return NextResponse.redirect(new URL("/", request.url));
-//   }
-
-  // Verificar acceso a rutas de administrador
-//   if (isAdminRoute && !isAdmin) {
-//     return NextResponse.redirect(new URL("/", request.url));
-//   }
-
+  
   // Continuar con la solicitud si pasa todas las verificaciones
   return NextResponse.next();
+
+  //  proteger las rutas de la api que no son publicas
 }
 
 // Configurar las rutas que serán manejadas por el middleware
@@ -48,6 +41,8 @@ export const config = {
     "/",
    
     "/admin/:path*", // Todas las rutas que empiezan con /admin
+
+    // rutas de la API
     
     // Excluir archivos estáticos y API routes
     "/((?!api|_next/static|_next/image|favicon.ico).*)",

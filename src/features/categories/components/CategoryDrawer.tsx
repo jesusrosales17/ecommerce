@@ -16,28 +16,32 @@ import { IoMdAdd } from "react-icons/io";
 import { CategoryForm } from "./CategoryForm";
 import { useCategoryStore } from "../store/categoryStore";
 
-interface Props {
-  children?: React.ReactNode;
-}
 
-export function CategoryDrawer({ children }: Props) {
+
+export function CategoryDrawer() {
   const isMobile = useIsMobile();
-  const {isOpenDrawer, setIsOpenDrawer} = useCategoryStore();
+  const {isOpenDrawer, setIsOpenDrawer, categoryToUpdate} = useCategoryStore();
   return (
     <>
       <Drawer open={isOpenDrawer} onOpenChange={() => {setIsOpenDrawer(!isOpenDrawer)}} direction={isMobile ? "bottom" : "right"}>
         <DrawerTrigger asChild className="flex items-center gap-2">
-         
+
         </DrawerTrigger>
         <DrawerContent>
           {/* <div className={`${isMobile ? "overflow-y-auto" : ""} `}> */}
           <DrawerHeader>
             <DrawerTitle className="text-2xl">
-              Registrar nueva categoria
+              {categoryToUpdate ? "Actualizar categoria" : "Nueva categoria"}
             </DrawerTitle>
             <DrawerDescription>
-              Completa el formulario para registrar una nueva categoria para la
-              tienda
+              
+              {
+                categoryToUpdate ? 
+                "Completa el formulario para  actualizar la categoria"
+                :
+                "Completa el formulario para  registrar una nueva categoria para la tienda"
+              }
+              
             </DrawerDescription>
           </DrawerHeader>
           <Separator className="mb-4" />

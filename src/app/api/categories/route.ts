@@ -1,11 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/libs/prisma";
-import { getSession } from "@/libs/auth/auth";
 import { categorySchema } from "@/features/categories/schemas/categorySchema";
 import { z } from "zod";
+import { getSession, requireAuth } from "@/libs/auth/auth";
 
 export async function POST(request: NextRequest) {
+
   try {
+    //  verificar si el usuario esta autenticado
+    const auth = await requireAuth();
+
+    if (!auth.isAutenticated) {
+      return auth.response;
+    }
     // validar los datos
     const body = await request.json();
     const {name,status, description} = categorySchema.parse(body);

@@ -19,9 +19,10 @@ interface Props {
 }
 
 export  function CategoryTable({ categories }: Props) {
-  const {setCategoryToUpdate} = useCategoryStore();
+  const {setCategoryToUpdate, setIsOpenDrawer} = useCategoryStore();
 
   const handleEdit = (category: Category) => {
+    setIsOpenDrawer(true);
     setCategoryToUpdate(category);
   }
 
