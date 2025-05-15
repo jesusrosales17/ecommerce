@@ -11,7 +11,7 @@ const ProductPage = () => {
   return (
     <div className="flex md:justify-between gap-4 md:items-center mb-5 flex-col md:flex-row">
       <div>
-        <h1 className="text-xl">Categorias</h1>
+        <h1 className="text-xl">Productos</h1>
         <p className="text-sm text-gray-500">
           Administra las categorias de tu tienda
         </p>

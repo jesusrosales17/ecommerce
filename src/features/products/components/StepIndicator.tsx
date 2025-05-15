@@ -1,6 +1,6 @@
 import { cn } from "@/libs/utils";
 import React, { useEffect } from "react";
-import { useWizardStore } from "../store/WizardStore";
+import { useWizardStore } from "../store/useWizardStore";
 import { Check } from "lucide-react";
 
 interface Props {
