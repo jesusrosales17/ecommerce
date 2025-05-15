@@ -1,4 +1,4 @@
-import { CategoryPage } from "@/features/categories/components/CategoryPage";
+import { CategoryPageContent } from "@/features/categories/components/CategoryPageContent";
 
 export const metadata = {
   title: "Categorias",
@@ -6,7 +6,7 @@ export const metadata = {
 };
 
 
-const Page = async () => {
+const CategoryPage = async () => {
   const base_url = process.env.PUBLIC_URL;
 
   const res = await fetch(`${base_url}/api/categories`, {
@@ -26,9 +26,9 @@ const Page = async () => {
   console.log(categories)
   return (
     <>
-  <CategoryPage initialCategories={categories} />
+  <CategoryPageContent initialCategories={categories} />
     </>
   );
 };
 
-export default Page;
+export default CategoryPage;

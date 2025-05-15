@@ -13,7 +13,7 @@ interface Props {
   initialCategories: Category[];
 }
 
-export const CategoryPage = ({ initialCategories }: Props) => {
+export const CategoryPageContent = ({ initialCategories }: Props) => {
   const { categories, setCategories, setIsOpenDrawer } = useCategoryStore();
 
   useEffect(() => {
