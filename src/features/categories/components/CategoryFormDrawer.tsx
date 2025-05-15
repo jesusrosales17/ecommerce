@@ -18,15 +18,13 @@ import { useCategoryStore } from "../store/categoryStore";
 
 
 
-export function CategoryDrawer() {
+export function CategoryFormDrawer() {
   const isMobile = useIsMobile();
   const {isOpenDrawer, setIsOpenDrawer, categoryToUpdate} = useCategoryStore();
   return (
     <>
       <Drawer open={isOpenDrawer} onOpenChange={() => {setIsOpenDrawer(!isOpenDrawer)}} direction={isMobile ? "bottom" : "right"}>
-        <DrawerTrigger asChild className="flex items-center gap-2">
-
-        </DrawerTrigger>
+        
         <DrawerContent>
           {/* <div className={`${isMobile ? "overflow-y-auto" : ""} `}> */}
           <DrawerHeader>

@@ -1,6 +1,6 @@
 "use client";
 import { CategoryTable } from "./CategoryTable";
-import { CategoryDrawer } from "./CategoryDrawer";
+import { CategoryFormDrawer } from "./CategoryFormDrawer";
 import { useCategoryStore } from "../store/categoryStore";
 import { Category } from "@prisma/client";
 import { useEffect, useState } from "react";
@@ -35,7 +35,7 @@ export const CategoryPage = ({ initialCategories }: Props) => {
           <IoMdAdd />
           Nueva categoría
         </Button>
-        <CategoryDrawer />
+        <CategoryFormDrawer />
       </div>
 
       <CategoryTable categories={categories} />
