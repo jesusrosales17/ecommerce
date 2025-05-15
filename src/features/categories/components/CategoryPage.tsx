@@ -6,6 +6,7 @@ import { Category } from "@prisma/client";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { IoMdAdd } from "react-icons/io";
+import { CategoryInfoDrawer } from "./CategoryInfoDrawer";
 
 interface Props {
   initialCategories: Category[];
@@ -38,6 +39,7 @@ export const CategoryPage = ({ initialCategories }: Props) => {
       </div>
 
       <CategoryTable categories={categories} />
+      <CategoryInfoDrawer />
     </>
   );
 };

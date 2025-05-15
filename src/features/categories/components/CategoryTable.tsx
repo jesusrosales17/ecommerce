@@ -19,11 +19,15 @@ interface Props {
 }
 
 export  function CategoryTable({ categories }: Props) {
-  const {setCategoryToUpdate, setIsOpenDrawer} = useCategoryStore();
+  const {setCategoryToUpdate, setIsOpenDrawer, setIsOpenInfoDrawer, setCategoryToShow} = useCategoryStore();
 
   const handleEdit = (category: Category) => {
     setIsOpenDrawer(true);
     setCategoryToUpdate(category);
+  }
+  const handleShow = (category: Category) => {
+    setIsOpenInfoDrawer(true);
+    setCategoryToShow(category);
   }
 
   return (
@@ -74,7 +78,7 @@ export  function CategoryTable({ categories }: Props) {
                     </DropdownMenuTrigger>
 
                     <DropdownMenuContent>
-                      <DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleShow(category)}>
                         <Eye />
                         Ver detalles
                       </DropdownMenuItem>
