@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { sonnerNotificationAdapter } from "@/libs/adapters/sonnerAdapter";
 import { forwardRef, useImperativeHandle, useState } from "react";
+import { Form } from "react-hook-form";
 
 export const ProductSpecificationsForm = forwardRef<{submit: () => string | boolean}>((_, ref) => {
   const [specifications, setSpecifications] = useState<{
@@ -53,7 +54,7 @@ export const ProductSpecificationsForm = forwardRef<{submit: () => string | bool
         </p>
       </div>
 
-      <div>
+      <form>
         {(specifications.length === 0 && (
           <p className="text-sm text-gray-500 mb-4 text-center">
             No hay especificaciones agregadas.
@@ -103,7 +104,7 @@ export const ProductSpecificationsForm = forwardRef<{submit: () => string | bool
           }
           
 
-      </div>
+      </form>
       {/* Boton nueva categoria */}
       <Button onClick={handleAddSpecifications} variant="outline" className="w-full">
         Agregar especificacion
