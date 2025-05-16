@@ -11,7 +11,7 @@ interface AdminLayoutProps {
 export const AdminLayout = async ({ children }: AdminLayoutProps) => {
     const session = await getSessionServer();
   return (
-      <div className="flex h-screen overflow-hidden w-full">
+      <div className="flex h-full min-h-screen overflow-hidden w-full">
         {/* Sidebar */}
         <SidebarAdmin session={session!} />
         {/* Main Content */}

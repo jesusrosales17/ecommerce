@@ -17,7 +17,7 @@ import Link from "next/link";
 
 const NewProductPage = () => {
   return (
-    <div className="">
+    <div className="w-full">
       <div className=" ">
         {/* boton de regresar */}
         <div className="flex items-center justify-between mb-4">
