@@ -115,7 +115,11 @@ model Category {
  
   @@index([name])
 }
-
+enum ProductStatus {
+  ACTIVE
+  INACTIVE
+  DELETED
+}
 // products
 model Product {
   id          String   @id @default(uuid())
@@ -126,7 +130,7 @@ model Product {
   isOnSale    Boolean? @default(false)
   salePrice   Decimal? @db.Decimal(10, 2)
   isFeatured  Boolean? @default(false)
-
+  status      ProductStatus @default(ACTIVE)
   categoryId String?
 
   createdAt   DateTime @default(now())
