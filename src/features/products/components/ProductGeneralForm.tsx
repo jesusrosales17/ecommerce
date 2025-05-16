@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import {
   productGeneralSchema,
   ProductGeneralSchemaType,
-} from "../schemas/productSchema";
+} from "../schemas/ProductSchema";
 import { Form, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";

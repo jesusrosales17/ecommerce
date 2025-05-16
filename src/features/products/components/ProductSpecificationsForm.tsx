@@ -1,6 +1,77 @@
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useState } from "react";
 
 export const ProductSpecificationsForm = () => {
+  const [specifications, setSpecifications] = useState<{
+    label: string;
+    value: string;
+  }[]>([]);
+
+  const handleAddSpecifications = () => {
+    setSpecifications((prev) => [
+      ...prev,
+      {
+        label: "",
+        value: "",
+      },
+    ]);
+  };
   return (
-    <div>ProductSpecificationsForm</div>
-  )
-}
+    <>
+      <div>
+        <h2 className="text-lg font-bold mb-4">
+          Especificaciones del producto
+        </h2>
+        <p className="text-sm text-gray-500 mb-4">
+          Agrega las especificaciones del producto que se mostraran en la
+          tienda, como el procesador, peso, y materiales. (Opcional lo puedes
+          saltar)
+        </p>
+      </div>
+
+      <div>
+        {(specifications.length === 0 && (
+          <p className="text-sm text-gray-500 mb-4 text-center">
+            No hay especificaciones agregadas.
+          </p>
+        ))}
+
+        {
+          specifications.map((specification, index) => (
+            <div key={index} className="flex gap-4 mb-4">
+              <Input
+                type="text"
+                placeholder="Etiqueta"
+                value={specification.label}
+                onChange={(e) => {
+                  const newSpecifications = [...specifications];
+                  newSpecifications[index].label = e.target.value;
+                  setSpecifications(newSpecifications);
+                }}
+                className="border rounded-md p-2 w-full"
+              />
+              <Input
+                type="text"
+                placeholder="Valor"
+                value={specification.value}
+                onChange={(e) => {
+                  const newSpecifications = [...specifications];
+                  newSpecifications[index].value = e.target.value;
+                  setSpecifications(newSpecifications);
+                }}
+                className="border rounded-md p-2 w-full"
+              />
+            </div>
+          ))
+          }
+          
+
+      </div>
+      {/* Boton nueva categoria */}
+      <Button onClick={handleAddSpecifications} variant="outline" className="w-full">
+        Agregar especificacion
+      </Button>
+    </>
+  );
+};
