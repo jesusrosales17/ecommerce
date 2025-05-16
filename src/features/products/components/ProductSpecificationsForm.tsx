@@ -6,7 +6,13 @@ export const ProductSpecificationsForm = () => {
   const [specifications, setSpecifications] = useState<{
     label: string;
     value: string;
-  }[]>([]);
+  }[]>([
+    {
+      label: "",
+      value: "",
+    },
+    
+  ]);
 
   const handleAddSpecifications = () => {
     setSpecifications((prev) => [
@@ -62,6 +68,19 @@ export const ProductSpecificationsForm = () => {
                 }}
                 className="border rounded-md p-2 w-full"
               />
+
+              {/* boton de eliminar */}
+              <Button
+                variant="outline"
+                className="w-8 h-8 p-0"
+                onClick={() => {
+                  const newSpecifications = [...specifications];
+                  newSpecifications.splice(index, 1);
+                  setSpecifications(newSpecifications);
+                }}
+              >
+                X
+              </Button>
             </div>
           ))
           }
