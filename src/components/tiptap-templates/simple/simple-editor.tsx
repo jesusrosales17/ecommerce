@@ -229,12 +229,8 @@ export const SimpleEditor = React.forwardRef<{submit: () => string | boolean}>(
       if (editor) {
         const json = editor.getJSON()
         const html = editor.getHTML()
-        console.log("json", json)
-        console.log("html", html)
 
-        console.log(json.content?.length)
-        console.log(json.content?.[0]?.text)
-        if(json.content?.length === 0 || json.content?.[0]?.text === undefined) {
+        if(json.content?.length === 0 ||  !json.content?.[0]?.content) {
           sonnerNotificationAdapter.error(
             "La descripcion no puede estar vacia"
           )

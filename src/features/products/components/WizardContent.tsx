@@ -17,9 +17,9 @@ export const WizardContent = () => {
     if (formRef.current) {
       try {
         const isValid = await formRef.current?.submit();
-        console.log(isValid)
-        if (isValid) nextStep();
+        if (!!isValid) nextStep();
 
+        console.log(activeStep)
       } catch (error) {
         console.error("Error al enviar el formulario", error);
         return; 
