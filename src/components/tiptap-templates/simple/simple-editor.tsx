@@ -98,7 +98,7 @@ const MainToolbarContent = ({
       <ToolbarSeparator />
 
       <ToolbarGroup>
-        <HeadingDropdownMenu levels={[1, 2, 3, 4]} />
+        <HeadingDropdownMenu levels={[ 2, 3, 4]} />
         <ListDropdownMenu types={["bulletList", "orderedList", "taskList"]} />
         <BlockQuoteButton />
         <CodeBlockButton />
@@ -178,7 +178,8 @@ const MobileToolbarContent = ({
   </>
 )
 
-export function SimpleEditor() {
+export const SimpleEditor = React.forwardRef<{submit: () => string | boolean}>(
+  (_, ref) => {
   const isMobile = useIsMobile()
   const windowSize = useWindowSize()
   const [mobileView, setMobileView] = React.useState<
@@ -221,6 +222,19 @@ export function SimpleEditor() {
     ],
     content: "",
   })
+
+  React.useImperativeHandle(ref, () => ({
+    submit: () => {
+      if (editor) {
+        const json = editor.getJSON()
+        const html = editor.getHTML()
+        console.log("json", json)
+        console.log("html", html)
+        return html
+      }
+      return ""
+    },
+  }))
 
   const bodyRect = useCursorVisibility({
     editor,
@@ -270,4 +284,4 @@ return (
   </EditorContext.Provider>
 )
  
-}
+})

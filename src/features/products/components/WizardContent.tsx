@@ -11,14 +11,14 @@ import { useRef } from "react";
 export const WizardContent = () => {
   const { activeStep, nextStep, prevStep, steps } = useWizardStore();
 
-  const formRef = useRef<{submit: () => boolean}>(null);
+  const formRef = useRef<{submit: () => boolean | string}>(null);
 
   const handleNextStep = async () => {
     if (formRef.current) {
       try {
         const isValid = await formRef.current?.submit();
         console.log(isValid)
-        if (isValid) nextStep();
+        // if (isValid) nextStep();
 
       } catch (error) {
         console.error("Error al enviar el formulario", error);
@@ -34,7 +34,7 @@ export const WizardContent = () => {
       case 1:
         return <ProductSpecificationsForm />;
       case 2:
-        return <ProductDescriptionForm  />;
+        return <ProductDescriptionForm ref={formRef} />;
       case 3:
         return <ProductImagesForm  />;
       default:

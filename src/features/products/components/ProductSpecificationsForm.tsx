@@ -31,8 +31,7 @@ export const ProductSpecificationsForm = () => {
         </h2>
         <p className="text-sm text-gray-500 mb-4">
           Agrega las especificaciones del producto que se mostraran en la
-          tienda, como el procesador, peso, y materiales. (Opcional lo puedes
-          saltar)
+          tienda, como el procesador, peso, y materiales.
         </p>
       </div>
 
