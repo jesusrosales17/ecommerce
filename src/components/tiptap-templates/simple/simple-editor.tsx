@@ -76,6 +76,7 @@ import { handleImageUpload, MAX_FILE_SIZE } from "@/utils/tiptap-utils"
 import "@/components/tiptap-templates/simple/simple-editor.scss"
 
 import content from "@/components/tiptap-templates/simple/data/content.json"
+import { sonnerNotificationAdapter } from "@/libs/adapters/sonnerAdapter"
 
 const MainToolbarContent = ({
   onHighlighterClick,
@@ -230,6 +231,15 @@ export const SimpleEditor = React.forwardRef<{submit: () => string | boolean}>(
         const html = editor.getHTML()
         console.log("json", json)
         console.log("html", html)
+
+        console.log(json.content?.length)
+        console.log(json.content?.[0]?.text)
+        if(json.content?.length === 0 || json.content?.[0]?.text === undefined) {
+          sonnerNotificationAdapter.error(
+            "La descripcion no puede estar vacia"
+          )
+          return false
+        }
         return html
       }
       return ""

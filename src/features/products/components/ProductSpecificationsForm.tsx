@@ -1,8 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import { sonnerNotificationAdapter } from "@/libs/adapters/sonnerAdapter";
+import { forwardRef, useImperativeHandle, useState } from "react";
 
-export const ProductSpecificationsForm = () => {
+export const ProductSpecificationsForm = forwardRef<{submit: () => string | boolean}>((_, ref) => {
   const [specifications, setSpecifications] = useState<{
     label: string;
     value: string;
@@ -23,6 +24,23 @@ export const ProductSpecificationsForm = () => {
       },
     ]);
   };
+
+  useImperativeHandle(ref, () => ({
+    submit: () => {
+      const isValid = specifications.every((specification) => {
+        return specification.label !== "" && specification.value !== "";
+      });
+
+      if (!isValid) {
+        sonnerNotificationAdapter.error(
+          "No debe haber campos vacios en las especificaciones");
+          return false;
+      }
+
+      return true;
+    },
+  }))
+
   return (
     <>
       <div>
@@ -92,4 +110,4 @@ export const ProductSpecificationsForm = () => {
       </Button>
     </>
   );
-};
+})

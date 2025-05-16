@@ -18,7 +18,7 @@ export const WizardContent = () => {
       try {
         const isValid = await formRef.current?.submit();
         console.log(isValid)
-        // if (isValid) nextStep();
+        if (isValid) nextStep();
 
       } catch (error) {
         console.error("Error al enviar el formulario", error);
@@ -32,7 +32,7 @@ export const WizardContent = () => {
       case 0:
         return <ProductGeneralForm ref={formRef} />
       case 1:
-        return <ProductSpecificationsForm />;
+        return <ProductSpecificationsForm ref={formRef} />;
       case 2:
         return <ProductDescriptionForm ref={formRef} />;
       case 3:
