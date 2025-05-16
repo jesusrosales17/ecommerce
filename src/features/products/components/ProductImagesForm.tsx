@@ -1,8 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { forwardRef, useImperativeHandle, useState } from "react";
 import { ImagePlus, Trash2 } from "lucide-react";
+import { sonnerNotificationAdapter } from "@/libs/adapters/sonnerAdapter";
 
-export const ProductImagesForm = forwardRef<{ submit: () => boolean }>((_, ref) => {
+export const ProductImagesForm = forwardRef<{ submit: () => boolean | string}>((_, ref) => {
   const [images, setImages] = useState<{ file: File | null; preview: string }[]>(
     Array(5).fill({ file: null, preview: "" })
   );
@@ -26,6 +27,12 @@ export const ProductImagesForm = forwardRef<{ submit: () => boolean }>((_, ref) 
     submit: () => {
       // Verificar si hay al menos una imagen seleccionada
       const hasImages = images.some((img) => img.file !== null);
+      if (!hasImages) {
+        sonnerNotificationAdapter.error(
+          "Debes agregar al menos una imagen del producto"
+        );
+        return false;
+      }
       return hasImages;
     },
   }));

@@ -36,7 +36,7 @@ export const WizardContent = () => {
       case 2:
         return <ProductDescriptionForm ref={formRef} />;
       case 3:
-        return <ProductImagesForm  />;
+        return <ProductImagesForm  ref={formRef}/>;
       default:
         return null;
     }
