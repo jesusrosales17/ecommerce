@@ -16,8 +16,8 @@ export async function saveImage(
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Crear la carpeta si no existe
-    const uploadDir = path.join(process.cwd(),  'uploads', basePath);
+    // Crear la carpeta si no existe con la env NEXT_PUBLIC_UPLOADS_PATH
+    const uploadDir = path.join(process.cwd(), process.env.NEXT_PUBLIC_UPLOADS_PATH || 'uploads', basePath);
     await fs.mkdir(uploadDir, { recursive: true });
 
     // Generar un nombre único para la imagen

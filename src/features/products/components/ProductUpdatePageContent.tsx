@@ -28,10 +28,10 @@ export const ProductUpdatePageContent = ({ productData }: Props) => {
     })));
     setImages(productData.images.map((image) => ({
       file: null,
-      preview: `${process.env.UPLOADS_PATH}/products/${image.name}`,
+      preview: `/api/uploads/products/${image.name}`
+
     })));
   }, []);
-  console.log("carpeta", process.env.UPLOADS_PATH)
 
   return (
     <>
