@@ -11,4 +11,5 @@ export interface WizardStore {
     setProgressWidth: (width: string) => void;
     stepClicked: number | null;
     setStepClicked: (index: number | null) => void;
+    reset: () => void;
 }

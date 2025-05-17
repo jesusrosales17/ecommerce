@@ -30,7 +30,6 @@ export const useProductStore = create<ProductStore>((set) => ({
         status: "ACTIVE",
       },
       specifications: [],
-      description: "",
-      images: [],
+      description: "", images: [],
     }),
 }));

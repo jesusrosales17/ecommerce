@@ -11,6 +11,7 @@ import { useProductStore } from "../store/useProductStore";
 import axios from "axios";
 import { sonnerNotificationAdapter } from "@/libs/adapters/sonnerAdapter";
 import { useRouter } from "next/navigation";
+import { set } from "zod";
 
 export const ProductWizardContent = () => {
   const {
@@ -22,7 +23,8 @@ export const ProductWizardContent = () => {
     setActiveStep,
     setStepClicked,
   } = useWizardStore();
-  const { general, specifications, description, images } = useProductStore();
+  const { general, specifications, description, images, reset } = useProductStore();
+  const {reset: resetWizard} = useWizardStore();
   const formRef = useRef<{ submit: () => boolean | string }>(null);
  
   const router = useRouter();
@@ -46,7 +48,7 @@ export const ProductWizardContent = () => {
       const response = await axios.post("/api/products", formData);
       sonnerNotificationAdapter.success("Producto creado con éxito");
       // redireccionar
-      // router.push(`/admin/products`);
+      router.push(`/admin/products`);
       setActiveStep(0);
     } catch (error) {
       console.error("Error al enviar el formulario", error);
@@ -110,6 +112,11 @@ export const ProductWizardContent = () => {
     };
     validateStep();
   }, [stepClicked]);
+
+  useEffect(() => {
+ resetWizard();
+ reset();
+  }, [])
   return (
     <div>
       {renderStep()}

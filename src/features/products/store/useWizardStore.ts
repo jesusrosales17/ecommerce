@@ -13,7 +13,7 @@ export const useWizardStore = create<WizardStore>()((set, get) => (
         },
         setActiveStep: (step) => {
             set({
-                activeStep: step,
+                activeStep: step as number ,
             });
         },
         nextStep: () => {
@@ -41,6 +41,13 @@ export const useWizardStore = create<WizardStore>()((set, get) => (
         setProgressWidth: (width) => {
             set({
                 progressWidth: width,
+            });
+        },
+        reset: () => {
+            set({
+                activeStep: 0,
+                stepClicked: null,
+                progressWidth: "0%",
             });
         },
     }
