@@ -9,6 +9,7 @@ export interface Images {
   preview: string;
 };
 export interface ProductStore {
+  
   general: {
       name: string;
     stock: number;

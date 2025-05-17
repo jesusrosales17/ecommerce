@@ -7,19 +7,69 @@ import { ProductGeneralForm } from "./ProductGeneralForm";
 import { ProductImagesForm } from "./ProductImagesForm";
 import { ProductSpecificationsForm } from "./ProductSpecificationsForm";
 import { useEffect, useRef } from "react";
+import { useProductStore } from "../store/useProductStore";
+import axios from "axios";
+import { sonnerNotificationAdapter } from "@/libs/adapters/sonnerAdapter";
+import { useRouter } from "next/navigation";
 
 export const ProductWizardContent = () => {
-  const { activeStep, nextStep, prevStep, steps, stepClicked , setActiveStep, setStepClicked} = useWizardStore();
-
+  const {
+    activeStep,
+    nextStep,
+    prevStep,
+    steps,
+    stepClicked,
+    setActiveStep,
+    setStepClicked,
+  } = useWizardStore();
+  const { general, specifications, description, images } = useProductStore();
   const formRef = useRef<{ submit: () => boolean | string }>(null);
+ 
+  const router = useRouter();
+  const handleSubmit = async () => {
+    const data = {
+      general,
+      specifications,
+      description,
+      images,
+    };
+    const formData = new FormData();
+    formData.append("general", JSON.stringify(data.general));
+    formData.append("specifications", JSON.stringify(data.specifications));
+    formData.append("description", data.description);
+    data.images.forEach((image, index) => {
+      if (image.file) {
+        formData.append(`images[${index}]`, image.file);
+      }
+    });
+    try {
+      const response = await axios.post("/api/products", formData);
+      sonnerNotificationAdapter.success("Producto creado con éxito");
+      // redireccionar
+      // router.push(`/admin/products`);
+      setActiveStep(0);
+    } catch (error) {
+      console.error("Error al enviar el formulario", error);
+      if (axios.isAxiosError(error)) {
+        console.error("Error de Axios:", error.response?.data);
+        sonnerNotificationAdapter.error(
+          error.response?.data.error || "Error al crear el producto"
+        );
+        return;
+      }
+
+      sonnerNotificationAdapter.error("Error al crear el producto");
+    }
+  };
 
   const handleNextStep = async () => {
     if (formRef.current) {
       try {
         const isValid = await formRef.current?.submit();
-        console.log(isValid)
         if (!!isValid) nextStep();
-
+        if (activeStep === steps.length - 1) {
+          handleSubmit();
+        }
       } catch (error) {
         console.error("Error al enviar el formulario", error);
         return;
@@ -43,21 +93,23 @@ export const ProductWizardContent = () => {
   };
 
   useEffect(() => {
-    if (stepClicked === null) return;
+    const validateStep = async () => {
+      if (stepClicked === null) return;
 
-    console.log("step clicked", stepClicked, "active step", activeStep);
-    if(stepClicked < activeStep ) {
-      setStepClicked(null);
-      setActiveStep(stepClicked);
-      return;
-    }
+      if (stepClicked < activeStep) {
+        setStepClicked(null);
+        setActiveStep(stepClicked);
+        return;
+      }
 
-      const isValid = formRef.current?.submit();
-      if(!!isValid) {
+      const isValid = await formRef.current?.submit();
+      if (!!isValid) {
         setActiveStep(stepClicked);
       }
       setStepClicked(null);
-  }, [stepClicked])
+    };
+    validateStep();
+  }, [stepClicked]);
   return (
     <div>
       {renderStep()}
