@@ -44,14 +44,19 @@ export const ProductWizardContent = () => {
 
   useEffect(() => {
     if (stepClicked === null) return;
-   
 
-    setTimeout(() => {
+    console.log("step clicked", stepClicked, "active step", activeStep);
+    if(stepClicked < activeStep ) {
+      setStepClicked(null);
+      setActiveStep(stepClicked);
+      return;
+    }
+
       const isValid = formRef.current?.submit();
       if(!!isValid) {
         setActiveStep(stepClicked);
       }
-    }, 0);
+      setStepClicked(null);
   }, [stepClicked])
   return (
     <div>

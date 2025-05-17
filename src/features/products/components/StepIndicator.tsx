@@ -2,6 +2,7 @@ import { cn } from "@/libs/utils";
 import  { useEffect } from "react";
 import { useWizardStore } from "../store/useWizardStore";
 import { Check } from "lucide-react";
+import { set } from "zod";
 
 interface Props {
   initialSteps?: { id: string; label: string }[];
@@ -17,7 +18,7 @@ export const StepIndicator = ({ initialSteps = [], className }: Props) => {
   }, [])
 
   const handleStepClick = (index: number) => {
-    setStepClicked(index)
+    setStepClicked(index);
   }
 
   return (

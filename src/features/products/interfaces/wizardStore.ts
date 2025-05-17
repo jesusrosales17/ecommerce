@@ -3,7 +3,7 @@ import { WizardStep } from "./step";
 export interface WizardStore {
     steps: WizardStep[];
     activeStep: number;
-    setActiveStep: (step: number) => void;
+    setActiveStep: (step: number | null) => void;
     nextStep: () => void;
     prevStep: () => void;
     setSteps: (steps: WizardStep[]) => void;
