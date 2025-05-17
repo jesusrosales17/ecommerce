@@ -32,4 +32,7 @@ export const  productGeneralSchema = z.object({
 }) 
 
 
+
+// unir el productGeneralSchema con el productImagesSchema
+
 export type ProductGeneralSchemaType = z.infer<typeof productGeneralSchema>;

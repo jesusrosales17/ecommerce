@@ -4,48 +4,53 @@ import {
   productGeneralSchema,
   ProductGeneralSchemaType,
 } from "../schemas/ProductSchema";
-import { Form, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
-import { forwardRef,  useImperativeHandle } from "react";
+import { forwardRef, useImperativeHandle } from "react";
+import { useProductStore } from "../store/useProductStore";
 
-
-export const ProductGeneralForm = forwardRef ((_, ref) => {
+export const ProductGeneralForm = forwardRef((_, ref) => {
+  const { setGeneral, general } = useProductStore();
   const form = useForm<ProductGeneralSchemaType>({
     resolver: zodResolver(productGeneralSchema),
     defaultValues: {
-      name: "",
-      price: 0,
-      stock: 0,
-      isOnSale: false,
-      salePrice: undefined,
-      isFeatured: false,
-      status: "ACTIVE",
+      name: general.name || "",
+      price: general.price || 0,
+      stock: general.stock || 0,
+      isOnSale: general.isOnSale || false,
+      salePrice: general.salePrice || undefined,
+      isFeatured: general.isFeatured || false,
+      status: general.status || "ACTIVE",
     },
   });
-
-  const onSubmit= async ( data: ProductGeneralSchemaType) => {
-    console.log("data", data);
-  };
 
   useImperativeHandle(ref, () => ({
     submit: async () => {
       const isValid = await form.trigger();
-      console.log(isValid)
+
       if (isValid) {
-        onSubmit(form.getValues());
+        const data = form.getValues();
+        setGeneral(data);
       }
 
       return isValid;
     },
-  }))
+  }));
   return (
     <>
       <h2 className="text-lg font-bold mb-4">
         Informacion general del producto
       </h2>
       <Form {...form}>
-        <form  className="space-y-4">
+        <form className="space-y-4">
           <FormField
             control={form.control}
             name="name"
@@ -67,7 +72,12 @@ export const ProductGeneralForm = forwardRef ((_, ref) => {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Precio</FormLabel>
-                <Input type="number" placeholder="Ej. 1000" {...field} onChange={(e) => field.onChange(e.target.valueAsNumber)} />
+                <Input
+                  type="number"
+                  placeholder="Ej. 1000"
+                  {...field}
+                  onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                />
                 <FormDescription>
                   Precio del producto que se mostrara en la tienda
                 </FormDescription>
@@ -82,7 +92,12 @@ export const ProductGeneralForm = forwardRef ((_, ref) => {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Stock</FormLabel>
-                <Input type="number" placeholder="Ej. 10" onChange={(e) => field.onChange(e.target.valueAsNumber)} />
+                <Input
+                  type="number"
+                  placeholder="Ej. 10"
+                  {...field}
+                  onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                />
                 <FormDescription>
                   Stock del producto que se mostrara en la tienda
                 </FormDescription>
@@ -90,13 +105,13 @@ export const ProductGeneralForm = forwardRef ((_, ref) => {
               </FormItem>
             )}
           />
-          <FormField 
+          <FormField
             control={form.control}
             name="isOnSale"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>¿Está en oferta?</FormLabel>
-                <Switch 
+                <Switch
                   id="isOnSale"
                   checked={field.value}
                   onCheckedChange={field.onChange}
@@ -109,28 +124,27 @@ export const ProductGeneralForm = forwardRef ((_, ref) => {
             )}
           />
 
-          
-            {
-              form.watch("isOnSale") && (
- <FormField
-                control={form.control}
-                name="salePrice"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Precio de oferta</FormLabel>
-                    <Input type="number" placeholder="Ej. 800" onChange={(e) => field.onChange(e.target.valueAsNumber)} value={field.value} />
-                    <FormDescription>
-                      Precio de oferta del producto que se mostrara en la tienda
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              )
-            } 
-            
-          
-
+          {form.watch("isOnSale") && (
+            <FormField
+              control={form.control}
+              name="salePrice"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Precio de oferta</FormLabel>
+                  <Input
+                    type="number"
+                    placeholder="Ej. 800"
+                    onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                    value={field.value}
+                  />
+                  <FormDescription>
+                    Precio de oferta del producto que se mostrara en la tienda
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          )}
 
           <FormField
             control={form.control}
@@ -138,7 +152,7 @@ export const ProductGeneralForm = forwardRef ((_, ref) => {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>¿Es destacado?</FormLabel>
-                <Switch 
+                <Switch
                   id="isFeatured"
                   checked={field.value}
                   onCheckedChange={field.onChange}

@@ -4,7 +4,7 @@ import { WizardStore } from "../interfaces/wizardStore";
 export const useWizardStore = create<WizardStore>()((set, get) => (
     {
         steps: [],
-        activeStep: 3,
+        activeStep: 0,
         stepClicked: null,
         setStepClicked: (index) => {
             set({

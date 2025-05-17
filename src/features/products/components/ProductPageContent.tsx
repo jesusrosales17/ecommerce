@@ -1,6 +1,6 @@
 import React from "react";
 import { StepIndicator } from "./StepIndicator";
-import { WizardContent } from "./WizardContent";
+import { ProductWizardContent } from "./ProductWizardContent";
 
 const ProductPageContent = () => {
     
@@ -16,7 +16,7 @@ const ProductPageContent = () => {
         ]}
       />
 
-      <WizardContent />
+      <ProductWizardContent />
     </>
   );
 };

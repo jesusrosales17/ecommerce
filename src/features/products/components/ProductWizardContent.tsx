@@ -7,9 +7,8 @@ import { ProductGeneralForm } from "./ProductGeneralForm";
 import { ProductImagesForm } from "./ProductImagesForm";
 import { ProductSpecificationsForm } from "./ProductSpecificationsForm";
 import { useEffect, useRef } from "react";
-import { set } from "zod";
 
-export const WizardContent = () => {
+export const ProductWizardContent = () => {
   const { activeStep, nextStep, prevStep, steps, stepClicked , setActiveStep, setStepClicked} = useWizardStore();
 
   const formRef = useRef<{ submit: () => boolean | string }>(null);
@@ -18,6 +17,7 @@ export const WizardContent = () => {
     if (formRef.current) {
       try {
         const isValid = await formRef.current?.submit();
+        console.log(isValid)
         if (!!isValid) nextStep();
 
       } catch (error) {
@@ -44,11 +44,7 @@ export const WizardContent = () => {
 
   useEffect(() => {
     if (stepClicked === null) return;
-    // if(stepClicked < activeStep) {
-    //   setActiveStep(stepClicked);
-    //   setStepClicked(null);
-    //   return;
-    // };
+   
 
     setTimeout(() => {
       const isValid = formRef.current?.submit();

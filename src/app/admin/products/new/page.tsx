@@ -1,7 +1,5 @@
 "use client";
 import {   ChevronLeft } from "lucide-react";
-import { StepIndicator } from "@/features/products/components/StepIndicator";
-import { WizardContent } from "@/features/products/components/WizardContent";
 import Link from "next/link";
 import ProductPageContent from "@/features/products/components/ProductPageContent";
 
