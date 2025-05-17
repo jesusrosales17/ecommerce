@@ -77,6 +77,8 @@ import "@/components/tiptap-templates/simple/simple-editor.scss"
 
 import content from "@/components/tiptap-templates/simple/data/content.json"
 import { sonnerNotificationAdapter } from "@/libs/adapters/sonnerAdapter"
+import { useProductStore } from "@/features/products/store/useProductStore"
+import { set } from "zod"
 
 const MainToolbarContent = ({
   onHighlighterClick,
@@ -181,6 +183,8 @@ const MobileToolbarContent = ({
 
 export const SimpleEditor = React.forwardRef<{submit: () => string | boolean}>(
   (_, ref) => {
+
+  const { setDescription, description } = useProductStore();
   const isMobile = useIsMobile()
   const windowSize = useWindowSize()
   const [mobileView, setMobileView] = React.useState<
@@ -221,7 +225,7 @@ export const SimpleEditor = React.forwardRef<{submit: () => string | boolean}>(
       TrailingNode,
       Link.configure({ openOnClick: false }),
     ],
-    content: "",
+    content: description || "",
   })
 
   React.useImperativeHandle(ref, () => ({
@@ -236,6 +240,7 @@ export const SimpleEditor = React.forwardRef<{submit: () => string | boolean}>(
           )
           return false
         }
+        setDescription(html)
         return html
       }
       return ""
