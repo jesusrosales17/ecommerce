@@ -41,7 +41,7 @@ const [res, resCategories] = await Promise.all([
 
   return (
     <>
-    <div className="flex md:justify-between gap-4 md:items-center mb-5 flex-col md:flex-row">
+    <div className="flex  items-center md:justify-between gap-4 md:items-center mb-5 flex-col md:flex-row">
       <div>
         <h1 className="text-xl">Productos</h1>
         <p className="text-sm text-gray-500">

@@ -16,9 +16,13 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { forwardRef, useImperativeHandle } from "react";
 import { useProductStore } from "../store/useProductStore";
+import { useCategoryStore } from "@/features/categories/store/useCategoryStore";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectGroup, SelectItem } from "@/components/ui/select";
+import { useEffect } from "react";
 
 export const ProductGeneralForm = forwardRef((_, ref) => {
   const { setGeneral, general } = useProductStore();
+  const { categories} = useCategoryStore();
   const form = useForm<ProductGeneralSchemaType>({
     resolver: zodResolver(productGeneralSchema),
     defaultValues: {
@@ -29,6 +33,7 @@ export const ProductGeneralForm = forwardRef((_, ref) => {
       salePrice: general.salePrice || undefined,
       isFeatured: general.isFeatured || false,
       status: general.status || "ACTIVE",
+      categoryId: general.categoryId || "",
     },
   });
 
@@ -44,6 +49,9 @@ export const ProductGeneralForm = forwardRef((_, ref) => {
       return isValid;
     },
   }));
+
+
+
   return (
     <>
       <h2 className="text-lg font-bold mb-4">
@@ -100,6 +108,48 @@ export const ProductGeneralForm = forwardRef((_, ref) => {
                 />
                 <FormDescription>
                   Stock del producto que se mostrara en la tienda
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="categoryId"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Categoria</FormLabel>
+                <Select
+                  defaultValue={field.value}
+                  value={field.value}
+                  onValueChange={field.onChange}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecciona una categoria" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {/* sin categoria */}
+                    <SelectItem value="undefined">Sin categoria</SelectItem>
+                    
+                    {
+                      categories.length > 0 ? (
+                        <SelectGroup>
+                          {categories.map((category) => (
+                            <SelectItem key={category.id} value={category.id}>
+                              {category.name}
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                      ) : (
+                        <SelectItem value="undefined">
+                          No hay categorias
+                        </SelectItem>
+                      )
+                    }
+                  </SelectContent>
+                </Select>
+                <FormDescription>
+                  Categoria del producto que se mostrara en la tienda
                 </FormDescription>
                 <FormMessage />
               </FormItem>

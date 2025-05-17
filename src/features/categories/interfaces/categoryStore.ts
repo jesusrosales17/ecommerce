@@ -16,4 +16,6 @@ export interface CategoryStore  {
     // info drawer
     isOpenInfoDrawer: boolean;
     setIsOpenInfoDrawer: (isOpen: boolean) => void;
+
+    categoriesFetch: () => Promise<void>;
 }

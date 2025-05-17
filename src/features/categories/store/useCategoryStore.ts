@@ -51,5 +51,14 @@ export const useCategoryStore = create<CategoryStore>()((set, get) => ({
             categoryToShow: null,
         })
     },
-
+    categoriesFetch: async () => {
+        const res = await fetch(`/api/categories`, {
+            method: 'GET',
+            cache: 'no-store',
+        });
+        const data = await res.json();
+        set({
+            categories: data,
+        })
+    },
 }))

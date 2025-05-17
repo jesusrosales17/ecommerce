@@ -4,8 +4,6 @@ import prisma from '@/libs/prisma';
 import { requireAuth } from '@/libs/auth/auth';
 import { productFormSchema } from '@/features/products/schemas/productFormSchema';
 import { processMultipleImages } from '@/libs/media/image-handler';
-import { extractSpecificationsFromFormData } from '@/features/products/schemas/productSpecificationSchema';
-import { rename } from 'fs';
 
 export async function POST(request: Request) { 
   try {

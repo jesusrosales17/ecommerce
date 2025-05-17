@@ -21,6 +21,7 @@ export const  productGeneralSchema = z.object({
     status: z.enum(["ACTIVE", "INACTIVE", "DELETED"], {
         errorMap: () => ({ message: "El estado no es valido" }),
     }),
+    categoryId: z.string().optional(),
 }).superRefine((data, ctx) => {
     if(data.isOnSale && data.salePrice === undefined) {
         ctx.addIssue({

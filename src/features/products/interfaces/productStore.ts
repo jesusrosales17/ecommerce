@@ -18,6 +18,7 @@ export interface ProductStore {
     isOnSale?: boolean | undefined;
     salePrice?: number | undefined;
     isFeatured?: boolean | undefined;
+    categoryId?: string | undefined;
   };
   specifications: Specification[];
   description: string;

@@ -11,6 +11,7 @@ import { useProductStore } from "../store/useProductStore";
 import axios from "axios";
 import { sonnerNotificationAdapter } from "@/libs/adapters/sonnerAdapter";
 import { useRouter } from "next/navigation";
+import { useCategoryStore } from "@/features/categories/store/useCategoryStore";
 
 export const ProductWizardContent = () => {
   const {
@@ -22,10 +23,12 @@ export const ProductWizardContent = () => {
     setActiveStep,
     setStepClicked,
   } = useWizardStore();
-  const { general, specifications, description, images, reset } = useProductStore();
-  const {reset: resetWizard} = useWizardStore();
+  const { general, specifications, description, images, reset } =
+    useProductStore();
+  const { reset: resetWizard } = useWizardStore();
+  const { setCategories, categories, categoriesFetch } = useCategoryStore();
   const formRef = useRef<{ submit: () => boolean | string }>(null);
- 
+
   const router = useRouter();
   const handleSubmit = async () => {
     const data = {
@@ -113,9 +116,11 @@ export const ProductWizardContent = () => {
   }, [stepClicked]);
 
   useEffect(() => {
- resetWizard();
- reset();
-  }, [])
+    resetWizard();
+    reset();
+
+    categoriesFetch();
+  }, []);
   return (
     <div>
       {renderStep()}
