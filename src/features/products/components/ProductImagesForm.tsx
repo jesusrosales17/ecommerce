@@ -65,6 +65,13 @@ export const ProductImagesForm = forwardRef<{ submit: () => boolean | string }>(
         },
       ]);
       }
+      if (images.length < 5) {
+        const newImages = [...images];
+        for (let i = images.length; i < 5; i++) {
+          newImages.push({ file: null, preview: "" });
+        }
+        setImages(newImages);
+      }
     }, []);
     return (
       <>
