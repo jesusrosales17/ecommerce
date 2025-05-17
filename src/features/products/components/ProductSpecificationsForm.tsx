@@ -2,42 +2,30 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { sonnerNotificationAdapter } from "@/libs/adapters/sonnerAdapter";
 import { forwardRef, useImperativeHandle, useState } from "react";
-import { Form } from "react-hook-form";
+import { useProductStore } from "../store/useProductStore";
 
 export const ProductSpecificationsForm = forwardRef<{submit: () => string | boolean}>((_, ref) => {
-  const [specifications, setSpecifications] = useState<{
-    label: string;
-    value: string;
-  }[]>([
-    {
-      label: "",
-      value: "",
-    },
-    
-  ]);
-
+  const {specifications, setSpecifications} = useProductStore();
+ 
   const handleAddSpecifications = () => {
-    setSpecifications((prev) => [
-      ...prev,
-      {
-        label: "",
-        value: "",
-      },
-    ]);
+    const newSpecifications = [...specifications, { label: "", value: "" }];
+    setSpecifications(newSpecifications);
   };
 
   useImperativeHandle(ref, () => ({
     submit: () => {
-      const isValid = specifications.every((specification) => {
-        return specification.label !== "" && specification.value !== "";
-      });
+      const hasEmptyFields = specifications.some(
+        (specification) => specification.label.trim() === "" || specification.value.trim() === ""
+      );
+      const isValid = !hasEmptyFields && specifications.length > 0;
 
+     console.log(hasEmptyFields); 
       if (!isValid) {
         sonnerNotificationAdapter.error(
           "No debe haber campos vacios en las especificaciones");
           return false;
       }
-
+      setSpecifications(specifications);
       return true;
     },
   }))

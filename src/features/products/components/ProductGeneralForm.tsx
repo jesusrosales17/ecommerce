@@ -38,7 +38,6 @@ export const ProductGeneralForm = forwardRef((_, ref) => {
 
       if (isValid) {
         const data = form.getValues();
-        console.log('submit')
         setGeneral(data);
       }
 

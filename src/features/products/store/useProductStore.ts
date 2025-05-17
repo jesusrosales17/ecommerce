@@ -11,7 +11,7 @@ export const useProductStore = create<ProductStore>((set) => ({
     isFeatured: false,
     status: "ACTIVE",
   },
-  specifications: [],
+  specifications: [ { label: "", value: "" }],
   description: "",
   images: [],
   setGeneral: (data: ProductStore['general']) => set({ general: data }),
