@@ -9,4 +9,6 @@ export interface WizardStore {
     setSteps: (steps: WizardStep[]) => void;
     progressWidth: string;
     setProgressWidth: (width: string) => void;
+    stepClicked: number | null;
+    setStepClicked: (index: number | null) => void;
 }

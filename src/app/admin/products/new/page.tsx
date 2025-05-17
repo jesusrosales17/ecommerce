@@ -1,14 +1,9 @@
 "use client";
-import React, { useState } from "react";
-import { ChevronRight, Check, ChevronLeft } from "lucide-react";
-import { cn } from "@/libs/utils";
-import { Form, FormLabel } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import {   ChevronLeft } from "lucide-react";
 import { StepIndicator } from "@/features/products/components/StepIndicator";
-import { Separator } from "@/components/ui/separator";
 import { WizardContent } from "@/features/products/components/WizardContent";
-import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import ProductPageContent from "@/features/products/components/ProductPageContent";
 
 // export const metadata = {
 //   title: "Nuevo Producto",
@@ -33,17 +28,7 @@ const NewProductPage = () => {
             Completa el siguiente formulario para registrar un nuevo producto
           </p>
         </div> */}
-        <StepIndicator
-          className="my-4"
-          initialSteps={[
-            { id: "genetal", label: "General" },
-            { id: "specifications", label: "Especificaciones" },
-            { id: "description", label: "Descripcion" },
-            { id: "images", label: "Imagenes" },
-          ]}
-        />
-
-        <WizardContent />
+      <ProductPageContent /> 
       </div>
     </div>
   );

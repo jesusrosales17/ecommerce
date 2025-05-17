@@ -5,6 +5,12 @@ export const useWizardStore = create<WizardStore>()((set, get) => (
     {
         steps: [],
         activeStep: 3,
+        stepClicked: null,
+        setStepClicked: (index) => {
+            set({
+                stepClicked: index,
+            });
+        },
         setActiveStep: (step) => {
             set({
                 activeStep: step,

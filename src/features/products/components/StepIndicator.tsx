@@ -1,26 +1,30 @@
 import { cn } from "@/libs/utils";
-import React, { useEffect } from "react";
+import  { useEffect } from "react";
 import { useWizardStore } from "../store/useWizardStore";
 import { Check } from "lucide-react";
 
 interface Props {
   initialSteps?: { id: string; label: string }[];
   className?: string; 
+  onStepClick?: (index: number) => void;
 }
 
-export const StepIndicator = ({initialSteps = [], className}: Props) => {
-  const { activeStep, progressWidth, setSteps, steps } = useWizardStore();
+export const StepIndicator = ({ initialSteps = [], className }: Props) => {
+  const { activeStep, progressWidth, setSteps, steps, setStepClicked } = useWizardStore();
 
   useEffect(() => {
     setSteps(initialSteps);
   }, [])
 
+  const handleStepClick = (index: number) => {
+    setStepClicked(index)
+  }
 
   return (
     <div className={cn( className)}>
       <div className="flex items-center justify-between">
         {steps.map((step, index) => (
-          <div key={step.id} className="flex flex-col items-center">
+          <div key={step.id} className="flex flex-col items-center" onClick={() => handleStepClick(index)}>
             <div
               className={cn(
                 "flex items-center justify-center w-8 h-8 rounded-full border-2 mb-2 text-base",
