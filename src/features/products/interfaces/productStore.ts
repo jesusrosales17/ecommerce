@@ -4,6 +4,10 @@ export interface Specification  {
   value: string;
 };
 
+export interface Images {
+  file: File | null;
+  preview: string;
+};
 export interface ProductStore {
   general: {
       name: string;
@@ -16,11 +20,11 @@ export interface ProductStore {
   };
   specifications: Specification[];
   description: string;
-  images: File[];
+  images: Images[];
   setGeneral: (data: ProductStore["general"]) => void;
   setSpecifications: (data: Specification[]) => void;
   setDescription: (desc: string) => void;
-  setImages: (files: File[]) => void;
+  setImages: (files: Images[]) => void;
   reset: () => void;
 };
 
