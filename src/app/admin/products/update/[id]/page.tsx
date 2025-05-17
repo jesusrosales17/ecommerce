@@ -12,7 +12,7 @@ const ProductUpdatePage = async ({ params }: Params) => {
   const { id } = await params;
 
   // optener el producto por id
-  const product = await fetch(`${process.env.PUBLIC_URL}/api/products/${id}`, {
+  const product = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/products/${id}`, {
     method: "GET",
     cache: "no-store",
   });

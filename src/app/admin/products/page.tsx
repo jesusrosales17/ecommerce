@@ -13,8 +13,8 @@ const ProductPage = async () => {
   // optener productos y categorias al mismo tiempo
 
 const [res, resCategories] = await Promise.all([
-  fetch(`${process.env.PUBLIC_URL}/api/products`, { method: "GET", cache: "no-store" }),
-  fetch(`${process.env.PUBLIC_URL}/api/categories`, { method: "GET", cache: "no-store" }),
+  fetch(`${process.env.NEXT_PUBLIC_URL}/api/products`, { method: "GET", cache: "no-store" }),
+  fetch(`${process.env.NEXT_PUBLIC_URL}/api/categories`, { method: "GET", cache: "no-store" }),
 ]);
  
 

@@ -22,7 +22,6 @@ import { useEffect} from "react";
 export const ProductGeneralForm = forwardRef((_, ref) => {
   const { setGeneral, general } = useProductStore();
   const { categories} = useCategoryStore();
-  console.log(general)
   const form = useForm<ProductGeneralSchemaType>({
     resolver: zodResolver(productGeneralSchema),
     defaultValues: {

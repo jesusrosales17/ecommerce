@@ -52,7 +52,7 @@ export const useCategoryStore = create<CategoryStore>()((set, get) => ({
         })
     },
     categoriesFetch: async () => {
-        const res = await fetch(`/api/categories`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/categories`, {
             method: 'GET',
             cache: 'no-store',
         });

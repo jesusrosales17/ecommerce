@@ -31,6 +31,7 @@ export const ProductUpdatePageContent = ({ productData }: Props) => {
       preview: `${process.env.UPLOADS_PATH}/products/${image.name}`,
     })));
   }, []);
+  console.log("carpeta", process.env.UPLOADS_PATH)
 
   return (
     <>

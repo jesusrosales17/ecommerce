@@ -36,7 +36,7 @@ export const useCategoryForm = () => {
         sonnerNotificationAdapter.success(response.data.message);
         return;
       }
-      const response = await axios.post("/api/categories", {
+      const response = await axios.post(`/api/categories`, {
         name: data.name,
         description: data.description,
         status: data.status,

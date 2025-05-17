@@ -7,15 +7,15 @@ import { processMultipleImages, deleteImage } from '@/libs/media/image-handler';
 import { extractSpecificationsFromFormData } from '@/features/products/schemas/productSpecificationSchema';
 
 interface Params {
-  params: {
+  params: Promise<{
     id: string;
-  }
+  }> 
 }
 
 // Obtener un producto por ID
 export async function GET(request: NextRequest, { params }: Params) {
   try {
-    const { id } = params;
+    const { id } = await params;
     
     const product = await prisma.product.findUnique({
       where: {
@@ -60,8 +60,8 @@ export async function PUT(request: Request, { params }: Params) {
       return auth.response;
     }
 
-    const { id } = params;
-    
+    const { id } = await params;
+
     // Verificar si el producto existe
     const existingProduct = await prisma.product.findUnique({
       where: {
@@ -226,8 +226,8 @@ export async function DELETE(request: Request, { params }: Params) {
       return auth.response;
     }
 
-    const { id } = params;
-    
+    const { id } = await params;
+
     // Verificar si el producto existe
     const product = await prisma.product.findUnique({
       where: {
