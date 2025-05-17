@@ -1,8 +1,8 @@
+'use client'
 import { cn } from "@/libs/utils";
 import  { useEffect } from "react";
 import { useWizardStore } from "../store/useWizardStore";
 import { Check } from "lucide-react";
-import { set } from "zod";
 
 interface Props {
   initialSteps?: { id: string; label: string }[];

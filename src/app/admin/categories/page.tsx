@@ -22,7 +22,6 @@ const CategoryPage = async () => {
   }
 
   const categories = await res.json();
-  console.log(categories);
   return (
     <>
       <CategoryPageContent initialCategories={categories} />

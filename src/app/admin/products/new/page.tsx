@@ -1,14 +1,12 @@
-"use client";
 import {   ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import ProductPageContent from "@/features/products/components/ProductPageContent";
 
-// export const metadata = {
-//   title: "Nuevo Producto",
-//   description: "Crea un nuevo producto",
-// }
-
-const NewProductPage = () => {
+export const metadata = {
+  title: "Nuevo Producto",
+  description: "Crea un nuevo producto",
+}
+const NewProductPage = async () => {
   return (
     <div className="w-full">
       <div className=" ">
@@ -20,12 +18,7 @@ const NewProductPage = () => {
               Regresar
             </Link>
         </div>
-        {/* <div className="flex-1">
-          <h1 className="text-xl">Registrar nuevo producto</h1>
-          <p className="text-sm">
-            Completa el siguiente formulario para registrar un nuevo producto
-          </p>
-        </div> */}
+     
       <ProductPageContent /> 
       </div>
     </div>

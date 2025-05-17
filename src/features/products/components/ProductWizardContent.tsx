@@ -11,7 +11,6 @@ import { useProductStore } from "../store/useProductStore";
 import axios from "axios";
 import { sonnerNotificationAdapter } from "@/libs/adapters/sonnerAdapter";
 import { useRouter } from "next/navigation";
-import { set } from "zod";
 
 export const ProductWizardContent = () => {
   const {
