@@ -1,9 +1,14 @@
-import React from "react";
+'use client'
 import { StepIndicator } from "./StepIndicator";
 import { ProductWizardContent } from "./ProductWizardContent";
+import { useProductStore } from "../store/useProductStore";
+import { useEffect } from "react";
 
 const ProductPageContent = () => {
-    
+  const {reset} = useProductStore();
+  useEffect(() => {
+    reset();
+  }, [reset]);
   return (
     <>
       <StepIndicator

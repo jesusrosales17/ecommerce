@@ -3,6 +3,7 @@ import { ProductStore, Specification } from "../interfaces/productStore";
 
 export const useProductStore = create<ProductStore>((set) => ({
   general: {
+    id: "",
     name: "",
     price: 0,
     stock: 0,
@@ -21,6 +22,7 @@ export const useProductStore = create<ProductStore>((set) => ({
   reset: () =>
     set({
       general: {
+        id: "",
         name: "",
         price: 0,
         stock: 0,

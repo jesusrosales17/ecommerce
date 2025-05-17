@@ -18,22 +18,22 @@ import { forwardRef, useImperativeHandle } from "react";
 import { useProductStore } from "../store/useProductStore";
 import { useCategoryStore } from "@/features/categories/store/useCategoryStore";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectGroup, SelectItem } from "@/components/ui/select";
-import { useEffect } from "react";
-
+import { useEffect} from "react";
 export const ProductGeneralForm = forwardRef((_, ref) => {
   const { setGeneral, general } = useProductStore();
   const { categories} = useCategoryStore();
+  console.log(general)
   const form = useForm<ProductGeneralSchemaType>({
     resolver: zodResolver(productGeneralSchema),
     defaultValues: {
-      name: general.name || "",
-      price: general.price || 0,
-      stock: general.stock || 0,
-      isOnSale: general.isOnSale || false,
-      salePrice: general.salePrice || undefined,
-      isFeatured: general.isFeatured || false,
-      status: general.status || "ACTIVE",
-      categoryId: general.categoryId || "",
+      name: general?.name || "",
+      price: general?.price || 0,
+      stock: general?.stock || 0,
+      isOnSale: general?.isOnSale || false,
+      salePrice: general?.salePrice || undefined,
+      isFeatured: general?.isFeatured || false,
+      status: general?.status || "ACTIVE",
+      categoryId: general?.categoryId || "",
     },
   });
 
@@ -50,6 +50,18 @@ export const ProductGeneralForm = forwardRef((_, ref) => {
     },
   }));
 
+  useEffect(() => {
+    form.reset({
+      name: general?.name || "",
+      price: general?.price || 0,
+      stock: general?.stock || 0,
+      isOnSale: general?.isOnSale || false,
+      salePrice: general?.salePrice || undefined,
+      isFeatured: general?.isFeatured || false,
+      status: general?.status || "ACTIVE",
+      categoryId: general?.categoryId || "",
+    });
+  }, [general]);
 
 
   return (
@@ -134,14 +146,15 @@ export const ProductGeneralForm = forwardRef((_, ref) => {
                     {
                       categories.length > 0 ? (
                         <SelectGroup>
-                          {categories.map((category) => (
-                            <SelectItem key={category.id} value={category.id}>
+                          {categories.map((category, index) => (
+                            console.log(category),
+                            <SelectItem key={category.id ?? `fallback-${index}`} value={category.id}>
                               {category.name}
                             </SelectItem>
                           ))}
                         </SelectGroup>
                       ) : (
-                        <SelectItem value="undefined">
+                        <SelectItem value="undefinedk">
                           No hay categorias
                         </SelectItem>
                       )

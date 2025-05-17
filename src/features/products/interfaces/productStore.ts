@@ -9,9 +9,9 @@ export interface Images {
   preview: string;
 };
 export interface ProductStore {
-  
   general: {
-      name: string;
+    id?: string,
+    name: string;
     stock: number;
     status: "ACTIVE" | "INACTIVE" | "DELETED";
     price?: number | undefined;

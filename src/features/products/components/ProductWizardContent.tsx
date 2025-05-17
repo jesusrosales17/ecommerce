@@ -26,7 +26,7 @@ export const ProductWizardContent = () => {
   const { general, specifications, description, images, reset } =
     useProductStore();
   const { reset: resetWizard } = useWizardStore();
-  const { setCategories, categories, categoriesFetch } = useCategoryStore();
+  const {  categoriesFetch } = useCategoryStore();
   const formRef = useRef<{ submit: () => boolean | string }>(null);
 
   const router = useRouter();
@@ -117,9 +117,8 @@ export const ProductWizardContent = () => {
 
   useEffect(() => {
     resetWizard();
-    reset();
-
     categoriesFetch();
+   
   }, []);
   return (
     <div>
