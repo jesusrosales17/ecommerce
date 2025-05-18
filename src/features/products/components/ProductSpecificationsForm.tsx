@@ -79,6 +79,7 @@ export const ProductSpecificationsForm = forwardRef<{submit: () => string | bool
               <Button
                 variant="outline"
                 className="w-8 h-8 p-0"
+                type="button"
                 onClick={() => {
                   const newSpecifications = [...specifications];
                   newSpecifications.splice(index, 1);

@@ -4,7 +4,7 @@ import prisma from '@/libs/prisma';
 import { requireAuth } from '@/libs/auth/auth';
 import { productFormSchema } from '@/features/products/schemas/productFormSchema';
 import { processMultipleImages, deleteImage } from '@/libs/media/image-handler';
-import { extractSpecificationsFromFormData } from '@/features/products/schemas/productSpecificationSchema';
+import { ProductSpecification } from '@prisma/client';
 
 interface Params {
   params: Promise<{
@@ -50,42 +50,31 @@ export async function GET(request: NextRequest, { params }: Params) {
   }
 }
 
-// Actualizar un producto
 export async function PUT(request: Request, { params }: Params) {
   try {
-    // Verificar autenticación
+    // 1. Autenticación
     const auth = await requireAuth();
-
-    if (!auth.isAutenticated) {
-      return auth.response;
-    }
+    if (!auth.isAutenticated) return auth.response;
 
     const { id } = await params;
 
-    // Verificar si el producto existe
+    // 2. Verificar existencia del producto
     const existingProduct = await prisma.product.findUnique({
-      where: {
-        id,
-      },
+      where: { id },
       include: {
         images: true,
         specifications: true,
-      }
+      },
     });
 
     if (!existingProduct) {
-      return NextResponse.json({
-        error: 'El producto no existe',
-      }, { status: 404 });
+      return NextResponse.json({ error: 'El producto no existe' }, { status: 404 });
     }
 
-    // Obtener los datos del formulario
+    // 3. Extraer y validar datos
     const formData = await request.formData();
+    const generalInformation = JSON.parse(formData.get('general')?.toString() || '{}');
 
-    const generalInformation = JSON.parse( formData.get('general')?.toString() || '{}');
-    
-    // return NextResponsle.json(formData);
-    // Validar los datos básicos del producto
     const validatedData = await productFormSchema.parseAsync({
       name: generalInformation.name,
       description: generalInformation.description,
@@ -98,54 +87,27 @@ export async function PUT(request: Request, { params }: Params) {
       categoryId: generalInformation.categoryId,
     });
 
-    // Verificar si hay imágenes a eliminar
-    const imagesToDeleteValue = formData.get('imagesToDelete');
-    const imagesToDelete = imagesToDeleteValue ? JSON.parse(imagesToDeleteValue.toString()) : [];
-    
-   
-    // Eliminar las imágenes marcadas para ser eliminadas
-    if (imagesToDelete.length > 0) {
-      // Eliminar de la base de datos
-      await prisma.productImage.deleteMany({
-        where: {
-          name: {
-            in: imagesToDelete
-          }
-        }
-      });
-      
-      // Eliminar archivos físicos - aquí asumimos que tenemos acceso al nombre del archivo
-      // Esto requeriría obtener los nombres de archivo antes de eliminar los registros
-      const filesToDelete = existingProduct.images
-        .filter(img => imagesToDelete.includes(img.name))
-        .map(img => img.name);
+    // 4. Preparar imágenes a eliminar
+    const imagesToDelete = JSON.parse(formData.get('imagesToDelete')?.toString() || '[]');
 
+    const filesToDelete = existingProduct.images
+      .filter(img => imagesToDelete.includes(img.name))
+      .map(img => img.name);
 
-      for (const fileName of filesToDelete) {
-        await deleteImage(fileName);
-      }
-    }
-    
-    console.log(formData)
-    // Procesar nuevas imágenes
+    // 5. Procesar nuevas imágenes
     const newImages = await processMultipleImages(formData, 'images', 'products');
-    
-    // Extraer especificaciones
-    const specifications = extractSpecificationsFromFormData(formData);
-    
-    // IDs de especificaciones a mantener
-    const specsToKeep = formData.getAll('keepSpecification').map(spec => spec.toString());
-    
-    // Actualizar el producto
+
+    // 6. Procesar especificaciones
+    const specifications = JSON.parse(formData.get('specifications')?.toString() || '[]');
+
+    // 7. Ejecutar transacción
     const updatedProduct = await prisma.$transaction(async (tx) => {
-      // 1. Actualizar producto principal
+      // 7.1 Actualizar producto principal
       const product = await tx.product.update({
-        where: {
-          id,
-        },
+        where: { id },
         data: {
           name: validatedData.name,
-          description: formData.get('description')?.toString(),
+          description: validatedData.description,
           price: validatedData.price,
           stock: validatedData.stock ?? existingProduct.stock,
           isOnSale: validatedData.isOnSale,
@@ -154,54 +116,46 @@ export async function PUT(request: Request, { params }: Params) {
           status: validatedData.status,
           categoryId: validatedData.categoryId,
         },
-        include: {
-          images: true,
-          specifications: true,
-        }
       });
 
-      // 2. Eliminar especificaciones que no se mantienen
-      if (specsToKeep.length > 0) {
-        await tx.productSpecification.deleteMany({
-          where: {
-            productId: id,
-            id: {
-              notIn: specsToKeep
-            }
-          }
-        });
-      } else {
-        // Si no hay specs para mantener, eliminar todas
-        await tx.productSpecification.deleteMany({
-          where: {
-            productId: id,
-          }
+      // 7.2 Eliminar imágenes (solo DB, archivos físicos fuera)
+      if (filesToDelete.length > 0) {
+        await tx.productImage.deleteMany({
+          where: { name: { in: filesToDelete } },
         });
       }
 
-      // 3. Crear nuevas especificaciones
-      if (specifications.length > 0) {
-        await tx.productSpecification.createMany({
-          data: specifications.map(spec => ({
-            name: spec.name,
-            value: spec.value,
-            productId: id,
-          }))
-        });
-      }
-
-      // 4. Crear nuevas imágenes
+      // 7.3 Crear nuevas imágenes
       if (newImages.length > 0) {
         await tx.productImage.createMany({
           data: newImages.map(img => ({
             name: img.name,
             productId: id,
-          }))
+          })),
         });
       }
 
+    
+
+      // 7.5 Crear nuevas especificaciones
+      await tx.productSpecification.deleteMany({
+        where: { productId: id },
+      });
+        await tx.productSpecification.createMany({
+          data: specifications.map((spec: { label: string; value: string }) => ({
+            name: spec.label,
+            value: spec.value,
+            productId: id,
+          })),
+        });
+
       return product;
     });
+
+    // 8. Eliminar archivos físicamente (fuera de transacción)
+    for (const fileName of filesToDelete) {
+      await deleteImage(fileName);
+    }
 
     return NextResponse.json({
       message: 'Producto actualizado correctamente',
@@ -209,19 +163,16 @@ export async function PUT(request: Request, { params }: Params) {
     }, { status: 200 });
 
   } catch (error) {
-    console.log(error)
+    console.error(error);
+
     if (error instanceof z.ZodError) {
-      return NextResponse.json({
-        error: error.issues[0].message,
-      }, { status: 400 });
+      return NextResponse.json({ error: error.issues[0].message }, { status: 400 });
     }
 
-
-    return NextResponse.json({
-      error: 'Error al actualizar el producto',
-    }, { status: 500 });
+    return NextResponse.json({ error: 'Error al actualizar el producto' }, { status: 500 });
   }
 }
+
 
 // Eliminar un producto (borrado lógico)
 export async function DELETE(request: Request, { params }: Params) {
