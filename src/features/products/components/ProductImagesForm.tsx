@@ -49,7 +49,10 @@ export const ProductImagesForm = forwardRef<{ submit: () => boolean | string }>(
           return false;
         }
 
-        // Verificar si hay imágenes eliminadas
+        const imagesDeleted = originalImages.filter((originalImage) => {
+          return !images.some(newImage => newImage.preview === originalImage.preview);
+        })
+        console.log("Imágenes eliminadas:", imagesDeleted);
         return false;
         setImages(images);
         return hasImages;
