@@ -115,14 +115,13 @@ export async function GET(request: NextRequest) {
       where.isFeatured = true;
     }
 
-    if (status !== 'ALL') {
-      where.status = status as ProductStatus;
-    }
+    // if (status !== 'ALL') {
+    //   where.status = status as ProductStatus;
+    // }
 
     // Obtener los productos con sus relaciones
     const products = await prisma.product.findMany({
       where,
-      // where,
       orderBy: {
         createdAt: 'desc',
       },

@@ -3,7 +3,7 @@ import { forwardRef, useEffect, useImperativeHandle, useMemo} from "react";
 import { ImagePlus, Trash2 } from "lucide-react";
 import { sonnerNotificationAdapter } from "@/libs/adapters/sonnerAdapter";
 import { useProductStore } from "../store/useProductStore";
-
+import Image from "next/image";
 
 export const ProductImagesForm = forwardRef<{ submit: () => boolean | string  }>(
   (_, ref) => {
@@ -114,7 +114,9 @@ export const ProductImagesForm = forwardRef<{ submit: () => boolean | string  }>
 
                   {image.preview ? (
                     <div className="relative aspect-square overflow-hidden rounded-md">
-                      <img
+                      <Image
+                        width={200}
+                        height={200}
                         src={image.preview}
                         alt={`Vista previa ${index + 1}`}
                         className="object-cover w-full h-full"
