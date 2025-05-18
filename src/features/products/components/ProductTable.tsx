@@ -22,6 +22,7 @@ import { SearchInput } from "@/components/ui/SearchInput";
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { formattedPrice } from '@/utils/price';
 
 interface Category {
   id: string;
@@ -37,12 +38,6 @@ const ProductTable = ({ products, categories }: Props) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
 
-  const formattedPrice = (price: string | number) => {
-    return Number(price).toLocaleString('es-MX', {
-      style: 'currency',
-      currency: 'MXN'
-    });
-  };
 
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {

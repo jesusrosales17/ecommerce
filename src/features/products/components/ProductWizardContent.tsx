@@ -91,7 +91,7 @@ export const ProductWizardContent = () => {
         sonnerNotificationAdapter.success("Producto actualizado con éxito");
       }
       // redireccionar
-      // router.push(`/admin/products`);
+      router.push(`/admin/products`);
       // setActiveStep(0);
     } catch (error) {
       console.error("Error al enviar el formulario", error);
