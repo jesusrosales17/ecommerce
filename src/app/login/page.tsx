@@ -1,5 +1,6 @@
 import { LoginForm } from "@/features/auth/components/LoginForm";
 import Image from "next/image";
+import Link from "next/link";
 import React from "react";
 
 const page = () => {
@@ -10,12 +11,12 @@ const page = () => {
       <div className="flex my-4 xl:my-3 flex-col h-full w-full px-4 sm:px-6 sm:w-5/6 md:w-5/6 2xl:w-4/6 mx-auto ">
         {/* Header fixed at top */}
         <header className="">
-          <p className="text-xl sm:text-2xl flex items-center font-medium">
-            <span className="text-white font-bold rounded-full px-2 sm:px-3 text-2xl sm:text-3xl bg-blue-900">
-              E
-            </span>
-            commerce
-          </p>
+          <Link href="/"  className="text-xl sm:text-2xl flex items-center font-medium">
+              <span className="text-white font-bold rounded-full px-2 sm:px-3 text-2xl sm:text-3xl bg-blue-900">
+                E
+              </span>
+              commerce
+          </Link>
         </header>
 
         {/* Content and form centered */}

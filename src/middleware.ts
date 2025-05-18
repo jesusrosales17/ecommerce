@@ -7,7 +7,7 @@ export default async function middleware(request: NextRequestWithAuth) {
   const { pathname } = request.nextUrl;
 
   // Rutas públicas que no requieren autenticación
-  const publicRoutes = ["/login" ];
+  const publicRoutes = ["/login", "/"];
   const isPublicRoute = publicRoutes.some((route) => pathname.startsWith(route));
 
   // Rutas protegidas por rol de administrador
