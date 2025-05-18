@@ -146,7 +146,6 @@ export const ProductGeneralForm = forwardRef((_, ref) => {
                       categories.length > 0 ? (
                         <SelectGroup>
                           {categories.map((category, index) => (
-                            console.log(category),
                             <SelectItem key={category.id ?? `fallback-${index}`} value={category.id}>
                               {category.name}
                             </SelectItem>

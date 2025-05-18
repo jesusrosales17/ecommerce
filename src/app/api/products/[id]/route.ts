@@ -81,23 +81,27 @@ export async function PUT(request: Request, { params }: Params) {
 
     // Obtener los datos del formulario
     const formData = await request.formData();
+
+    const generalInformation = JSON.parse( formData.get('general')?.toString() || '{}');
     
+    // return NextResponsle.json(formData);
     // Validar los datos básicos del producto
     const validatedData = await productFormSchema.parseAsync({
-      name: formData.get('name'),
-      description: formData.get('description'),
-      price: formData.get('price'),
-      stock: formData.get('stock'),
-      isOnSale: formData.get('isOnSale'),
-      salePrice: formData.get('salePrice'),
-      isFeatured: formData.get('isFeatured'),
-      status: formData.get('status') || existingProduct.status,
-      categoryId: formData.get('categoryId'),
+      name: generalInformation.name,
+      description: generalInformation.description,
+      price: generalInformation.price,
+      stock: generalInformation.stock,
+      isOnSale: generalInformation.isOnSale,
+      salePrice: generalInformation.salePrice,
+      isFeatured: generalInformation.isFeatured,
+      status: generalInformation.status || existingProduct.status,
+      categoryId: generalInformation.categoryId,
     });
 
     // Verificar si hay imágenes a eliminar
     const imagesToDelete = formData.getAll('deleteImages').map(img => img.toString());
     
+    return NextResponse.json(imagesToDelete);
     // Eliminar las imágenes marcadas para ser eliminadas
     if (imagesToDelete.length > 0) {
       // Eliminar de la base de datos
@@ -208,7 +212,6 @@ export async function PUT(request: Request, { params }: Params) {
       }, { status: 400 });
     }
 
-    console.error('Error inesperado al actualizar producto:', error);
 
     return NextResponse.json({
       error: 'Error al actualizar el producto',

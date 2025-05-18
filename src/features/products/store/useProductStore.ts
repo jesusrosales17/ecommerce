@@ -3,7 +3,6 @@ import { ProductStore, Specification } from "../interfaces/productStore";
 
 export const useProductStore = create<ProductStore>((set) => ({
   general: {
-    id: "",
     name: "",
     price: 0,
     stock: 0,
@@ -15,6 +14,10 @@ export const useProductStore = create<ProductStore>((set) => ({
   specifications: [ { label: "", value: "" }],
   description: "",
   images: [],
+  productSelectedId: undefined,
+  imagesToDelete: [],
+  setImagesToDelete: (images: string[]) => set({ imagesToDelete: images }),
+  setProductSelectedId: (id: string | undefined) => set({ productSelectedId: id }),
   setGeneral: (data: ProductStore['general']) => set({ general: data }),
   setSpecifications: (data: Specification[]) => set({ specifications: data }),
   setDescription: (desc: ProductStore['description']) => set({ description: desc }),
@@ -22,7 +25,6 @@ export const useProductStore = create<ProductStore>((set) => ({
   reset: () =>
     set({
       general: {
-        id: "",
         name: "",
         price: 0,
         stock: 0,

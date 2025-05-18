@@ -11,7 +11,7 @@ export const getSession = async () => {
     return session;
 }
 
-export const requireAuth = async () => {
+export const requireAuth = async (role = "ADMIN") => {
     const session = await getSession();
 
     if (!session) {
@@ -20,6 +20,17 @@ export const requireAuth = async () => {
             response: NextResponse.json(
                 { error: "No estás autenticado" }, {
                 status: 401,
+            }),
+        }
+    }
+    console.log(session.user.role)
+
+    if (session.user.role !== role) {
+        return {
+            isAutenticated: false,
+            response: NextResponse.json(
+                { error: "No tienes permisos para acceder a esta ruta" }, {
+                status: 403,
             }),
         }
     }

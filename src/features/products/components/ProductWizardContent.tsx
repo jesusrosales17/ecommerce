@@ -23,7 +23,7 @@ export const ProductWizardContent = () => {
     setActiveStep,
     setStepClicked,
   } = useWizardStore();
-  const { general, specifications, description, images, reset } =
+  const { general, specifications, description, images, reset, productSelectedId } =
     useProductStore();
   const { reset: resetWizard } = useWizardStore();
   const {  categoriesFetch } = useCategoryStore();
@@ -47,11 +47,16 @@ export const ProductWizardContent = () => {
       }
     });
     try {
+      if(!productSelectedId) {
       const response = await axios.post("/api/products", formData);
       sonnerNotificationAdapter.success("Producto creado con éxito");
+    } else {
+      const response = await axios.put(`/api/products/${productSelectedId}`, formData);
+      sonnerNotificationAdapter.success("Producto actualizado con éxito");
+    }
       // redireccionar
-      router.push(`/admin/products`);
-      setActiveStep(0);
+      // router.push(`/admin/products`);
+      // setActiveStep(0);
     } catch (error) {
       console.error("Error al enviar el formulario", error);
       if (axios.isAxiosError(error)) {
@@ -70,10 +75,11 @@ export const ProductWizardContent = () => {
     if (formRef.current) {
       try {
         const isValid = await formRef.current?.submit();
-        if (!!isValid) nextStep();
+        if (!isValid) return;
         if (activeStep === steps.length - 1) {
           handleSubmit();
         }
+         nextStep();
       } catch (error) {
         console.error("Error al enviar el formulario", error);
         return;

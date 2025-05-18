@@ -1,12 +1,20 @@
 import { Button } from "@/components/ui/button";
-import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useMemo} from "react";
 import { ImagePlus, Trash2 } from "lucide-react";
 import { sonnerNotificationAdapter } from "@/libs/adapters/sonnerAdapter";
 import { useProductStore } from "../store/useProductStore";
 
+
 export const ProductImagesForm = forwardRef<{ submit: () => boolean | string }>(
   (_, ref) => {
-    const { images, setImages } = useProductStore();
+    const { images, setImages, productSelectedId } = useProductStore();
+    // guardar imagenes originales (no cambian)
+    const originalImages = useMemo(() => {
+      return images.filter((image) => image.file === null && image.preview).map((image) => ({
+        file: image.file,
+        preview: image.preview,
+      }));
+    }, []);
 
     const handleImageChange = (index: number, file: File | null) => {
       const newImages = [...images];
@@ -25,16 +33,24 @@ export const ProductImagesForm = forwardRef<{ submit: () => boolean | string }>(
 
     useImperativeHandle(ref, () => ({
       submit: () => {
+       
+        console.log(originalImages);
         // Verificar si hay al menos una imagen seleccionada
         const hasImages = images.some((img) => img.file !== null);
-        if (!hasImages) {
+        // si no hay imagenes pero se esta actualizando un producto si puede continuar
+        if(!hasImages && productSelectedId) return true;
+
+        // si no hay imagenes y no se esta actualizando un producto mostrar error
+        if (!hasImages && !productSelectedId) {
           sonnerNotificationAdapter.error(
             "Debes agregar al menos una imagen del producto"
           );
+
           return false;
         }
 
-        console.log(images)
+        // Verificar si hay imágenes eliminadas
+        return false;
         setImages(images);
         return hasImages;
       },

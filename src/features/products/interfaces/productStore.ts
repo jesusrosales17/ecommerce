@@ -10,7 +10,6 @@ export interface Images {
 };
 export interface ProductStore {
   general: {
-    id?: string,
     name: string;
     stock: number;
     status: "ACTIVE" | "INACTIVE" | "DELETED";
@@ -23,6 +22,10 @@ export interface ProductStore {
   specifications: Specification[];
   description: string;
   images: Images[];
+  productSelectedId?: string | undefined;
+  imagesToDelete: string[];
+  setImagesToDelete: (images: string[]) => void;
+  setProductSelectedId: (id:  string | undefined) => void;
   setGeneral: (data: ProductStore["general"]) => void;
   setSpecifications: (data: Specification[]) => void;
   setDescription: (desc: string) => void;

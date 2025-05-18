@@ -5,9 +5,11 @@ import { useProductStore } from "../store/useProductStore";
 import { useEffect } from "react";
 
 const ProductPageContent = () => {
-  const {reset} = useProductStore();
+  const {reset, setProductSelectedId, setImagesToDelete} = useProductStore();
   useEffect(() => {
     reset();
+    setProductSelectedId(undefined);
+    setImagesToDelete([]);
   }, [reset]);
   return (
     <>

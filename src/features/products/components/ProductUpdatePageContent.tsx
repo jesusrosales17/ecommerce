@@ -10,10 +10,9 @@ interface Props {
 }
 
 export const ProductUpdatePageContent = ({ productData }: Props) => {
-  const { setGeneral, setDescription, setSpecifications, setImages } = useProductStore();
+  const { setGeneral, setDescription, setSpecifications, setImages, setProductSelectedId, setImagesToDelete } = useProductStore();
   useEffect(() => {
     setGeneral({
-      id: productData.id,
       name: productData.name,
       price: Number( productData.price ),
       stock: productData.stock,
@@ -31,6 +30,8 @@ export const ProductUpdatePageContent = ({ productData }: Props) => {
       preview: `/api/uploads/products/${image.name}`
 
     })));
+    setProductSelectedId(productData.id);
+    setImagesToDelete([]);
   }, []);
 
   return (
@@ -38,7 +39,7 @@ export const ProductUpdatePageContent = ({ productData }: Props) => {
       <StepIndicator
         className="my-4"
         initialSteps={[
-          { id: "genetal", label: "General" },
+          { id: "general", label: "General" },
           { id: "specifications", label: "Especificaciones" },
           { id: "description", label: "Descripcion" },
           { id: "images", label: "Imagenes" },
