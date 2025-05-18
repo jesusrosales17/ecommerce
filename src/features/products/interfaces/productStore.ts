@@ -24,6 +24,8 @@ export interface ProductStore {
   images: Images[];
   productSelectedId?: string | undefined;
   imagesToDelete: string[];
+  originalImages: string[];
+  setOriginalImages: (images: string[]) => void;
   setImagesToDelete: (images: string[]) => void;
   setProductSelectedId: (id:  string | undefined) => void;
   setGeneral: (data: ProductStore["general"]) => void;

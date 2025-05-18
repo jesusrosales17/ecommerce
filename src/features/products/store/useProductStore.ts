@@ -16,6 +16,8 @@ export const useProductStore = create<ProductStore>((set) => ({
   images: [],
   productSelectedId: undefined,
   imagesToDelete: [],
+  originalImages: [],
+  setOriginalImages: (images: string[]) => set({ originalImages: images }),
   setImagesToDelete: (images: string[]) => set({ imagesToDelete: images }),
   setProductSelectedId: (id: string | undefined) => set({ productSelectedId: id }),
   setGeneral: (data: ProductStore['general']) => set({ general: data }),

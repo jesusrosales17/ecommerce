@@ -12,6 +12,7 @@ import axios from "axios";
 import { sonnerNotificationAdapter } from "@/libs/adapters/sonnerAdapter";
 import { useRouter } from "next/navigation";
 import { useCategoryStore } from "@/features/categories/store/useCategoryStore";
+import { useMemo } from "react";
 
 export const ProductWizardContent = () => {
   const {
@@ -23,14 +24,43 @@ export const ProductWizardContent = () => {
     setActiveStep,
     setStepClicked,
   } = useWizardStore();
-  const { general, specifications, description, images, reset, productSelectedId } =
-    useProductStore();
+  const {
+    general,
+    specifications,
+    description,
+    images,
+    productSelectedId,
+    originalImages,
+    setOriginalImages
+  } = useProductStore();
   const { reset: resetWizard } = useWizardStore();
-  const {  categoriesFetch } = useCategoryStore();
+  const { categoriesFetch } = useCategoryStore();
   const formRef = useRef<{ submit: () => boolean | string }>(null);
 
   const router = useRouter();
+
+  useEffect(() => {
+    if (originalImages.length > 0) return;
+    const productOriginalImages =  images
+      .filter((image) => image.file === null && image.preview)
+      .map((image) => ({
+        preview: image.preview,
+      }));
+
+    setOriginalImages(productOriginalImages.map((image) => image.preview));
+  }, [images]);
+
+
   const handleSubmit = async () => {
+    console.log(originalImages)
+    const imagesDeleted = originalImages?.filter((originalImage) => {
+      return !images.some(
+        (newImage) => newImage.preview === originalImage
+      );
+    }) || [];
+    const imagesToDelete = imagesDeleted.map(
+      (image) => image.split("/").pop() || ""
+    );
     const data = {
       general,
       specifications,
@@ -43,17 +73,23 @@ export const ProductWizardContent = () => {
     formData.append("description", data.description);
     data.images.forEach((image, index) => {
       if (image.file) {
-        formData.append(`images[${index}]`, image.file);
+        formData.append(`images`, image.file);
       }
     });
+    formData.append("imagesToDelete", JSON.stringify(imagesToDelete));
+    console.log("Imagenes a eliminar", imagesToDelete);
+    console.log("Imagenes eliminadads", imagesDeleted);
     try {
-      if(!productSelectedId) {
-      const response = await axios.post("/api/products", formData);
-      sonnerNotificationAdapter.success("Producto creado con éxito");
-    } else {
-      const response = await axios.put(`/api/products/${productSelectedId}`, formData);
-      sonnerNotificationAdapter.success("Producto actualizado con éxito");
-    }
+      if (!productSelectedId) {
+        const response = await axios.post("/api/products", formData);
+        sonnerNotificationAdapter.success("Producto creado con éxito");
+      } else {
+        const response = await axios.put(
+          `/api/products/${productSelectedId}`,
+          formData
+        );
+        sonnerNotificationAdapter.success("Producto actualizado con éxito");
+      }
       // redireccionar
       // router.push(`/admin/products`);
       // setActiveStep(0);
@@ -79,7 +115,7 @@ export const ProductWizardContent = () => {
         if (activeStep === steps.length - 1) {
           handleSubmit();
         }
-         nextStep();
+        nextStep();
       } catch (error) {
         console.error("Error al enviar el formulario", error);
         return;
@@ -124,7 +160,6 @@ export const ProductWizardContent = () => {
   useEffect(() => {
     resetWizard();
     categoriesFetch();
-   
   }, []);
   return (
     <div>

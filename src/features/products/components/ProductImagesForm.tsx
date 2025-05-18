@@ -5,16 +5,11 @@ import { sonnerNotificationAdapter } from "@/libs/adapters/sonnerAdapter";
 import { useProductStore } from "../store/useProductStore";
 
 
-export const ProductImagesForm = forwardRef<{ submit: () => boolean | string }>(
+export const ProductImagesForm = forwardRef<{ submit: () => boolean | string  }>(
   (_, ref) => {
-    const { images, setImages, productSelectedId } = useProductStore();
+    const { images, setImages, productSelectedId, setImagesToDelete } = useProductStore();
     // guardar imagenes originales (no cambian)
-    const originalImages = useMemo(() => {
-      return images.filter((image) => image.file === null && image.preview).map((image) => ({
-        file: image.file,
-        preview: image.preview,
-      }));
-    }, []);
+   
 
     const handleImageChange = (index: number, file: File | null) => {
       const newImages = [...images];
@@ -33,8 +28,7 @@ export const ProductImagesForm = forwardRef<{ submit: () => boolean | string }>(
 
     useImperativeHandle(ref, () => ({
       submit: () => {
-       
-        console.log(originalImages);
+        
         // Verificar si hay al menos una imagen seleccionada
         const hasImages = images.some((img) => img.file !== null);
         // si no hay imagenes pero se esta actualizando un producto si puede continuar
@@ -49,13 +43,12 @@ export const ProductImagesForm = forwardRef<{ submit: () => boolean | string }>(
           return false;
         }
 
-        const imagesDeleted = originalImages.filter((originalImage) => {
-          return !images.some(newImage => newImage.preview === originalImage.preview);
-        })
-        console.log("Imágenes eliminadas:", imagesDeleted);
-        return false;
+       
+       
+        
         setImages(images);
-        return hasImages;
+
+        return  hasImages 
       },
     }));
 

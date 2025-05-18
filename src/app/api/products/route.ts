@@ -33,7 +33,7 @@ export async function POST(request: Request) {
 
   
     // Procesamos las imágenes
-    const savedImages = await processMultipleImages(formData, 'images[0]', 'products');
+    const savedImages = await processMultipleImages(formData, 'images', 'products');
     
     // Extraemos las especificaciones
     // const specifications = extractSpecificationsFromFormData(formData);

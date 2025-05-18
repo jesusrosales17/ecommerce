@@ -49,7 +49,10 @@ export async function deleteImage(
   basePath: string = 'products'
 ): Promise<void> {
   try {
-    const filePath = path.join(process.cwd(), 'public', 'uploads', basePath, fileName);
+
+    const uploadDir = path.join(process.cwd(), process.env.NEXT_PUBLIC_UPLOADS_PATH || 'uploads', basePath);
+
+    const filePath = path.join(uploadDir, fileName);
     await fs.unlink(filePath);
   } catch (error) {
     console.error('Error al eliminar la imagen:', error);

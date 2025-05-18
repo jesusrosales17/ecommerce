@@ -99,15 +99,16 @@ export async function PUT(request: Request, { params }: Params) {
     });
 
     // Verificar si hay imágenes a eliminar
-    const imagesToDelete = formData.getAll('deleteImages').map(img => img.toString());
+    const imagesToDeleteValue = formData.get('imagesToDelete');
+    const imagesToDelete = imagesToDeleteValue ? JSON.parse(imagesToDeleteValue.toString()) : [];
     
-    return NextResponse.json(imagesToDelete);
+   
     // Eliminar las imágenes marcadas para ser eliminadas
     if (imagesToDelete.length > 0) {
       // Eliminar de la base de datos
       await prisma.productImage.deleteMany({
         where: {
-          id: {
+          name: {
             in: imagesToDelete
           }
         }
@@ -116,16 +117,18 @@ export async function PUT(request: Request, { params }: Params) {
       // Eliminar archivos físicos - aquí asumimos que tenemos acceso al nombre del archivo
       // Esto requeriría obtener los nombres de archivo antes de eliminar los registros
       const filesToDelete = existingProduct.images
-        .filter(img => imagesToDelete.includes(img.id))
+        .filter(img => imagesToDelete.includes(img.name))
         .map(img => img.name);
-      
+
+
       for (const fileName of filesToDelete) {
         await deleteImage(fileName);
       }
     }
     
+    console.log(formData)
     // Procesar nuevas imágenes
-    const newImages = await processMultipleImages(formData);
+    const newImages = await processMultipleImages(formData, 'images', 'products');
     
     // Extraer especificaciones
     const specifications = extractSpecificationsFromFormData(formData);
@@ -206,6 +209,7 @@ export async function PUT(request: Request, { params }: Params) {
     }, { status: 200 });
 
   } catch (error) {
+    console.log(error)
     if (error instanceof z.ZodError) {
       return NextResponse.json({
         error: error.issues[0].message,
