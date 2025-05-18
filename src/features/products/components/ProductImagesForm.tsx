@@ -99,7 +99,7 @@ export const ProductImagesForm = forwardRef<{ submit: () => boolean | string  }>
               <div key={index} className="rounded-lg border ">
                 <div className="relative">
                   <div className="flex items-center justify-between">
-                    {image.file && (
+                    {image.preview && (
                       <Button
                         type="button"
                         variant="destructive"
