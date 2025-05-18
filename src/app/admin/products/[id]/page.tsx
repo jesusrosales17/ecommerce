@@ -11,49 +11,12 @@ import {
   Trash,
 } from "lucide-react";
 import Link from "next/link";
-import { formatDistanceToNow } from "date-fns";
-import { es } from "date-fns/locale";
 import { Button } from "@/components/ui/button";
+import { Product } from "@/features/products/interfaces/product";
+import { formattedPrice } from "@/utils/price";
+import { formatRelativeTime } from "@/utils/date";
 
-interface ProductImage {
-  id: string;
-  name: string;
-  productId: string;
-  createdAt: string;
-  updatedAt: string;
-}
 
-interface ProductSpecification {
-  id: string;
-  name: string;
-  value: string;
-  productId: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-interface Category {
-  id: string;
-  name: string;
-}
-
-interface Product {
-  id: string;
-  name: string;
-  description: string;
-  price: string;
-  stock: number;
-  isOnSale: boolean;
-  salePrice: string | null;
-  isFeatured: boolean;
-  status: "ACTIVE" | "INACTIVE" | "DELETED";
-  categoryId: string | null;
-  createdAt: string;
-  updatedAt: string;
-  category: Category | null;
-  images: ProductImage[];
-  specifications: ProductSpecification[];
-}
 
 interface Props {
   params: {
@@ -82,20 +45,10 @@ const ProductViewPage = async ({ params }: Props) => {
 
   const product: Product = await res.json();
 
-  const formattedPrice = (price: string | number) => {
-    return Number(price).toLocaleString("es-MX", {
-      style: "currency",
-      currency: "MXN",
-    });
-  };
+ 
 
   // Función para formatear la fecha en "hace X tiempo"
-  const formatRelativeTime = (dateString: string) => {
-    return formatDistanceToNow(new Date(dateString), {
-      addSuffix: true,
-      locale: es,
-    });
-  };
+
 
   const hasImages = product.images && product.images.length > 0;
   const hasSpecifications =
