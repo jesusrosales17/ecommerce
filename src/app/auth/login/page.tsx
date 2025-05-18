@@ -1,3 +1,4 @@
+import { Logo } from "@/components/template/Logo";
 import { LoginForm } from "@/features/auth/components/LoginForm";
 import Image from "next/image";
 import Link from "next/link";
@@ -5,18 +6,12 @@ import React from "react";
 
 const page = () => {
   return (
-    // grid [40, 60] for left and right sections, ajustado para móviles
     <main className="max-w-[2000px] mx-auto grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-[45%_55%] h-svh">
       {/* left section */}
       <div className="flex my-4 xl:my-3 flex-col h-full w-full px-4 sm:px-6 sm:w-5/6 md:w-5/6 2xl:w-4/6 mx-auto ">
         {/* Header fixed at top */}
         <header className="">
-          <Link href="/"  className="text-xl sm:text-2xl flex items-center font-medium">
-              <span className="text-white font-bold rounded-full px-2 sm:px-3 text-2xl sm:text-3xl bg-blue-900">
-                E
-              </span>
-              commerce
-          </Link>
+          <Logo /> 
         </header>
 
         {/* Content and form centered */}
