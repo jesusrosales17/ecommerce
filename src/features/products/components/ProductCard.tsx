@@ -46,7 +46,7 @@ export function ProductCard({
     : null;
 
   return (
-    <div className="group relative border rounded-2xl bg-white  hover:shadow-lg transition-all duration-300">
+    <div className="group  relative border lg:rounded-2xl bg-white  hover:shadow-lg transition-all duration-300">
       <div className="relative ">
         {discount !== null && (
           <span className="absolute top-4 left-4 z-10 bg-red-500 text-white text-xs font-semibold px-2 py-1 rounded">

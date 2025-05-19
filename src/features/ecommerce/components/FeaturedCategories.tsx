@@ -22,8 +22,9 @@ export async function FeaturedCategories({ categories }: FeaturedCategoriesProps
       title="Gran variedad de categorías"
       description="Explora entre nuestra gran variedad de categorías"
       viewAllLink="/categories"
+      viewAllText="Ver todas las categorías"
     >
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+      <div className="grid border-t py-4 border-b px-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         {/* solo 5 */}
         {categories.map((category) => (
           <CategoryCard

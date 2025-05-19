@@ -15,8 +15,9 @@ export async function FeaturedProducts({ products }: FeaturedProductsProps) {
       title="Productos destacados"
       description="Nuestros productos más populares elegidos por nuestros clientes"
       viewAllLink="/products"
+      viewAllText="Ver todos los productos destacados"
     >
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div className="grid md:px-4 rounded-sm overflow-hidden grid-cols-2 md:grid-cols-2  lg:grid-cols-4 lg:gap-6 ">
         {products.map((product) => (
           <ProductCard
             key={product.id}

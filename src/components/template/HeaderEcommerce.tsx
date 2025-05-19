@@ -56,7 +56,7 @@ const HeaderEcommerce = async () => {
           </div>
         </div>
 
-        <div className="flex justify-between flex-grow w-full">
+        <div className="hidden md:flex justify-between flex-grow w-full">
           {/* Menú superior */}
           <nav className="hidden md:flex items-center gap-4">
             {/* Hover de categorías */}
