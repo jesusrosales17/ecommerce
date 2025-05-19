@@ -55,7 +55,7 @@ export const ProductGeneralForm = forwardRef((_, ref) => {
       price: general?.price || 0,
       stock: general?.stock || 0,
       isOnSale: general?.isOnSale || false,
-      salePrice: general?.salePrice || undefined,
+      salePrice: Number(general?.salePrice) || undefined,
       isFeatured: general?.isFeatured || false,
       status: general?.status || "ACTIVE",
       categoryId: general?.categoryId || "",
@@ -195,7 +195,7 @@ export const ProductGeneralForm = forwardRef((_, ref) => {
                   <Input
                     type="number"
                     placeholder="Ej. 800"
-                    onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                    onChange={(e) => field.onChange(Number(e.target.valueAsNumber))}
                     value={field.value}
                   />
                   <FormDescription>

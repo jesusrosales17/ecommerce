@@ -10,6 +10,7 @@ interface Props {
 }
 
 export const ProductUpdatePageContent = ({ productData }: Props) => {
+  console.log(productData)
   const { setGeneral, setDescription, setSpecifications, setImages, setProductSelectedId, setImagesToDelete, setOriginalImages } = useProductStore();
   useEffect(() => {
     setGeneral({
@@ -17,6 +18,8 @@ export const ProductUpdatePageContent = ({ productData }: Props) => {
       price: Number( productData.price ),
       stock: productData.stock,
       status: productData.status,
+      isOnSale: productData.isOnSale,
+      salePrice: productData.salePrice as number | undefined,
       categoryId: productData.categoryId as string | undefined,
       isFeatured: productData.isFeatured,
     });

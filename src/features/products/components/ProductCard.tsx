@@ -41,7 +41,7 @@ export function ProductCard({
   description,
   specs = [],
 }: ProductCardProps) {
-  const discount = salePrice
+  const discount = salePrice && isOnSale
     ? Math.round(((price - salePrice) / price) * 100)
     : null;
 
@@ -88,9 +88,13 @@ export function ProductCard({
           <div className="mt-5 flex items-center justify-between ">
             <div className="flex  items-center gap-4">
               <span className="text-lg font-bold text-primary">
-                {formattedPrice(salePrice ?? price)}
+                {
+                  isOnSale && salePrice
+                    ? formattedPrice(salePrice)
+                    : formattedPrice(price)
+                }
               </span>
-              {salePrice && (
+              { isOnSale && salePrice && (
                 <span className="text-sm text-muted-foreground line-through">
                   {formattedPrice(price)}
                 </span>
