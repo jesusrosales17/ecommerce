@@ -106,7 +106,10 @@ const ProductTable = ({ products, categories }: Props) => {
             ) : (
               filteredProducts.map((product) => (
                 <TableRow key={product.id}>
-                  <TableCell className="font-medium">{product.name}</TableCell>
+                  <TableCell className="font-medium">{
+                    // reducir su tamaño a 20 caracteres
+                    product.name.length > 20 ? `${product.name.slice(0, 20)}...` : product.name
+                    }</TableCell>
                   <TableCell>{product.stock}</TableCell>
                   <TableCell>
                     {product.isOnSale && product.salePrice ? (

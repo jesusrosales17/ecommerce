@@ -52,7 +52,7 @@ export const ProductWizardContent = () => {
 
 
   const handleSubmit = async () => {
-    console.log(originalImages)
+
     const imagesDeleted = originalImages?.filter((originalImage) => {
       return !images.some(
         (newImage) => newImage.preview === originalImage
@@ -77,8 +77,7 @@ export const ProductWizardContent = () => {
       }
     });
     formData.append("imagesToDelete", JSON.stringify(imagesToDelete));
-    console.log("Imagenes a eliminar", imagesToDelete);
-    console.log("Imagenes eliminadads", imagesDeleted);
+    console.log(imagesToDelete)
     try {
       if (!productSelectedId) {
         const response = await axios.post("/api/products", formData);

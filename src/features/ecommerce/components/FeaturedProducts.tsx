@@ -27,10 +27,9 @@ export async function FeaturedProducts({ products }: FeaturedProductsProps) {
             name={product.name}
             description={product.description}
             price={product.price}
-            salePrice={product.salePrice}
+            salePrice={product.salePrice as number | undefined}
             isOnSale={product.isOnSale}
             image={product.images?.[0]?.name}
-            isFeatured={product.isFeatured}
           />
         ))}
       </div>

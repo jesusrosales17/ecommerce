@@ -10,7 +10,7 @@ interface Props {
 }
 
 export const ProductUpdatePageContent = ({ productData }: Props) => {
-  const { setGeneral, setDescription, setSpecifications, setImages, setProductSelectedId, setImagesToDelete } = useProductStore();
+  const { setGeneral, setDescription, setSpecifications, setImages, setProductSelectedId, setImagesToDelete, setOriginalImages } = useProductStore();
   useEffect(() => {
     setGeneral({
       name: productData.name,
@@ -32,6 +32,7 @@ export const ProductUpdatePageContent = ({ productData }: Props) => {
     })));
     setProductSelectedId(productData.id);
     setImagesToDelete([]);
+    setOriginalImages([])
   }, []);
 
   return (

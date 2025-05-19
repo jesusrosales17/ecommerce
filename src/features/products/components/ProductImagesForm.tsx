@@ -30,7 +30,7 @@ export const ProductImagesForm = forwardRef<{ submit: () => boolean | string  }>
       submit: () => {
         
         // Verificar si hay al menos una imagen seleccionada
-        const hasImages = images.some((img) => img.file !== null);
+        const hasImages = images.some((img) => img.file !== null );
         // si no hay imagenes pero se esta actualizando un producto si puede continuar
         if(!hasImages && productSelectedId) return true;
 
@@ -39,6 +39,7 @@ export const ProductImagesForm = forwardRef<{ submit: () => boolean | string  }>
           sonnerNotificationAdapter.error(
             "Debes agregar al menos una imagen del producto"
           );
+
 
           return false;
         }
