@@ -1,8 +1,11 @@
 import HeaderEcommerce from "@/components/template/HeaderEcommerce"
 
-const layout = () => {
+const layout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <HeaderEcommerce />
+    <>
+      <HeaderEcommerce />
+      {children}
+    </>
   )
 }
 
