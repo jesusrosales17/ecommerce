@@ -13,6 +13,7 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { Heart, LogIn, ShoppingCart, User } from "lucide-react";
+import { getSession } from "@/libs/auth/auth";
 
 const HeaderEcommerce = async () => {
   const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/products`, {
@@ -21,7 +22,7 @@ const HeaderEcommerce = async () => {
   });
 
   const categories = (await res.json().catch(() => [])) || [];
-
+  const session = await getSession();
   return (
     <header className="w-full bg-white shadow-md">
       <div className="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
@@ -115,12 +116,25 @@ const HeaderEcommerce = async () => {
                 <ShoppingCart className="w-5 h-5" />
               </Button>
             </Link>
-            <Link href="/auth/login">
-              <Button variant="outline">Iniciar sesión</Button>
-            </Link>
-            <Link href="/auth/register">
-              <Button>Registrarse</Button>
-            </Link>
+
+            {!session && (
+              <>
+                <Link href="/auth/login">
+                  <Button variant="outline">Iniciar sesión</Button>
+                </Link>
+                <Link href="/auth/register">
+                  <Button>Registrarse</Button>
+                </Link>
+              </>
+            )}
+
+            {
+              session && session.user.role === "ADMIN" && (
+                <Link href="/admin">
+                  <Button variant="outline">Panel</Button>
+                </Link>
+              )
+            }
           </div>
         </div>
       </div>
