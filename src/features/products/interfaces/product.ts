@@ -2,7 +2,7 @@
     id: string;
     name: string;
     description: string;
-    price: string;
+    price: number;
     stock: number;
     isOnSale: boolean;
     salePrice: number | null;

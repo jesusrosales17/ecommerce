@@ -1,6 +1,4 @@
-"use client"
 
-import { useTransition } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { Heart } from "lucide-react"
@@ -31,22 +29,15 @@ export function ProductCard({
   className,
   isFeatured
 }: ProductCardProps) {
-  const [isPending, startTransition] = useTransition()
 
-  const addToFavorites = () => {
-    startTransition(() => {
-      // Add to favorites logic will go here
-      console.log("Add to favorites:", id)
-    })
-  }
-
+  console.log("image", image)
   return (
     <div className={cn("group overflow-hidden rounded-lg border", className)}>
       <Link href={`/product/${id}`} className="relative block overflow-hidden">
         {/* Product image */}
         <div className="relative aspect-square overflow-hidden bg-gray-100">
           <Image
-            src={image ? `/uploads/products/${image}` : "/images/product-placeholder.png"}
+            src={image ? `/api/uploads/products/${image}` : "/images/product-placeholder.png"}
             alt={name}
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -91,8 +82,8 @@ export function ProductCard({
             size="icon" 
             variant="ghost" 
             className="h-8 w-8 rounded-full" 
-            onClick={addToFavorites}
-            disabled={isPending}
+            // onClick={addToFavorites}
+            // disabled={isPending}
           >
             <Heart className="h-4 w-4" />
             <span className="sr-only">Add to favorites</span>

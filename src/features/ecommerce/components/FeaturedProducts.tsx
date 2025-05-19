@@ -4,18 +4,9 @@ import { ArrowRight } from "lucide-react"
 import { Section } from "@/components/ui/section"
 import { Button } from "@/components/ui/button"
 import { ProductCard } from "@/features/products/components/ProductCard"
+import { Product } from "@/features/products/interfaces/product"
 
-interface Product {
-  id: string
-  name: string
-  description: string | null
-  price: number
-  salePrice: number | null
-  isOnSale: boolean
-  images: { url: string }[]
-  status: string
-  isFeatured?: boolean
-}
+
 
 interface FeaturedProductsProps {
   products: Product[]
@@ -38,7 +29,7 @@ export async function FeaturedProducts({ products }: FeaturedProductsProps) {
             price={product.price}
             salePrice={product.salePrice}
             isOnSale={product.isOnSale}
-            image={product.images?.[0]?.url || ""}
+            image={product.images?.[0]?.name}
             isFeatured={product.isFeatured}
           />
         ))}

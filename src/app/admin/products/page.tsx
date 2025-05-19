@@ -38,7 +38,6 @@ const [res, resCategories] = await Promise.all([
   const products: Product[] = await res.json();
   const categories: Category[] = await resCategories.json();
 
-  console.log(products)
   return (
     <>
     <div className="flex  items-center md:justify-between gap-4 md:items-center mb-5 flex-col md:flex-row">

@@ -170,7 +170,6 @@ export async function GET(request: NextRequest) {
         specifications: true,
       }
     });
-    console.log("Productos", products)
 
     return NextResponse.json(products);
 
