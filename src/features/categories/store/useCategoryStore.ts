@@ -20,7 +20,7 @@ export const useCategoryStore = create<CategoryStore>()((set, get) => ({
     },
     addCategory: (category) => {
         set({
-            categories: [...get().categories, category],
+            categories: [category,...get().categories ],
             isOpenDrawer: false,
         })
 

@@ -15,19 +15,35 @@ export const useCategoryForm = () => {
     defaultValues: {
       name: categoryToUpdate?.name || "",
       description: categoryToUpdate?.description || "",
+      image: categoryToUpdate?.image || "",
       status: categoryToUpdate?.status || "ACTIVE",
     },
   });
-
   const onSubmit = async (data: CategorySchemaType) => {
     try {
+      // Create a FormData object to send multipart/form-data
+      const formData = new FormData();
+      formData.append('name', data.name);
+      
+      if (data.description) {
+        formData.append('description', data.description);
+      }
+      
+      formData.append('status', data.status);
+      
+      // Append image if it exists and is a File object
+      if (data.image && data.image instanceof File) {
+        formData.append('image', data.image);
+      }
+      
       if(categoryToUpdate)  {
         const response = await axios.put(
           `/api/categories/${categoryToUpdate.id}`,
+          formData,
           {
-            name: data.name,
-            description: data.description,
-            status: data.status,
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
           }
         );
         
@@ -36,10 +52,11 @@ export const useCategoryForm = () => {
         sonnerNotificationAdapter.success(response.data.message);
         return;
       }
-      const response = await axios.post(`/api/categories`, {
-        name: data.name,
-        description: data.description,
-        status: data.status,
+      
+      const response = await axios.post('/api/categories', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
       });
 
       const { category } = response.data;

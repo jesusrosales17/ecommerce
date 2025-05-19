@@ -5,6 +5,9 @@ export const categorySchema = z.object({
         message: "El nombre de la categoría debe tener al menos 3 caracteres",
     }),
     description: z.string().optional(),
+    image: z.instanceof(File).or(z.string()).refine(val => val !== '', {
+        message: "La imagen es obligatoria",
+    }),
     status: z.enum(["ACTIVE", "INACTIVE", "DELETED"], {
         errorMap: () => ({ message: "El estado no es valido" }),
     })

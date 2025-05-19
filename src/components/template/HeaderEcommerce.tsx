@@ -115,10 +115,10 @@ const HeaderEcommerce = async () => {
                 <ShoppingCart className="w-5 h-5" />
               </Button>
             </Link>
-            <Link href="/account/login">
+            <Link href="/auth/login">
               <Button variant="outline">Iniciar sesión</Button>
             </Link>
-            <Link href="/account/register">
+            <Link href="/auth/register">
               <Button>Registrarse</Button>
             </Link>
           </div>

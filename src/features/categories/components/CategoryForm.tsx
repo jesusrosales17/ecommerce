@@ -1,6 +1,5 @@
 "use client";
 import axios from "axios";
-import { Button } from "@/components/ui/button";
 import { DrawerFooter, DrawerClose } from "@/components/ui/drawer";
 import {
   FormField,
@@ -14,16 +13,16 @@ import {
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Switch } from "@/components/ui/switch";
+import { FileUpload } from "@/components/ui/FileUpload";
 import { categorySchema, CategorySchemaType } from "../schemas/categorySchema";
 import { useForm } from "react-hook-form";
 import { useCategoryStore } from "../store/useCategoryStore";
 import { sonnerNotificationAdapter } from "@/libs/adapters/sonnerAdapter";
 import { useCategoryForm } from "../hooks/useCategoryForm";
-
-
+import { Button } from "@/components/ui/button";
 
 export const CategoryForm = () => {
- const {form, isUpdating,onSubmit}  = useCategoryForm();
+  const { form, isUpdating, onSubmit } = useCategoryForm();
   return (
     <Form {...form}>
       <form
@@ -60,6 +59,31 @@ export const CategoryForm = () => {
                 <FormDescription>
                   Descripcion de la categoria que se mostrara en la tienda
                   (opcional)
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />          <FormField
+            control={form.control}
+            name="image"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>
+                  Imagen: <span className="text-red-500">*</span>
+                </FormLabel>                <FormControl>
+                  <FileUpload
+                    id="category-image"
+                    value={field.value}
+                    onChange={field.onChange}
+                    defaultPreview={
+                      isUpdating && typeof field.value === 'string' 
+                        ? `/api/uploads/categories/${field.value}`
+                        : null
+                    }
+                  />
+                </FormControl>
+                <FormDescription>
+                  Imagen representativa de la categoría (obligatorio)
                 </FormDescription>
                 <FormMessage />
               </FormItem>

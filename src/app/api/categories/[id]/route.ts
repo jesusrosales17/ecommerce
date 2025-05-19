@@ -3,6 +3,7 @@ import { requireAuth } from "@/libs/auth/auth";
 import prisma from "@/libs/prisma";
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { saveImage, deleteImage } from "@/libs/media/image-handler";
 
 interface Params {
     params: Promise< {
@@ -14,19 +15,29 @@ export async function PUT(request: Request, { params }: Params) {
     try {
         const auth = await requireAuth();
 
-        // if (!auth.isAutenticated) {
-        //     return auth.response;
-        // }
+        if (!auth.isAutenticated) {
+            return auth.response;
+        }
         // obtener el id de la categoria
         const {id}  = await params;
 
-        // validar los datos
-        const body = await request.json();
-        body.id = id;
+        // Parse formData
+        const formData = await request.formData();
+        const name = formData.get('name') as string;
+        const description = formData.get('description') as string || undefined;
+        const status = formData.get('status') as string;
+        const imageFile = formData.get('image') as File | string;
         
-        const {name, status, description} = categoryUpdateSchema.parse(body);
-
-        //  verificar si la categoria existe
+        // Include id in validated data
+        const validationData = {
+            id,
+            name,
+            description,
+            status,
+            image: imageFile
+        };
+        
+        const validatedData = categoryUpdateSchema.parse(validationData);        //  verificar si la categoria existe
         const category = await prisma.category.findUnique({
             where: {
                 id,
@@ -37,6 +48,18 @@ export async function PUT(request: Request, { params }: Params) {
             return NextResponse.json({
                 error: "La categoría no existe",
             }, { status: 404 });
+        }        // Procesar la imagen si se subió una nueva
+        let imageData = null;
+        if (imageFile instanceof File) {
+            // Eliminar la imagen antigua si existe
+            if ((category as any).image) {
+                try {
+                    await deleteImage((category as any).image, 'categories');
+                } catch (error) {
+                    console.error('Error al eliminar la imagen antigua:', error);
+                }
+            }
+            imageData = await saveImage(imageFile, 'categories');
         }
 
         // actualizar la categoria en la bd
@@ -44,11 +67,11 @@ export async function PUT(request: Request, { params }: Params) {
             where: {
                 id
             }, 
-            data: {
-                name, 
-                status,
-                description,
-            }
+            data: {                name: validatedData.name, 
+                status: validatedData.status as any,
+                description: validatedData.description,
+                image: imageData ? imageData.name : (category as any).image,
+            } as any
         })
 
         return NextResponse.json({

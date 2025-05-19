@@ -10,6 +10,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
+import Image from "next/image";
 
 export const CategoryInfoDrawer = () => {
   const { isOpenInfoDrawer, setIsOpenInfoDrawer, categoryToShow } =
@@ -85,6 +86,19 @@ export const CategoryInfoDrawer = () => {
                 ) : (
                   "-"
                 )}
+              </div>
+              <div>
+                <h2 className="text-base font-medium text-muted-foreground">
+                  Imagen
+                </h2>
+                <Image
+                  src={
+                       `/api/uploads/categories/${categoryToShow?.image}`
+                  }
+                  alt={categoryToShow?.name || "Imagen de la categoría"}
+                  width={100}
+                  height={100}
+                  />
               </div>
             </div>
           </ScrollArea>
