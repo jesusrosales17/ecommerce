@@ -96,8 +96,9 @@ export const CategoryInfoDrawer = () => {
                        `/api/uploads/categories/${categoryToShow?.image}`
                   }
                   alt={categoryToShow?.name || "Imagen de la categoría"}
-                  width={100}
-                  height={100}
+                  width={200}
+                  className="w-full"
+                  height={300}
                   />
               </div>
             </div>

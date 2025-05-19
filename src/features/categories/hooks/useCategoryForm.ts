@@ -30,10 +30,12 @@ export const useCategoryForm = () => {
       }
       
       formData.append('status', data.status);
-      
-      // Append image if it exists and is a File object
+        // Append image if it exists and is a File object
       if (data.image && data.image instanceof File) {
         formData.append('image', data.image);
+      } else if (categoryToUpdate?.image && typeof categoryToUpdate.image === 'string') {
+        // Si estamos actualizando y ya existe una imagen, enviamos su nombre
+        formData.append('keepExistingImage', 'true');
       }
       
       if(categoryToUpdate)  {

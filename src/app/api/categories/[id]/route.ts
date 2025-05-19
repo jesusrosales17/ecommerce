@@ -26,7 +26,7 @@ export async function PUT(request: Request, { params }: Params) {
         const name = formData.get('name') as string;
         const description = formData.get('description') as string || undefined;
         const status = formData.get('status') as string;
-        const imageFile = formData.get('image') as File | string;
+        const imageFile = formData.get('image') as File | string || null;
         
         // Include id in validated data
         const validationData = {
@@ -36,8 +36,8 @@ export async function PUT(request: Request, { params }: Params) {
             status,
             image: imageFile
         };
-        
         const validatedData = categoryUpdateSchema.parse(validationData);        //  verificar si la categoria existe
+        console.log(validatedData);
         const category = await prisma.category.findUnique({
             where: {
                 id,
@@ -50,6 +50,8 @@ export async function PUT(request: Request, { params }: Params) {
             }, { status: 404 });
         }        // Procesar la imagen si se subió una nueva
         let imageData = null;
+        let finalImageName = (category as any).image || null;
+        
         if (imageFile instanceof File) {
             // Eliminar la imagen antigua si existe
             if ((category as any).image) {
@@ -60,17 +62,17 @@ export async function PUT(request: Request, { params }: Params) {
                 }
             }
             imageData = await saveImage(imageFile, 'categories');
-        }
-
-        // actualizar la categoria en la bd
+            finalImageName = imageData.name;
+        }        // actualizar la categoria en la bd
         const updatedCategory = await prisma.category.update({
             where: {
                 id
             }, 
-            data: {                name: validatedData.name, 
+            data: {                
+                name: validatedData.name, 
                 status: validatedData.status as any,
                 description: validatedData.description,
-                image: imageData ? imageData.name : (category as any).image,
+                image: finalImageName,
             } as any
         })
 
@@ -79,13 +81,14 @@ export async function PUT(request: Request, { params }: Params) {
             category: updatedCategory,
         }, { status: 200 });
     } catch (error) {
+
+        console.log('Error inesperado', error);
         if (error instanceof z.ZodError) {
             return NextResponse.json({
                 error: error.issues[0].message,
             }, { status: 400 })
         }
 
-        console.log('Error inesperado', error);
 
         return NextResponse.json(
             { error: "Error al actualizar la categoría" }, { status: 500 })
