@@ -97,6 +97,7 @@ export async function GET(request: NextRequest) {
     // Opciones de filtrado desde los query params
     const searchParams = request.nextUrl.searchParams;
     const category = searchParams.get('category');
+    const isOnSale = searchParams.get('onSale') === 'true';
     const featured = searchParams.get('featured') === 'true';
     const status = searchParams.get('status') || 'ACTIVE';
     const minPrice = searchParams.get('minPrice');
@@ -124,6 +125,9 @@ export async function GET(request: NextRequest) {
     if (featured) {
       where.isFeatured = true;
     }
+    if (isOnSale) {
+      where.isOnSale = true;
+    }
 
     if (status !== 'ALL') {
       where.status = status as ProductStatus;
@@ -134,7 +138,6 @@ export async function GET(request: NextRequest) {
         gte: parseFloat(minPrice)
       };
     }
-
     if (maxPrice) {
       where.price = {
         lte: parseFloat(maxPrice)
@@ -170,7 +173,6 @@ export async function GET(request: NextRequest) {
         specifications: true,
       }
     });
-
     return NextResponse.json(products);
 
   } catch (error) {

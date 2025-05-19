@@ -1,6 +1,8 @@
 import { HeroCarousel } from "@/features/ecommerce/components/HeroCarousel";
 import { FeaturedCategories } from "@/features/ecommerce/components/FeaturedCategories";
 import { FeaturedProducts } from "@/features/ecommerce/components/FeaturedProducts";
+import { SpecialOffers } from "@/features/ecommerce/components/SpecialOffers";
+import { Footer } from "@/components/layout/Footer";
 
 export default async function HomePage() {
   // Fetch categories
@@ -22,21 +24,36 @@ export default async function HomePage() {
       cache: "no-store",
     }
   );
+  const productsOnSaleRes = await fetch(
+    `${process.env.NEXT_PUBLIC_URL}/api/products?onSale=true`,
+    {
+      method: "GET",
+      cache: "no-store",
+    }
+  );
+  console.log(productsOnSaleRes)
 
   const products = (await productsRes.json().catch(() => [])) || [];
-  console.log(products);
+  const productsOnSale = (await productsOnSaleRes.json().catch(() => [])) || [];
 
   return (
-    <main className="xl:container mx-auto px-3 py-3 ">
-      {/* Hero Carousel */}
-      <HeroCarousel />
+    <>
+      <main className="xl:container mx-auto px-3 py-3">
+        {/* Hero Carousel */}
+        <HeroCarousel />
 
-      <div className="space-y-16 mt-16">
-        {/* Featured Products */}
-        <FeaturedProducts products={products.slice(0, 6)} />
-        {/* Featured Categories */}
-        <FeaturedCategories categories={categories.slice(0, 6)} />
-      </div>
-    </main>
+        <div className="space-y-16 mt-16">
+          {/* Special Offers */}
+          <SpecialOffers products={productsOnSale.slice(0,6)} />
+          
+          {/* Featured Products */}
+          <FeaturedProducts products={products.slice(0, 6)} />
+          
+          {/* Featured Categories */}
+          <FeaturedCategories categories={categories.slice(0, 6)} />
+        </div>
+      </main>
+      <Footer />
+    </>
   );
 }
