@@ -16,7 +16,7 @@ import { Heart, LogIn, ShoppingCart, User } from "lucide-react";
 import { getSession } from "@/libs/auth/auth";
 
 const HeaderEcommerce = async () => {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/products`, {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/categories`, {
     method: "GET",
     cache: "no-store",
   });
@@ -24,7 +24,7 @@ const HeaderEcommerce = async () => {
   const categories = (await res.json().catch(() => [])) || [];
   const session = await getSession();
   return (
-    <header className="w-full bg-white shadow-md">
+    <header className="w-full bg-white  shadow-md sticky top-0 z-40">
       <div className="xl:container mx-auto px-4 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
         {/* Logo */}
         <div className="flex items-center gap-4 w-full md:w-auto justify-between">

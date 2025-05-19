@@ -64,9 +64,9 @@ export function HeroCarousel() {
   }
 
   return (
-    <div className="relative w-full overflow-hidden rounded-xl">
+    <div className="relative w-full overflow-hidden rounded-xl ">
       {/* Main carousel container with images */}
-      <div className="relative h-[400px] md:h-[500px] w-full">
+      <div className="relative h-[400px] md:h-[500px] 2xl:h-[700px] w-full">
         {demoSlides.map((slide, index) => (
           <div
             key={slide.id}
