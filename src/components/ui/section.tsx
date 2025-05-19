@@ -21,11 +21,11 @@ export function Section({
   contentClassName,
 }: SectionProps) {
   return (
-    <section className={cn("py-8 md:py-12", className)}>
+    <section className={cn("py-8 md:py-12 bg-white p-4 rounded-lg shadow", className)}>
       <div className="container">
         <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center">
           <div className="mb-4 sm:mb-0">
-            <h2 className="text-2xl font-bold tracking-tight">{title}</h2>
+          <h2 className="text-3xl font-bold tracking-tight">{title}</h2>
             {description && (
               <p className="mt-1 text-muted-foreground">{description}</p>
             )}

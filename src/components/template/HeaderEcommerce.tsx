@@ -25,7 +25,7 @@ const HeaderEcommerce = async () => {
   const session = await getSession();
   return (
     <header className="w-full bg-white shadow-md">
-      <div className="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
+      <div className="xl:container mx-auto px-4 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
         {/* Logo */}
         <div className="flex items-center gap-4 w-full md:w-auto justify-between">
           <Logo />

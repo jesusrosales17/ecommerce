@@ -1,8 +1,5 @@
-import Link from "next/link"
-import { ArrowRight } from "lucide-react"
 
 import { Section } from "@/components/ui/section"
-import { Button } from "@/components/ui/button"
 import { ProductCard } from "@/features/products/components/ProductCard"
 import { Product } from "@/features/products/interfaces/product"
 
@@ -29,6 +26,7 @@ export async function FeaturedProducts({ products }: FeaturedProductsProps) {
             price={product.price}
             salePrice={product.salePrice as number | undefined}
             isOnSale={product.isOnSale}
+            specifications={product.specifications}
             image={product.images?.[0]?.name}
           />
         ))}

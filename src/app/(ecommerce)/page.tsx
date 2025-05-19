@@ -27,7 +27,7 @@ export default async function HomePage() {
   console.log(products);
 
   return (
-    <main className="max-w-7xl mx-auto px-3 py-3">
+    <main className="xl:container mx-auto px-3 py-3">
       {/* Hero Carousel */}
       <HeroCarousel />
 
