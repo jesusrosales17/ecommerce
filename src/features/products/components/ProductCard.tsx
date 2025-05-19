@@ -37,7 +37,7 @@ export function ProductCard({
   return (
     <div className="group  relative border lg:rounded-2xl bg-white  hover:shadow-lg transition-all duration-300 ">
       <div className="relative flex flex-col justify-between  h-full">
-        <div className="aspect-[4/3] relative overflow-hidden w-full">
+        <div className="aspect-[4/3] relative overflow-hidden w-full border-b">
           <Image
             src={
               `/api/uploads/products/${image}` ||

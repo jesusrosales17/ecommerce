@@ -68,6 +68,7 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET() {
+  
   try {
     const categories = await prisma.category.findMany({
       orderBy: {

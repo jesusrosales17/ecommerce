@@ -96,7 +96,8 @@ export async function GET(request: NextRequest) {
   try {
     // Opciones de filtrado desde los query params
     const searchParams = request.nextUrl.searchParams;
-    const category = searchParams.get('category');
+    const categoryName = searchParams.get('categoryName');
+    const categoryId = searchParams.get('categoryId');
     const isOnSale = searchParams.get('onSale') === 'true';
     const featured = searchParams.get('featured') === 'true';
     const status = searchParams.get('status') || 'ACTIVE';
@@ -118,8 +119,11 @@ export async function GET(request: NextRequest) {
       }
     };
 
-    if (category) {
-      where.categoryId = category;
+    if (categoryName) {
+      where.category = { name: categoryName };
+    }
+    if( categoryId) {
+      where.categoryId = categoryId;
     }
 
     if (featured) {

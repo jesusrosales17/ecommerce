@@ -70,7 +70,7 @@ const HeaderEcommerce = async () => {
                     categories.map((cat: any) => (
                       <li key={cat.id || cat.slug || cat.name}>
                         <Link
-                          href={`/category/${cat.slug || cat.id}`}
+                          href={`/categories/${cat.name}`}
                           className="text-sm hover:underline block"
                         >
                           {cat.name}

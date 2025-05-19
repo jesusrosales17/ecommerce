@@ -25,7 +25,7 @@ export function Section({
 }: SectionProps) {
   return (
     <section
-      className={cn("pt-8 pb-2   md:py-12 bg-white  rounded-lg shadow", className)}
+      className={cn("pt-8 pb-2   md:pb-12 md:pt-5  bg-white  rounded-lg shadow", className)}
     >
       <div className="w-full">
         <div className="mb-6 p-4  flex flex-col sm:flex-row justify-between items-start sm:items-center">
