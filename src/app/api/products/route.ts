@@ -99,6 +99,16 @@ export async function GET(request: NextRequest) {
     const category = searchParams.get('category');
     const featured = searchParams.get('featured') === 'true';
     const status = searchParams.get('status') || 'ACTIVE';
+    const minPrice = searchParams.get('minPrice');
+    const maxPrice = searchParams.get('maxPrice');
+    const search = searchParams.get('search');
+    const sortBy = searchParams.get('sortBy') || 'createdAt';
+    const sortOrder = searchParams.get('sortOrder') || 'desc';
+    const limit = parseInt(searchParams.get('limit') || '0');
+    const page = parseInt(searchParams.get('page') || '1');
+
+
+    
 
     // Construir las condiciones de filtrado
     const where: Prisma.ProductWhereInput = {
@@ -115,16 +125,40 @@ export async function GET(request: NextRequest) {
       where.isFeatured = true;
     }
 
-    // if (status !== 'ALL') {
-    //   where.status = status as ProductStatus;
-    // }
+    if (status !== 'ALL') {
+      where.status = status as ProductStatus;
+    }
+
+    if (minPrice) {
+      where.price = {
+        gte: parseFloat(minPrice)
+      };
+    }
+
+    if (maxPrice) {
+      where.price = {
+        lte: parseFloat(maxPrice)
+      };
+    }
+
+    if (search) {
+      where.OR = [
+        { name: { contains: search } },
+        { description: { contains: search } }
+      ];
+    }
+
+    // Obtener el total de productos para la paginación
+    const total = await prisma.product.count({ where });
 
     // Obtener los productos con sus relaciones
     const products = await prisma.product.findMany({
       where,
       orderBy: {
-        createdAt: 'desc',
+        [sortBy]: sortOrder,
       },
+      take: limit || undefined,
+      skip: limit ? (page - 1) * limit : undefined,
       include: {
         category: {
           select: {
@@ -136,6 +170,7 @@ export async function GET(request: NextRequest) {
         specifications: true,
       }
     });
+    console.log("Productos", products)
 
     return NextResponse.json(products);
 

@@ -19,24 +19,18 @@ interface FeaturedCategoriesProps {
 export async function FeaturedCategories({ categories }: FeaturedCategoriesProps) {
   return (
     <Section
-      title="Categorías populares"
-      description="Explora nuestras categorías más populares"
-      action={
-        <Button asChild variant="ghost" size="sm">
-          <Link href="/categories" className="flex items-center gap-1">
-            Ver todas <ArrowRight className="ml-1 h-4 w-4" />
-          </Link>
-        </Button>
-      }
+      title="Gran variedad de categorías"
+      description="Explora entre nuestra gran variedad de categorías"
+      viewAllLink="/categories"
     >
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
-        {categories.map((category) => (
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+        {/* solo 5 */}
+        {categories.splice(0, 5).map((category) => (
           <CategoryCard
             key={category.id}
             id={category.id}
             name={category.name}
-            slug={category.slug}
-            image={category.image}
+            image={category.image!}
           />
         ))}
       </div>

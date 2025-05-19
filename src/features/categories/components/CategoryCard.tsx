@@ -4,17 +4,16 @@ import Link from "next/link"
 interface CategoryCardProps {
   id: string
   name: string
-  slug: string
-  image?: string
+  image: string
 }
 
-export function CategoryCard({ id, name, slug, image }: CategoryCardProps) {
+export function CategoryCard({ id, name,  image }: CategoryCardProps) {
   return (
-    <Link href={`/category/${slug}`}>
+    <Link href={`/category/${name}__${id}`} className="block">
       <div className="group relative overflow-hidden rounded-lg border hover:border-primary transition-colors">
         <div className="relative aspect-square overflow-hidden bg-gray-100">
           <Image
-            src={image ? `/uploads/categories/${image}` : "/images/category-placeholder.png"}
+            src={image ? `/api/uploads/categories/${image}` : "/images/category-placeholder.png"}
             alt={name}
             fill
             className="object-cover transition-transform duration-300 ease-in-out group-hover:scale-105"

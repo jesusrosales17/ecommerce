@@ -19,9 +19,10 @@ export default async function HomePage() {
   });
   
   const products = (await productsRes.json().catch(() => [])) || [];
+  console.log(products)
 
   return (
-    <main className="max-w-7xl mx-auto px-4 py-8">
+    <main className="max-w-7xl mx-auto px-3 py-3">
       {/* Hero Carousel */}
       <HeroCarousel />
       

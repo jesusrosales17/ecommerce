@@ -26,13 +26,7 @@ export async function FeaturedProducts({ products }: FeaturedProductsProps) {
     <Section
       title="Productos destacados"
       description="Nuestros productos más populares elegidos por nuestros clientes"
-      action={
-        <Button asChild variant="ghost" size="sm">
-          <Link href="/products" className="flex items-center gap-1">
-            Ver todos <ArrowRight className="ml-1 h-4 w-4" />
-          </Link>
-        </Button>
-      }
+      viewAllLink="/products"
     >
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {products.map((product) => (
