@@ -17,7 +17,7 @@ export async function FeaturedProducts({ products }: FeaturedProductsProps) {
       viewAllLink="/products"
       viewAllText="Ver todos los productos destacados"
     >
-      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-5 2xl:grid-cols-6 lg:gap-6 overflow-hidden lg:mx-4 lg:max-h-[330px] 2xl:max-h-[380px]">
+      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-5 2xl:grid-cols-6 lg:gap-6 overflow-hidden lg:mx-4 lg:max-h-[350px] 2xl:max-h-[380px]">
         {products.map((product) => (
           <ProductCard
             key={product.id}
@@ -27,7 +27,7 @@ export async function FeaturedProducts({ products }: FeaturedProductsProps) {
             price={product.price}
             salePrice={product.salePrice as number | undefined}
             isOnSale={product.isOnSale}
-            specifications={product.specifications}
+            category={product.category?.name || "Sin categoria"}
             image={product.images?.[0]?.name}
           />
         ))}
