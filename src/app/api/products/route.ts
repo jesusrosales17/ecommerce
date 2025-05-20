@@ -98,8 +98,8 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
     const categoryName = searchParams.get('categoryName');
     const categoryId = searchParams.get('categoryId');
-    const isOnSale = searchParams.get('onSale') === 'true';
-    const featured = searchParams.get('featured') === 'true';
+    const isOnSale = searchParams.get('onSale') ;
+    const featured = searchParams.get('featured') ;
     const status = searchParams.get('status') || 'ACTIVE';
     const minPrice = searchParams.get('minPrice');
     const maxPrice = searchParams.get('maxPrice');

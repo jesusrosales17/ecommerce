@@ -2,14 +2,10 @@ import { ProductCardLong } from "@/features/products/components/ProductCardLong"
 import { Product } from "@/features/products/interfaces/product";
 import { formmatNumber } from "@/utils/number";
 
-interface Props {
-  params: Promise<{
-    name: string;
-  }>;
-}
-const SalesProducsPage= async ({ params }: Props) => {
+
+const SalesProducsPage= async () => {
   const res = await fetch(
-    `${process.env.NEXT_PUBLIC_URL}/api/products?featured=true`
+    `${process.env.NEXT_PUBLIC_URL}/api/products?onSale=true`
   );
   if (!res.ok) {
     return (
@@ -27,7 +23,7 @@ const SalesProducsPage= async ({ params }: Props) => {
       <div className="flex flex-col items-center justify-center h-screen">
         <h1 className="text-2xl font-bold">No hay productos</h1>
         <p className="text-gray-500">
-          No se encontraron productos destacados
+          No se encontraron productos en oferta
         </p>
       </div>
     );
@@ -35,7 +31,7 @@ const SalesProducsPage= async ({ params }: Props) => {
   return (
     <main className="container mx-auto px-3 py-3 grid grid-cols-1 md:grid-cols-[30%_70%] mt-5">
       <div className="hidden lg:block">
-        <h1 className="text-xl font-bold">Destacados</h1>
+        <h1 className="text-xl font-bold">En oferta</h1>
         <p className="text-accent-foreground">
           {formmatNumber(products.length)}{" "}
           {products.length > 1 ? "resultados" : "resultado"}
