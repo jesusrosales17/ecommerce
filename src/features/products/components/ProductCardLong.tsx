@@ -3,6 +3,7 @@ import { Product } from "../interfaces/product";
 import { Badge } from "@/components/ui/badge";
 import ButtonsCardProduct from "@/features/ecommerce/components/ButtonsCardProduct";
 import { formattedPrice } from "@/utils/price";
+import Link from "next/link";
 
 interface Props {
   product: Product;
@@ -14,7 +15,8 @@ export const ProductCardLong = ({ product }: Props) => {
       ? Math.round(((product.price - product.salePrice) / product.price) * 100)
       : null;
   return (
-    <div
+    <Link 
+        href={`/products/${product.id}`}
       key={product.id}
       className="p-4 group grid grid-cols-[35%_62%] lg:grid-cols-[1fr_3fr] gap-4 border-b items-center shadow"
     >
@@ -59,6 +61,6 @@ export const ProductCardLong = ({ product }: Props) => {
           </div>
         </div>
       </div>
-    </div>
+    </Link>
   );
 };

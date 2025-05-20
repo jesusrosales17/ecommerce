@@ -2,10 +2,6 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
-import { Heart, RefreshCcw, ShoppingCart } from "lucide-react";
-import { cn } from "@/libs/utils";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { formattedPrice } from "@/utils/price";
 import ButtonsCardProduct from "@/features/ecommerce/components/ButtonsCardProduct";
@@ -36,7 +32,7 @@ export function ProductCard({
       : null;
 
   return (
-    <div className="group  relative border lg:rounded-2xl bg-white  hover:shadow-lg transition-all duration-300 ">
+    <Link href={id} className="group  relative border lg:rounded-2xl bg-white  hover:shadow-lg transition-all duration-300 ">
       <div className="relative flex flex-col justify-between  h-full">
         <div className="aspect-[4/3] relative overflow-hidden w-full border-b">
           <Image
@@ -84,9 +80,9 @@ export function ProductCard({
               </div>
             </div>
           </div>
-                <ButtonsCardProduct />
+          <ButtonsCardProduct />
         </div>
       </div>
-    </div>
+    </Link>
   );
 }

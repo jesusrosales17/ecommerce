@@ -51,7 +51,7 @@ export const CategoriesPage = async () => {
           key={category}
             title={category}
             description={data.category}
-            viewAllLink="/products"
+            viewAllLink={`/categories/${category}`}
             viewAllText="Ver todos los productos destacados"
             className="mb-10"
           >
