@@ -8,6 +8,7 @@ import { cn } from "@/libs/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { formattedPrice } from "@/utils/price";
+import ButtonsCardProduct from "@/features/ecommerce/components/ButtonsCardProduct";
 
 interface ProductCardProps {
   id: string;
@@ -54,7 +55,7 @@ export function ProductCard({
         {/* Nombre y precio */}
         <div className="mt-1 p-4 pt-0 flex flex-col justify-between  flex-grow ">
           <div className="">
-            <h3 className=" font-medium text-gray-900  line-clamp-1">{name}</h3>
+            <h3 className="  line-clamp-1">{name}</h3>
             <Badge>{category}</Badge>
             <div className="mt-3 flex items-center justify-between ">
               <div className="flex flex-col-reverse gap-0">
@@ -83,21 +84,7 @@ export function ProductCard({
               </div>
             </div>
           </div>
-          <div className="flex justify-between items-center mt-2">
-            <Button
-              size="icon"
-              variant="ghost"
-              className="rounded-full  bg-white hover:bg-red-500 hover:text-white"
-            >
-              <Heart className="h-4 w-4" />
-            </Button>
-            <Button
-              size="icon"
-              className="rounded-md bg-gray-500 group-hover:bg-rose-600 text-white"
-            >
-              <ShoppingCart className="h-4 w-4" />
-            </Button>
-          </div>
+                <ButtonsCardProduct />
         </div>
       </div>
     </div>

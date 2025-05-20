@@ -81,7 +81,7 @@ export async function FooterEcommerce() {
               {categories.slice(0,4).map((category) => (
                 <li key={category.id}>
                   <Link
-                    href={`/categories/${category.name}__${category.id}`}
+                    href={`/categories/${category.name}`}
                     className="hover:text-white transition-colors"
                   >
                     {category.name}
