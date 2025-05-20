@@ -33,8 +33,8 @@ const FeaturedProducsPage= async ({ params }: Props) => {
     );
   }
   return (
-    <main className="container mx-auto px-3 py-3 grid grid-cols-1 md:grid-cols-[30%_70%] mt-5">
-      <div className="hidden lg:block">
+    <main className="container mx-auto lg:px-3 py-3 grid grid-cols-1 md:grid-cols-[30%_70%] mt-5">
+      <div className="hidden lg:block px-3 lg:px-0">
         <h1 className="text-xl font-bold">Destacados</h1>
         <p className="text-accent-foreground">
           {formmatNumber(products.length)}{" "}
@@ -42,7 +42,7 @@ const FeaturedProducsPage= async ({ params }: Props) => {
         </p>
       </div>
       
-     <h1 className="lg:hidden">
+     <h1 className="lg:hidden px-3 lg:px-0">
       Destacados
      </h1>
       <div className="grid grid-cols-1  bg-white">

@@ -16,7 +16,7 @@ export function SpecialOffers({ products }: SpecialOffersProps) {
     <Section
       title="Ofertas Especiales"
       description="Aprovecha nuestras mejores promociones"
-      viewAllLink="/ofertas"
+      viewAllLink="/sales"
       viewAllText="Ver todas las ofertas"
     >
 

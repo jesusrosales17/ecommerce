@@ -22,8 +22,8 @@ export const ProductPage = async ({ params }: Props) => {
   const product: Product = await res.json();
 
   return (
-    <div className="container bg-white mx-auto px-4 py-6">
-      <div className="grid grid-cols-1 md:grid-cols-[1fr_1.3fr] gap-8 bg-white p-6 ">
+    <div className="container bg-white md:bg-transparent mx-auto px-4 py-6">
+      <div className="grid grid-cols-1 md:grid-cols-[1fr_1.3fr] gap-8 bg-white md:rounded-lg md:shadow p-6 ">
         {/* Galería de imágenes */}
         <div className="w-full">
           <ProductImagesGallery images={product.images} alt={product.name} />

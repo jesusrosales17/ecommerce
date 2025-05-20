@@ -33,8 +33,8 @@ const ProductsByCategoryPage = async ({ params }: Props) => {
     );
   }
   return (
-    <main className="container mx-auto px-3 py-3 grid grid-cols-1 md:grid-cols-[30%_70%] mt-5">
-      <div className="hidden lg:block">
+    <main className=" mx-auto lg:px-3 py-3 grid grid-cols-1 md:grid-cols-[30%_70%] mt-5">
+      <div className="hidden lg:block px-3 lg:px-0">
         <h1 className="text-xl font-bold">{name}</h1>
         <p className="text-accent-foreground">
           {formmatNumber(products.length)}{" "}
@@ -42,7 +42,7 @@ const ProductsByCategoryPage = async ({ params }: Props) => {
         </p>
       </div>
       
-     <h1 className="lg:hidden">
+     <h1 className="lg:hidden px-3 lg:px-0">
         {products[0].category.name}
 
      </h1>

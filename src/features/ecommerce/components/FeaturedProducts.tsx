@@ -14,7 +14,7 @@ export async function FeaturedProducts({ products }: FeaturedProductsProps) {
     <Section
       title="Productos destacados"
       description="Nuestros productos más populares elegidos por nuestros clientes"
-      viewAllLink="/products"
+      viewAllLink="/featured"
       viewAllText="Ver todos los productos destacados"
     >
       <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-5 2xl:grid-cols-6 lg:gap-6 overflow-hidden lg:mx-4 lg:max-h-[350px] 2xl:max-h-[380px]">
