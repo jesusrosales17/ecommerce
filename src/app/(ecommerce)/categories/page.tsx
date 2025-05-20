@@ -38,7 +38,6 @@ export const CategoriesPage = async () => {
     },
     {}
   );
-  console.log(productByCategories);
   return (
     <main className="xl:container mx-auto px-3 py-3">
       <div className="mb-10 mt-5">

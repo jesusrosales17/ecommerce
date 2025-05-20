@@ -7,10 +7,9 @@ interface Props {
     name: string;
   }>;
 }
-const ProductsByCategoryPage = async ({ params }: Props) => {
-  const { name } = await params;
+const FeaturedProducsPage= async ({ params }: Props) => {
   const res = await fetch(
-    `${process.env.NEXT_PUBLIC_URL}/api/products?categoryName=${name}`
+    `${process.env.NEXT_PUBLIC_URL}/api/products?featured=true`
   );
   if (!res.ok) {
     return (
@@ -21,13 +20,14 @@ const ProductsByCategoryPage = async ({ params }: Props) => {
     );
   }
   const products: Product[] = (await res.json().catch(() => [])) || [];
+  // console.log(products)
 
   if (products.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center h-screen">
         <h1 className="text-2xl font-bold">No hay productos</h1>
         <p className="text-gray-500">
-          No se encontraron productos en esta categoria
+          No se encontraron productos destacados
         </p>
       </div>
     );
@@ -35,7 +35,7 @@ const ProductsByCategoryPage = async ({ params }: Props) => {
   return (
     <main className="container mx-auto px-3 py-3 grid grid-cols-1 md:grid-cols-[30%_70%] mt-5">
       <div className="hidden lg:block">
-        <h1 className="text-xl font-bold">{name}</h1>
+        <h1 className="text-xl font-bold">Destacados</h1>
         <p className="text-accent-foreground">
           {formmatNumber(products.length)}{" "}
           {products.length > 1 ? "resultados" : "resultado"}
@@ -43,12 +43,11 @@ const ProductsByCategoryPage = async ({ params }: Props) => {
       </div>
       
      <h1 className="lg:hidden">
-        {products[0].category.name}
-
+      Destacados
      </h1>
       <div className="grid grid-cols-1  bg-white">
        {
-        products.map(product => (
+         products.map(product => (
             <ProductCardLong key={product.id} product={product} />
         ))
        } 
@@ -57,4 +56,5 @@ const ProductsByCategoryPage = async ({ params }: Props) => {
   );
 };
 
-export default ProductsByCategoryPage;
+export default FeaturedProducsPage;
+

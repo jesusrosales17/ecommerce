@@ -12,7 +12,6 @@ export async function GET(
     const { path } = await params;
     const filePath = join(process.cwd(), baseUploadsPath, ...path);
     const file = await readFile(filePath);
-    console.log("file",file)
 
     const ext = filePath.split('.').pop();
     const contentType = ext === "jpg" || ext === "jpeg"

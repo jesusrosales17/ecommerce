@@ -55,20 +55,13 @@ export async function FooterEcommerce() {
               </li>
               <li>
                 <Link
-                  href="/ofertas"
+                  href="/sales"
                   className="hover:text-white transition-colors"
                 >
                   Ofertas
                 </Link>
               </li>
-              <li>
-                <Link
-                  href="/contacto"
-                  className="hover:text-white transition-colors"
-                >
-                  Contacto
-                </Link>
-              </li>
+             
             </ul>
           </div>
 

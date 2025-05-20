@@ -23,7 +23,6 @@ export default async function middleware(request: NextRequestWithAuth) {
  
 
   // Redireccionar al login si no está autenticado y no es ruta pública
-  console.log(isAuthenticated, isPublicRoute, pathname);
   if (isAdminRoute && !isAuthenticated && !isAdmin) {
     return NextResponse.redirect(new URL("/auth/login", request.url));
   }

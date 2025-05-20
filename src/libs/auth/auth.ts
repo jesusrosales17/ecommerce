@@ -23,7 +23,6 @@ export const requireAuth = async (role = "ADMIN") => {
             }),
         }
     }
-    console.log(session.user.role)
 
     if (session.user.role !== role) {
         return {

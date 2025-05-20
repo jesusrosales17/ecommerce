@@ -93,14 +93,14 @@ const HeaderEcommerce = async () => {
               variant="link"
               className="text-muted-foreground hover:text-primary"
             >
-              <Link href="/destacados">Destacados</Link>
+              <Link href="/featured">Destacados</Link>
             </Button>
             <Button
               asChild
               variant="link"
               className="text-muted-foreground hover:text-primary"
             >
-              <Link href="/descuentos">Descuentos</Link>
+              <Link href="/sales">Descuentos</Link>
             </Button>
           </nav>
 

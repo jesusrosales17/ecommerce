@@ -31,7 +31,6 @@ export default async function HomePage() {
       cache: "no-store",
     }
   );
-  console.log(productsOnSaleRes)
 
   const products = (await productsRes.json().catch(() => [])) || [];
   const productsOnSale = (await productsOnSaleRes.json().catch(() => [])) || [];

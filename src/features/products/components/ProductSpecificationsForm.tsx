@@ -19,7 +19,6 @@ export const ProductSpecificationsForm = forwardRef<{submit: () => string | bool
       );
       const isValid = !hasEmptyFields && specifications.length > 0;
 
-     console.log(hasEmptyFields); 
       if (!isValid) {
         sonnerNotificationAdapter.error(
           "No debe haber campos vacios en las especificaciones");

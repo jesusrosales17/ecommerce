@@ -8,6 +8,7 @@ interface Props {
   product: Product;
 }
 export const ProductCardLong = ({ product }: Props) => {
+    console.log(product)
   const discount =
     product.salePrice && product.isOnSale
       ? Math.round(((product.price - product.salePrice) / product.price) * 100)
@@ -15,7 +16,7 @@ export const ProductCardLong = ({ product }: Props) => {
   return (
     <div
       key={product.id}
-      className="p-4 grid grid-cols-[35%_62%] lg:grid-cols-[1fr_3fr] gap-4 border-b items-center shadow"
+      className="p-4 group grid grid-cols-[35%_62%] lg:grid-cols-[1fr_3fr] gap-4 border-b items-center shadow"
     >
       <Image
         src={`/api/uploads/products/${product.images?.[0]?.name}`}
@@ -26,8 +27,8 @@ export const ProductCardLong = ({ product }: Props) => {
       />
       <div className="flex flex-col gap-5 h-full justify-center relative">
         <div>
-          <h3 className="text-sm lg:text-xl mb-4">{product.name}</h3>
-          <Badge>{product.category.name}</Badge>
+          <h3 className="text-sm lg:text-xl mb-4 line-clamp-2">{product.name}</h3>
+          <Badge>{product?.category?.name || "Sin categoria"}</Badge>
           <div className="mt-3 flex flex-col    ">
             <div className="flex flex-col-reverse gap-0">
               <span className="text-base lg:text-2xl font-medium  relative">

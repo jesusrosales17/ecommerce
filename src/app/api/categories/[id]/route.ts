@@ -37,7 +37,6 @@ export async function PUT(request: Request, { params }: Params) {
             image: imageFile
         };
         const validatedData = categoryUpdateSchema.parse(validationData);        //  verificar si la categoria existe
-        console.log(validatedData);
         const category = await prisma.category.findUnique({
             where: {
                 id,

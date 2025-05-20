@@ -74,7 +74,6 @@ export async function processMultipleImages(
 ): Promise<{ name: string; url: string }[]> {
   const images = formData.getAll(fieldName);
   const savedImages: { name: string; url: string }[] = [];
-    console.log(formData)
   for (const image of images) {
     if (image instanceof File) {
       const savedImage = await saveImage(image, basePath);

@@ -37,7 +37,6 @@ export function extractSpecificationsFromFormData(formData: FormData): ProductSp
     }
   }
 
-  console.log("espe", formData)
   
   return specifications;
 }
