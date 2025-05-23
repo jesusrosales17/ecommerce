@@ -1,6 +1,6 @@
 import { ProductDescription } from "./ProductDescription";
-import { ProductSpecs } from "./ProductSpecs";
 import { KeyFeatures } from "./KeyFeatures";
+import {  ProductSpecificationsTable } from "./ProductSpecificationsTable";
 import { Product } from "../interfaces/product";
 
 interface Props {
@@ -20,10 +20,13 @@ export const ProductDetails = ({ product }: Props) => {
             <h2 className="text-xl font-semibold text-gray-900 mb-4">
               Detalles del producto
             </h2>
-            <ProductSpecs
-              categoryName={product.category?.name}
-              stock={product.stock}
-              specifications={product.specifications}
+            <KeyFeatures
+              product={{
+                category: product.category?.name,
+                color: product.color || "Sin color",
+                stock: product.stock || 0,
+                brand: product.brand || "Sin marca",
+              }}
             />
           </div>
 
@@ -31,9 +34,9 @@ export const ProductDetails = ({ product }: Props) => {
 
           <div className="border-t border-b border-gray-200 py-4">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">
-              Características principales
+              Especificaciones del producto
             </h2>
-            <KeyFeatures specifications={product.specifications} />
+            <ProductSpecificationsTable specifications={product.specifications} />
           </div>
         </div>
       </div>

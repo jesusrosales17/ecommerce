@@ -45,13 +45,13 @@ export const ProductInfo = ({ product }: Props) => {
         {/* Precio */}
         <div className="mt-4">
           <div className="flex items-center gap-3">
-            <span className="text-3xl font-bold text-gray-900">
+            <span className="text-xl lg:text-3xl font-bold text-gray-900">
               {formattedPrice(
                 product.isOnSale ? product.salePrice! : product.price
               )}
             </span>
             {product.isOnSale && (
-              <span className="text-lg text-gray-500 line-through">
+              <span className="text-md lg:text-lg text-gray-500 line-through">
                 {formattedPrice(product.price)}
               </span>
             )}

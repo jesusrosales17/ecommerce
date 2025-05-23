@@ -11,29 +11,29 @@
     isFeatured: boolean;
     status: 'ACTIVE' | 'INACTIVE' | 'DELETED';
     categoryId: string | null;
-    createdAt: string;
-    updatedAt: string;
+    createdAt: Date;
+    updatedAt: Date;
     category: {
         id: string;
         name: string;
         description: string;
         status: 'ACTIVE' | 'INACTIVE' | 'DELETED';
-        createdAt: string;
-        updatedAt: string;
+        createdAt: Date;
+        updatedAt: Date;
     },
     images: {
         id: string;
         name: string;
         productId: string;
-        createdAt: string;
-        updatedAt: string;
+        createdAt: Date;
+        updatedAt: Date;
     }[];
     specifications: {
         id: string;
         name: string;
         value: string;
         productId: string;
-        createdAt: string;
-        updatedAt: string;
+        createdAt: Date;
+        updatedAt: Date;
     }[];
   }
