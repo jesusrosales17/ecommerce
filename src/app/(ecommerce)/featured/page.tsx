@@ -2,12 +2,8 @@ import { ProductCardLong } from "@/features/products/components/ProductCardLong"
 import { Product } from "@/features/products/interfaces/product";
 import { formmatNumber } from "@/utils/number";
 
-interface Props {
-  params: Promise<{
-    name: string;
-  }>;
-}
-const FeaturedProducsPage= async ({ params }: Props) => {
+
+const FeaturedProducsPage= async () => {
   const res = await fetch(
     `${process.env.NEXT_PUBLIC_URL}/api/products?featured=true`
   );

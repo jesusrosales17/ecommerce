@@ -1,9 +1,9 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { ArrowLeft, ArrowRight, ChevronLast, ChevronLeft, ChevronRight } from "lucide-react"
+import { ArrowLeft, ArrowRight } from "lucide-react"
 import { cn } from "@/libs/utils"
 import { Button } from "@/components/ui/button"
 
@@ -45,28 +45,97 @@ const demoSlides: Slide[] = [
 
 export function HeroCarousel() {
   const [currentSlide, setCurrentSlide] = useState(0)
+  const [touchStartX, setTouchStartX] = useState(0)
+  const [touchEndX, setTouchEndX] = useState(0)
+  const [isDragging, setIsDragging] = useState(false)
+  const [autoplayPaused, setAutoplayPaused] = useState(false)
 
   // Auto slide functionality
   useEffect(() => {
+    if (autoplayPaused) return;
+    
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev === demoSlides.length - 1 ? 0 : prev + 1))
     }, 5000)
 
     return () => clearInterval(interval)
-  }, [])
+  }, [autoplayPaused])
 
   const nextSlide = () => {
     setCurrentSlide((prev) => (prev === demoSlides.length - 1 ? 0 : prev + 1))
+    setAutoplayPaused(true)
+    // Resume autoplay after 4 seconds of inactivity
+    setTimeout(() => setAutoplayPaused(false), 4000)
   }
 
   const prevSlide = () => {
     setCurrentSlide((prev) => (prev === 0 ? demoSlides.length - 1 : prev - 1))
+    setAutoplayPaused(true)
+    // Resume autoplay after 4 seconds of inactivity
+    setTimeout(() => setAutoplayPaused(false), 4000)
   }
 
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStartX(e.touches[0].clientX)
+    setIsDragging(true)
+    setAutoplayPaused(true)
+  }
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setTouchStartX(e.clientX)
+    setIsDragging(true)
+    setAutoplayPaused(true)
+  }
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isDragging) return
+    setTouchEndX(e.touches[0].clientX)
+  }
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging) return
+    setTouchEndX(e.clientX)
+  }
+
+  const handleTouchEnd = () => {
+    if (!isDragging) return
+    
+    const deltaX = touchEndX - touchStartX
+    const minSwipeDistance = 50 // Mínimo para considerar un swipe válido
+    
+    if (deltaX > minSwipeDistance) {
+      prevSlide()
+    } else if (deltaX < -minSwipeDistance) {
+      nextSlide() 
+    }
+
+    setIsDragging(false)
+    // Resume autoplay after 4 seconds
+    setTimeout(() => setAutoplayPaused(false), 4000)
+  }
+
+  const handleMouseUp = () => {
+    handleTouchEnd()
+  }
+
+  const handleMouseLeave = () => {
+    if (isDragging) {
+      handleTouchEnd()
+    }
+  }
   return (
-    <div className="relative h-[calc(100dvh-65px)] overflow-hidden">
+    <div 
+      className="relative h-[calc(100dvh-65px)] overflow-hidden "
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+      onMouseDown={handleMouseDown}
+      onMouseMove={handleMouseMove}
+      onMouseUp={handleMouseUp}
+      onMouseLeave={handleMouseLeave}
+    >
       {/* Main carousel container with images */}
-      <div className="relative h-full w-full">
+      <div className={`relative h-full w-full `}>
         {demoSlides.map((slide, index) => (
           <div
             key={slide.id}
