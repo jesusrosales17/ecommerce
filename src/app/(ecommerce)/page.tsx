@@ -37,7 +37,7 @@ export default async function HomePage() {
 
   return (
     <>
-      <main className="xl:container mx-auto px-3 py-3">
+      <main className="xl:container mx-auto">
         {/* Hero Carousel */}
         <HeroCarousel />
 

@@ -100,6 +100,16 @@ export async function PUT(request: Request, { params }: Params) {
     // 6. Procesar especificaciones
     const specifications = JSON.parse(formData.get('specifications')?.toString() || '[]');
 
+    if(!specifications || specifications.length === 0) {
+      return NextResponse.json({ error: 'Las especificaciones son obligatorias' }, { status: 400 });
+    }
+
+    const description = formData.get('description')?.toString();
+
+    
+    if(!description) {   
+      return NextResponse.json({ error: 'La descripción es obligatoria' }, { status: 400 });
+    }
     // 7. Ejecutar transacción
     const updatedProduct = await prisma.$transaction(async (tx) => {
       // 7.1 Actualizar producto principal
@@ -107,7 +117,7 @@ export async function PUT(request: Request, { params }: Params) {
         where: { id },
         data: {
           name: validatedData.name,
-          description: validatedData.description,
+          description: description,
           price: validatedData.price,
           stock: validatedData.stock ?? existingProduct.stock,
           isOnSale: validatedData.isOnSale,

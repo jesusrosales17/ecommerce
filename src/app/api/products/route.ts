@@ -41,13 +41,20 @@ export async function POST(request: Request) {
     const specifications = JSON.parse(formData.get('specifications')?.toString() || '[]');
 
 
-
+    if(!specifications || specifications.length === 0) {
+      return NextResponse.json({ error: 'Las especificaciones son obligatorias' }, { status: 400 });
+    }
+    
+    const description = formData.get('description')?.toString();
+    if (!description) {
+      return NextResponse.json({ error: 'La descripción es obligatoria' }, { status: 400 });
+    }
 
     // Creamos el producto con sus relaciones
     const product = await prisma.product.create({
       data: {
         name: validatedData.name,
-        description: formData.get('description')?.toString(),
+        description: description,
         price: validatedData.price,
         stock: validatedData.stock ?? 0,
         isOnSale: validatedData.isOnSale,

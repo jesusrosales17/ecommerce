@@ -32,7 +32,7 @@ export function ProductCard({
       : null;
 
   return (
-    <Link href={id} className="group  relative border lg:rounded-2xl bg-white  hover:shadow-lg transition-all duration-300 ">
+    <Link href={`/products/${id}`} className="group  relative border lg:rounded-2xl bg-white  hover:shadow-lg transition-all duration-300 ">
       <div className="relative flex flex-col justify-between  h-full">
         <div className="aspect-[4/3] relative overflow-hidden w-full lg:border-b">
           <Image

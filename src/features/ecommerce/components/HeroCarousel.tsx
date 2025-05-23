@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { ArrowLeft, ArrowRight } from "lucide-react"
+import { ArrowLeft, ArrowRight, ChevronLast, ChevronLeft, ChevronRight } from "lucide-react"
 import { cn } from "@/libs/utils"
 import { Button } from "@/components/ui/button"
 
@@ -64,9 +64,9 @@ export function HeroCarousel() {
   }
 
   return (
-    <div className="relative w-full overflow-hidden rounded-xl ">
+    <div className="relative h-[calc(100vh-65px)] overflow-hidden">
       {/* Main carousel container with images */}
-      <div className="relative h-[400px] md:h-[500px] 2xl:h-[700px] w-full">
+      <div className="relative h-full w-full">
         {demoSlides.map((slide, index) => (
           <div
             key={slide.id}

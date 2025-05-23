@@ -77,7 +77,7 @@ export const ProductWizardContent = () => {
       }
     });
     formData.append("imagesToDelete", JSON.stringify(imagesToDelete));
-    console.log(imagesToDelete)
+   
     try {
       if (!productSelectedId) {
         const response = await axios.post("/api/products", formData);
