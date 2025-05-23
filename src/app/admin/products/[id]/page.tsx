@@ -64,6 +64,7 @@ const ProductViewPage = async ({ params }: Props) => {
                   <div className="grid grid-cols-2  gap-2">
                     {product.images.map((img) => (
                         <Image
+                        key={img.id}
                           src={`/api/uploads/products/${img.name}`}
                           alt={product.name}
                           width={100}
@@ -146,6 +147,16 @@ const ProductViewPage = async ({ params }: Props) => {
                 <div className="flex items-center ">
                   <span className="text-muted-foreground">En oferta:</span>
                   <span className="font-medium">{product.isOnSale ? 'Sí' : 'No'}</span>
+                </div>
+
+                {/* brand */}
+                <div className="flex items-center ">
+                  <span className="text-muted-foreground">Marca:</span>
+                  <span className="font-medium">{product.brand ?? 'Sin marca'}</span>
+                </div>
+                <div className="flex items-center ">
+                  <span className="text-muted-foreground">Color:</span>
+                  <span className="font-medium">{product.color ?? 'Sin color'}</span>
                 </div>
               </div>
             </CardContent>
