@@ -64,7 +64,7 @@ export function HeroCarousel() {
   }
 
   return (
-    <div className="relative h-[calc(100vh-65px)] overflow-hidden">
+    <div className="relative h-[calc(100dvh-65px)] overflow-hidden">
       {/* Main carousel container with images */}
       <div className="relative h-full w-full">
         {demoSlides.map((slide, index) => (
