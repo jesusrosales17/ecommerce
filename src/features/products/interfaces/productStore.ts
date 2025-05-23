@@ -18,6 +18,8 @@ export interface ProductStore {
     salePrice?: number | undefined;
     isFeatured?: boolean | undefined;
     categoryId?: string | undefined;
+    brand?: string | undefined;
+    color?: string | undefined;
   };
   specifications: Specification[];
   description: string;

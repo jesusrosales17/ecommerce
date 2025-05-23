@@ -12,6 +12,12 @@ export const  productGeneralSchema = z.object({
     stock: z.number().int().nonnegative({
         message: "El stock del producto debe ser un número entero no negativo",
     }),
+    brand: z.string().trim().min(3, {
+        message: "La marca del producto debe tener al menos 3 caracteres",
+    }).optional(),
+    color: z.string().trim().min(3, {
+        message: "El color del producto debe tener al menos 3 caracteres",
+    }).optional(),
     isOnSale: z.boolean().optional(),
     // si el producto esta en oferta, el precio de oferta es requerido
     salePrice: z.number().positive({

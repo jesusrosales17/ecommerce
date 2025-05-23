@@ -12,6 +12,12 @@ export const productFormSchema = z.object({
   stock: z.number().min(0, {
     message: "El stock del producto debe ser un número entero positivo",
   }).optional(),
+  brand: z.string().trim().min(3, {
+    message: "La marca del producto debe tener al menos 3 caracteres",
+  }).optional(),
+  color: z.string().trim().min(3, {
+    message: "El color del producto debe tener al menos 3 caracteres",
+  }).optional(),
   isOnSale: z.boolean().optional(),
   salePrice: z.number().min(0, {
     message: "El precio de oferta debe ser un número positivo",

@@ -29,6 +29,7 @@ export const ProductGeneralForm = forwardRef((_, ref) => {
       price: general?.price || 0,
       stock: general?.stock || 0,
       isOnSale: general?.isOnSale || false,
+      
       salePrice: general?.salePrice || undefined,
       isFeatured: general?.isFeatured || false,
       status: general?.status || "ACTIVE",
@@ -48,12 +49,15 @@ export const ProductGeneralForm = forwardRef((_, ref) => {
       return isValid;
     },
   }));
+  console.log(general)
 
   useEffect(() => {
     form.reset({
       name: general?.name || "",
       price: general?.price || 0,
       stock: general?.stock || 0,
+      brand: general?.brand || undefined,
+      color: general?.color || undefined,
       isOnSale: general?.isOnSale || false,
       salePrice: Number(general?.salePrice) || undefined,
       isFeatured: general?.isFeatured || false,
@@ -124,6 +128,37 @@ export const ProductGeneralForm = forwardRef((_, ref) => {
               </FormItem>
             )}
           />
+
+          <FormField
+            control={form.control}
+            name="brand"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Marca</FormLabel>
+                <Input type="text" placeholder="Ej. Samsung" {...field} />
+                <FormDescription>
+                  Marca del producto que se mostrara en la tienda
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="color"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Color</FormLabel>
+                <Input type="text" placeholder="Ej. Negro" {...field} />
+                <FormDescription>
+                  Color del producto que se mostrara en la tienda
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
           <FormField
             control={form.control}
             name="categoryId"

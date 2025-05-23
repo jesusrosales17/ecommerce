@@ -16,6 +16,8 @@ export const ProductUpdatePageContent = ({ productData }: Props) => {
       name: productData.name,
       price: Number( productData.price ),
       stock: productData.stock,
+      brand: productData.brand as string | undefined,
+      color: productData.color as string | undefined,
       status: productData.status,
       isOnSale: productData.isOnSale,
       salePrice: productData.salePrice as number | undefined,

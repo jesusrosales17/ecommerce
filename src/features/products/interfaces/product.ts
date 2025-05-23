@@ -5,6 +5,8 @@
     price: number;
     stock: number;
     isOnSale: boolean;
+    brand: string | null;
+    color: string | null;
     salePrice: number | null;
     isFeatured: boolean;
     status: 'ACTIVE' | 'INACTIVE' | 'DELETED';
