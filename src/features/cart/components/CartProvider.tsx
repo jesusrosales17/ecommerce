@@ -12,8 +12,16 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const pathname = usePathname();
   const { status } = useCartAuth();
-  
+  const { cart } = useCartStore();
+  const { fetchCart } = useCartActions();
+  const { isAuthenticated } = useCartAuth();
   // No necesitamos llamar a fetchCart aquí, ya lo hace useCartAuth
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchCart();
+    }
+  }, [isAuthenticated])
 
   // Clear pending cart data when user explicitly logs out
   useEffect(() => {

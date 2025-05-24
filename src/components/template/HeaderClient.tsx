@@ -4,13 +4,7 @@ import { signOut } from "next-auth/react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Heart, User } from "lucide-react";
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuSeparator, 
-  DropdownMenuTrigger 
-} from "@/components/ui/dropdown-menu";
+
 import { getSession } from "@/libs/auth/auth";
 import { DropdownUserEcommerce } from "./DropdownUserEcommerce";
 

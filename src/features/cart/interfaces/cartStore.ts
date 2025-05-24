@@ -22,7 +22,7 @@ export interface PendingCartItem {
 // The simplified CartStore interface only manages state
 export interface CartStore {
     // Cart state
-    cart: CartItemWithProduct[];
+    cart: CartItemWithProduct[]| null;
     total: number;
     isLoading: boolean;
     isCartOpen: boolean;

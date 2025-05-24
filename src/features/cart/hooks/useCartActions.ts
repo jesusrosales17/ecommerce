@@ -78,6 +78,7 @@ export const useCartActions = () => {
 
       // Refresh the cart after adding item
       await fetchCart();
+    
       toast.success('Producto agregado al carrito');
       
       return true;

@@ -34,6 +34,7 @@ export default async function HomePage() {
   const products = (await productsRes.json().catch(() => [])) || [];
   const productsOnSale = (await productsOnSaleRes.json().catch(() => [])) || [];
 
+  
   return (
     <>
       <main className="xl:container mx-auto">

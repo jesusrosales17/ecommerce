@@ -44,15 +44,15 @@ export const CartDrawer = () => {
             Carrito de compras
           </SheetTitle> 
           <SheetDescription>
-            {cart.length === 0 
+            {cart?.length === 0 
               ? 'Tu carrito está vacío.' 
-              : `Tienes ${cart.length} productos en tu carrito.`
+              : `Tienes ${cart?.length} productos en tu carrito.`
             }
           </SheetDescription>
         </SheetHeader>
 
         <div className="space-y-4 m-4">
-          {cart.map((item) => (
+          {cart?.map((item) => (
             <div 
               key={item.id} 
               className="flex border-b pb-4 relative"
@@ -80,7 +80,7 @@ export const CartDrawer = () => {
               
               {/* Product Details */}
               <div className="ml-4 flex-1">
-                <h4 className="font-medium text-sm line-clamp-2 mr-3">
+                <h4 className="font-medium text-sm line-clamp-2 mr-3 md:mr-10">
                   {item.Product?.name || 'Producto'}
                 </h4>
                 
@@ -144,7 +144,7 @@ export const CartDrawer = () => {
         </div>
         
         {/* Cart Total */}
-        {cart.length > 0 && (
+        {!cart || cart?.length > 0  && (
           <div className="py-4 m-4">
             <div className="flex justify-between items-center border-t pt-4">
               <span className="font-medium">Total:</span>

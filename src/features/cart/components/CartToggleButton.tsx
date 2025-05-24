@@ -6,6 +6,7 @@ import { useCartStore } from '../store/useCartStore';
 import { useCartAuth } from '../hooks/useCartAuth';
 import { signIn } from 'next-auth/react';
 import { Badge } from '@/components/ui/badge';
+import { useEffect } from 'react';
 
 interface CartToggleButtonProps {
   showCount?: boolean;
@@ -20,7 +21,7 @@ export const CartToggleButton = ({
   const { isAuthenticated } = useCartAuth();
 
   // Calculate total items in cart
-  const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+  const itemCount = cart?.reduce((sum, item) => sum + item.quantity, 0) || 0;
 
   const handleToggleCart = () => {
     if (!isAuthenticated) {
@@ -32,6 +33,8 @@ export const CartToggleButton = ({
       setIsCartOpen(!isCartOpen);
     }
   };
+
+ 
 
   return (
     <div className="relative">

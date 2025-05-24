@@ -6,7 +6,7 @@ export const useCartStore = create<CartStore>()(
   persist(
     (set) => ({
       // State
-      cart: [],
+      cart: null,
       total: 0,
       isLoading: false,
       isCartOpen: false,
