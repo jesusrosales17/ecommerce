@@ -7,6 +7,7 @@ export interface Specification  {
 export interface Images {
   file: File | null;
   preview: string;
+  isPrincipal?: boolean | undefined;
 };
 export interface ProductStore {
   general: {

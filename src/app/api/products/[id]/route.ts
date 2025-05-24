@@ -87,7 +87,7 @@ export async function PUT(request: Request, { params }: Params) {
       status: generalInformation.status || existingProduct.status,
       categoryId: generalInformation.categoryId,
     });
-
+    
     // 4. Preparar imágenes a eliminar
     const imagesToDelete = JSON.parse(formData.get('imagesToDelete')?.toString() || '[]');
 
@@ -110,7 +110,10 @@ export async function PUT(request: Request, { params }: Params) {
     
     if(!description) {   
       return NextResponse.json({ error: 'La descripción es obligatoria' }, { status: 400 });
-    }
+    }    // Obtener información sobre imágenes existentes que pueden haber sido marcadas como principales
+    const existingImagesData = formData.get('existingImages')?.toString();
+    const existingImages = existingImagesData ? JSON.parse(existingImagesData) : [];
+    
     // 7. Ejecutar transacción
     const updatedProduct = await prisma.$transaction(async (tx) => {
       // 7.1 Actualizar producto principal
@@ -137,15 +140,40 @@ export async function PUT(request: Request, { params }: Params) {
           where: { name: { in: filesToDelete } },
         });
       }
-
+      
       // 7.3 Crear nuevas imágenes
       if (newImages.length > 0) {
         await tx.productImage.createMany({
           data: newImages.map(img => ({
             name: img.name,
             productId: id,
+            isPrincipal: img.isPrincipal || false,
           })),
         });
+      }
+      
+      // 7.4 Actualizar estado de imágenes existentes (isPrincipal)
+      if (existingImages.length > 0) {
+        // Primero, resetear todas las imágenes a no principales
+        await tx.productImage.updateMany({
+          where: { productId: id },
+          data: { isPrincipal: false }
+        });
+        
+        // Luego, marcar la imagen seleccionada como principal
+        for (const img of existingImages) {
+          if (img.isPrincipal) {
+            await tx.productImage.updateMany({
+              where: { 
+                productId: id,
+                name: img.name 
+              },
+              data: { isPrincipal: true }
+            });
+            // Solo debe haber una imagen principal, así que salimos del bucle
+            break;
+          }
+        }
       }
 
     

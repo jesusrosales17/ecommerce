@@ -33,8 +33,8 @@ export async function POST(request: Request) {
       status: generalInformation.status || 'ACTIVE',
       categoryId: generalInformation.categoryId,
     });
-
-
+    
+   
     // Procesamos las imágenes
     const savedImages = await processMultipleImages(formData, 'images', 'products');
 
@@ -65,11 +65,11 @@ export async function POST(request: Request) {
         salePrice: validatedData.salePrice,
         isFeatured: validatedData.isFeatured,
         status: validatedData.status,
-        categoryId: validatedData.categoryId,
-        // Creamos las imágenes relacionadas
+        categoryId: validatedData.categoryId,        // Creamos las imágenes relacionadas
         images: {
           create: savedImages.map(img => ({
-            name: img.name
+            name: img.name,
+            isPrincipal: img.isPrincipal || false,
           }))
         },
         // Creamos las especificaciones relacionadas

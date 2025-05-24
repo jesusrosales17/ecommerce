@@ -71,13 +71,23 @@ export async function processMultipleImages(
   formData: FormData,
   fieldName: string = 'images',
   basePath: string = 'products'
-): Promise<{ name: string; url: string }[]> {
+): Promise<{ name: string; url: string; isPrincipal?: boolean }[]> {
   const images = formData.getAll(fieldName);
-  const savedImages: { name: string; url: string }[] = [];
-  for (const image of images) {
+  const principalImageIndex = formData.get('principalImageIndex');
+  const savedImages: { name: string; url: string; isPrincipal?: boolean }[] = [];
+  
+  // Convertir el índice de la imagen principal a número
+  const principalIndex = principalImageIndex ? parseInt(principalImageIndex.toString(), 10) : -1;
+  
+  for (let i = 0; i < images.length; i++) {
+    const image = images[i];
     if (image instanceof File) {
       const savedImage = await saveImage(image, basePath);
-      savedImages.push(savedImage);
+      // Marcar la imagen como principal si su índice coincide con el principalImageIndex
+      savedImages.push({
+        ...savedImage,
+        isPrincipal: i === principalIndex
+      });
     }
   }
 

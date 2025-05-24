@@ -25,6 +25,7 @@
         id: string;
         name: string;
         productId: string;
+        isPrincipal: boolean;
         createdAt: Date;
         updatedAt: Date;
     }[];

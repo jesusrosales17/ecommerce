@@ -51,7 +51,6 @@ export const ProductWizardContent = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [images]);
 
-
   const handleSubmit = async () => {
 
     const imagesDeleted = originalImages?.filter((originalImage) => {
@@ -72,14 +71,50 @@ export const ProductWizardContent = () => {
     formData.append("general", JSON.stringify(data.general));
     formData.append("specifications", JSON.stringify(data.specifications));
     formData.append("description", data.description);
-    data.images.forEach((image) => {
+      // Mapear imágenes y recopilar información sobre cuál es la principal
+    const principalImageIndex = images.findIndex(img => img.isPrincipal);
+    
+    // Si estamos editando un producto existente, necesitamos enviar también la información
+    // de qué imagen existente se ha marcado como principal
+    if (productSelectedId) {
+      // Enviar información sobre imágenes existentes y su estado principal
+      const existingImages = images
+        .filter(img => !img.file && img.preview) // Solo imágenes existentes (sin nuevos archivos)
+        .map((img, index) => ({
+          url: img.preview,
+          isPrincipal: img.isPrincipal || false,
+          name: img.preview.split('/').pop() || '' // Extraer el nombre del archivo de la URL
+        }));
+      
+      if (existingImages.length > 0) {
+        formData.append("existingImages", JSON.stringify(existingImages));
+      }
+    }
+    
+    // Agregar archivos de imagen nuevos al formData
+    data.images.forEach((image, index) => {
       if (image.file) {
         formData.append(`images`, image.file);
+        // Si esta imagen nueva es la principal, añadir su índice al formData
+        if (image.isPrincipal) {
+          formData.append("principalImageIndex", index.toString());
+        }
       }
     });
+    
+    // Si ninguna imagen está marcada como principal pero hay imágenes, marcar la primera como principal
+    if (principalImageIndex === -1 && images.some(img => img.file !== null || img.preview)) {
+      // Buscar la primera imagen con contenido
+      const firstImageWithContent = images.findIndex(img => img.file !== null || img.preview);
+      if (firstImageWithContent >= 0) {
+        formData.append("principalImageIndex", firstImageWithContent.toString());
+      }
+    }
+    
     formData.append("imagesToDelete", JSON.stringify(imagesToDelete));
     
-   
+  
+    
     try {
       if (!productSelectedId) {
         await axios.post("/api/products", formData);

@@ -31,8 +31,8 @@ export const ProductUpdatePageContent = ({ productData }: Props) => {
     })));
     setImages(productData.images.map((image) => ({
       file: null,
-      preview: `/api/uploads/products/${image.name}`
-
+      preview: `/api/uploads/products/${image.name}`,
+      isPrincipal: image?.isPrincipal,
     })));
     setProductSelectedId(productData.id);
     setImagesToDelete([]);
