@@ -38,6 +38,7 @@ export const CartButton = ({
       setRedirectAfterLogin(window.location.pathname);
       // Use Next-Auth's signIn to redirect to login page
       signIn(undefined, { callbackUrl: window.location.pathname });
+      
     } else {
       // User is authenticated, directly add to cart
       try {

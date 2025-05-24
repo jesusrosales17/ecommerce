@@ -6,12 +6,14 @@ import { useState } from "react";
 import { LoginFormValues } from "../schemas/loginSchema";
 import { NotificationAdapter } from "@/libs/adapters/notificationAdapter";
 import { sonnerNotificationAdapter } from "@/libs/adapters/sonnerAdapter";
+import { useCartStore } from "@/features/cart/store/useCartStore";
 
 // Hook de autenticación que utiliza el adaptador de notificaciones
 export const useAuth = (notificationProvider: NotificationAdapter = sonnerNotificationAdapter) => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const {redirectAfterLogin} = useCartStore();
 
   const login = async (values: LoginFormValues) => {
     try {
@@ -37,11 +39,12 @@ export const useAuth = (notificationProvider: NotificationAdapter = sonnerNotifi
         // Obtener la sesión después de iniciar sesión
         const session = await getSession();
         
+      
         // Redireccionar según el rol
         if (session?.user?.role === "ADMIN") {
           router.push("/admin");
         } else {
-          router.push("/");
+        router.push(redirectAfterLogin || "/");
         }
         
         router.refresh();
