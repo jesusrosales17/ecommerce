@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { formattedPrice } from "@/utils/price";
-import ButtonsCardProduct from "@/features/ecommerce/components/ButtonsCardProduct";
+import ButtonsCardProduct from "@/features/products/components/ButtonsCardProduct";
 
 interface ProductCardProps {
   id: string;
@@ -35,6 +35,7 @@ export function ProductCard({
     <Link href={`/products/${id}`} className="group  relative border lg:rounded-2xl bg-white  hover:shadow-lg transition-all duration-300 ">
       <div className="relative flex flex-col justify-between  h-full">
         <div className="aspect-[4/3] relative overflow-hidden w-full lg:border-b">
+        {/* TODO: Poner la imagen principal desde aqui */}
           <Image
             src={
               `/api/uploads/products/${image}` ||

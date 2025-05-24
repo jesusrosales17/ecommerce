@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { Product } from "../interfaces/product";
 import { Badge } from "@/components/ui/badge";
-import ButtonsCardProduct from "@/features/ecommerce/components/ButtonsCardProduct";
+import ButtonsCardProduct from "@/features/products/components/ButtonsCardProduct";
 import { formattedPrice } from "@/utils/price";
 import Link from "next/link";
 
@@ -9,19 +9,19 @@ interface Props {
   product: Product;
 }
 export const ProductCardLong = ({ product }: Props) => {
-    console.log(product)
   const discount =
     product.salePrice && product.isOnSale
       ? Math.round(((product.price - product.salePrice) / product.price) * 100)
       : null;
+    const image = product.images.find((image) => image.isPrincipal) || product.images[0];  
   return (
-    <Link 
-        href={`/products/${product.id}`}
+    <Link
+      href={`/products/${product.id}`}
       key={product.id}
-      className="p-4 group grid grid-cols-[35%_62%] lg:grid-cols-[1fr_3fr] gap-4 border-b items-center shadow"
+      className="p-4 group grid grid-cols-[35%_62%] lg:grid-cols-[1fr_3fr] gap-4 border-b items-center shadow cursor-default"
     >
       <Image
-        src={`/api/uploads/products/${product.images?.[0]?.name}`}
+        src={`/api/uploads/products/${image?.name}`}
         alt={product.name}
         width={300}
         height={300}
@@ -29,7 +29,9 @@ export const ProductCardLong = ({ product }: Props) => {
       />
       <div className="flex flex-col gap-5 h-full justify-center relative">
         <div>
-          <h3 className="text-sm lg:text-xl mb-4 line-clamp-2">{product.name}</h3>
+          <h3 className="text-sm lg:text-xl mb-4 line-clamp-2">
+            {product.name}
+          </h3>
           <Badge>{product?.category?.name || "Sin categoria"}</Badge>
           <div className="mt-3 flex flex-col    ">
             <div className="flex flex-col-reverse gap-0">

@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { CartButton } from "@/features/cart/components/CartButton";
 import { Heart, ShoppingCart } from "lucide-react";
 
 interface Props {
@@ -10,16 +11,11 @@ const ButtonsCardProduct = ({className}: Props) => {
       <Button
         size="icon"
         variant="ghost"
-        className="rounded-full  bg-white hover:bg-red-500 hover:text-white "
+        className="rounded-full  bg-white hover:bg-red-500 hover:text-white transition-all duration-300 group"
       >
         <Heart className="h-4 w-4" />
       </Button>
-      <Button
-        size="icon"
-        className="rounded-md bg-gray-500 group-hover:bg-rose-600 text-white transition-colors duration-300 "
-      >
-        <ShoppingCart className="h-4 w-4" />
-      </Button>
+    <CartButton /> 
     </div>
   );
 };
