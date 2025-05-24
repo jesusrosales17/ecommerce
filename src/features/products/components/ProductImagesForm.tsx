@@ -44,7 +44,6 @@ export const ProductImagesForm = forwardRef<{ submit: () => boolean | string }>(
       newImages[index].isPrincipal = true;
       
       setImages(newImages);
-      sonnerNotificationAdapter.success("Imagen principal actualizada");
     };
 
     useImperativeHandle(ref, () => ({
