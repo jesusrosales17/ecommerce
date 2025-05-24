@@ -1,4 +1,4 @@
-import { CartItem } from "@prisma/client";
+import { CartItem, ProductImage } from "@prisma/client";
 
 // Extended CartItem with product information for display
 export interface CartItemWithProduct extends CartItem {
@@ -8,7 +8,7 @@ export interface CartItemWithProduct extends CartItem {
         price: number;
         isOnSale?: boolean;
         salePrice?: number;
-        image?: string;
+        images?: ProductImage[];
         // Add other product fields as needed
     };
 }

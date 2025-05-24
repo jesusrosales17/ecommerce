@@ -59,13 +59,18 @@ export const CartDrawer = () => {
             >
               {/* Product Image */}
               <div className="h-20 w-20 relative flex-shrink-0 bg-gray-100 rounded-md overflow-hidden">
-                {item.Product?.image ? (
-                  <Image 
-                    src={`/api/uploads/products/${item.Product.image}`} 
-                    alt={item.Product?.name || 'Producto'} 
-                    fill
-                    className="object-cover"
-                  />
+                {item.Product?.images ? (
+                  (() => {
+                    const image = item.Product?.images.find((img) => img.isPrincipal) || item.Product?.images[0];
+                    return (
+                      <Image 
+                        src={`/api/uploads/products/${image.name}`} 
+                        alt={item.Product?.name || 'Producto'} 
+                        fill
+                        className="object-cover"
+                      />
+                    );
+                  })()
                 ) : (
                   <div className="w-full h-full flex items-center justify-center bg-gray-100">
                     <span className="text-gray-500 text-xs">Sin imagen</span>

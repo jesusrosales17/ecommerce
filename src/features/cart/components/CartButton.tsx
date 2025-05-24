@@ -26,7 +26,7 @@ export const CartButton = ({
 }: CartButtonProps) => {
   const { setPendingCartItem, setRedirectAfterLogin } = useCartStore();
   const { isAuthenticated } = useCartAuth();
-  const { addToCart } = useCartActions();
+  const { addToCart, isLoading } = useCartActions();
   const handleAddToCart = async (e: React.MouseEvent) => {
     // Evitar que el evento se propague a elementos padres (como el Link de la tarjeta)
     e.preventDefault();
@@ -48,12 +48,12 @@ export const CartButton = ({
       }
     }
   };
-
   return (
     <Button
       onClick={handleAddToCart}
       size={size}
       variant={variant}
+      disabled={isLoading}
       className={`rounded-md hover:-translate-y-0.5 transition-all duration-300 ${className}`}
     >
       <ShoppingCart className="h-4 w-4" />

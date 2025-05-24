@@ -18,7 +18,12 @@ export async function GET(request: NextRequest) {
       include: {
         items: {
           include: {
-            Product: true,
+            Product: {
+                include: {
+                    images: true,
+                    category: true,
+                }
+            },
           },
         },
       },
