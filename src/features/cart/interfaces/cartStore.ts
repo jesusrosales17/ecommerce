@@ -19,6 +19,7 @@ export interface PendingCartItem {
     quantity: number;
 }
 
+// The simplified CartStore interface only manages state
 export interface CartStore {
     // Cart state
     cart: CartItemWithProduct[];
@@ -30,22 +31,14 @@ export interface CartStore {
     pendingCartItem: PendingCartItem | null;
     redirectAfterLogin: string | null;
     
-    // Cart actions
+    // State setters
     setCart: (cart: CartItemWithProduct[]) => void;
     setTotal: (total: number) => void;
     setIsLoading: (isLoading: boolean) => void;
     setIsCartOpen: (isOpen: boolean) => void;
     
-    // Cart item operations
-    addToCart: (productId: string, quantity: number, isAuthenticated: boolean) => Promise<void>;
-    removeFromCart: (productId: string) => Promise<void>;
-    updateQuantity: (productId: string, quantity: number) => Promise<void>;
-    fetchCart: () => Promise<void>;
-    clearCart: () => Promise<void>;
-    
     // Authentication-related actions
     setPendingCartItem: (item: PendingCartItem | null) => void;
     setRedirectAfterLogin: (path: string | null) => void;
     clearPendingData: () => void;
-    processPendingCartItem: () => Promise<void>;
 }

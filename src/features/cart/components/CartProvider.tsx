@@ -3,6 +3,7 @@
 import React, { useEffect } from 'react';
 import { useCartStore } from '../store/useCartStore';
 import { useCartAuth } from '../hooks/useCartAuth';
+import { useCartActions } from '../hooks/useCartActions';
 import { CartDrawer } from './CartDrawer';
 import { usePathname } from 'next/navigation';
 
@@ -10,15 +11,9 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
   children 
 }) => {
   const pathname = usePathname();
-  const { isAuthenticated, status } = useCartAuth();
-  const { fetchCart } = useCartStore();
+  const { status } = useCartAuth();
   
-  // Fetch cart data when authentication status changes
-  useEffect(() => {
-    if (isAuthenticated) {
-      fetchCart();
-    }
-  }, [isAuthenticated, fetchCart]);
+  // No necesitamos llamar a fetchCart aquí, ya lo hace useCartAuth
 
   // Clear pending cart data when user explicitly logs out
   useEffect(() => {

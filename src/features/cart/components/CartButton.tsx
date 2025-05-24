@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button'
 import { ShoppingCart } from 'lucide-react'
 import { useCartStore } from '../store/useCartStore'
 import { useCartAuth } from '../hooks/useCartAuth'
+import { useCartActions } from '../hooks/useCartActions'
 import { signIn } from 'next-auth/react'
 import { toast } from 'sonner';
 
@@ -23,9 +24,9 @@ export const CartButton = ({
   showText = false,
   className = ''
 }: CartButtonProps) => {
-  const { addToCart } = useCartStore();
+  const { setPendingCartItem, setRedirectAfterLogin } = useCartStore();
   const { isAuthenticated } = useCartAuth();
-
+  const { addToCart } = useCartActions();
   const handleAddToCart = async (e: React.MouseEvent) => {
     // Evitar que el evento se propague a elementos padres (como el Link de la tarjeta)
     e.preventDefault();
@@ -33,7 +34,8 @@ export const CartButton = ({
     
     if (!isAuthenticated) {
       // Save intended product and redirect to login
-      addToCart(productId, quantity, false);
+      setPendingCartItem({ productId, quantity });
+      setRedirectAfterLogin(window.location.pathname);
       // Use Next-Auth's signIn to redirect to login page
       signIn(undefined, { callbackUrl: window.location.pathname });
     } else {

@@ -1,14 +1,16 @@
 import { useState } from 'react';
 import { useCartStore } from '../store/useCartStore';
 import { useCartAuth } from './useCartAuth';
+import { useCartActions } from './useCartActions';
 import { signIn } from 'next-auth/react';
 import { toast } from 'sonner';
 
 export const useAddToCart = (productId: string, maxStock?: number) => {
   const [quantity, setQuantity] = useState(1);
   const [isAdding, setIsAdding] = useState(false);
-  const { addToCart } = useCartStore();
+  const { setPendingCartItem, setRedirectAfterLogin } = useCartStore();
   const { isAuthenticated } = useCartAuth();
+  const { addToCart } = useCartActions();
   
   // Si no se proporciona, asumimos un stock alto
   const stock = typeof maxStock === 'number' ? maxStock : 999;
@@ -24,14 +26,14 @@ export const useAddToCart = (productId: string, maxStock?: number) => {
   const decrementQuantity = () => {
     setQuantity((prev) => Math.max(1, prev - 1));
   };
-
   const handleAddToCart = async () => {
     setIsAdding(true);
     
     try {
       if (!isAuthenticated) {
         // Save product and redirect to login
-        addToCart(productId, quantity, false);
+        setPendingCartItem({ productId, quantity });
+        setRedirectAfterLogin(window.location.pathname);
         // Use Next-Auth's signIn to redirect to login page
         signIn(undefined, { callbackUrl: window.location.pathname });
       } else {

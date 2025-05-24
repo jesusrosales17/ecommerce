@@ -1,6 +1,7 @@
 import React from 'react';
 import { useCartStore } from '../store/useCartStore';
 import { useCartAuth } from '../hooks/useCartAuth';
+import { useCartActions } from '../hooks/useCartActions';
 import { Trash2, X, Plus, Minus } from 'lucide-react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
@@ -20,12 +21,11 @@ export const CartDrawer = () => {
     total, 
     isCartOpen, 
     setIsCartOpen, 
-    removeFromCart, 
-    updateQuantity,
     isLoading,
   } = useCartStore();
   
   const { isAuthenticated } = useCartAuth();
+  const { removeFromCart, updateQuantity } = useCartActions();
 
   const handleQuantityChange = (productId: string, currentQuantity: number, change: number) => {
     const newQuantity = Math.max(1, currentQuantity + change);

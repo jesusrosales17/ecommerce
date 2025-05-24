@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
 import { getSession } from "@/libs/auth/auth";
+import { DropdownUserEcommerce } from "./DropdownUserEcommerce";
 
 export const HeaderClient = async () => {
     const session = await getSession();
@@ -37,34 +38,7 @@ export const HeaderClient = async () => {
       )}
 
       {session && (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="flex items-center gap-2">
-              <User className="w-4 h-4" />
-              <span className="hidden md:inline">{session.user?.name || 'Cuenta'}</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {session.user.role === "ADMIN" && (
-              <DropdownMenuItem asChild>
-                <Link href="/admin">Panel de administración</Link>
-              </DropdownMenuItem>
-            )}
-            <DropdownMenuItem asChild>
-              <Link href="/account">Mi cuenta</Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link href="/orders">Mis pedidos</Link>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem 
-              onClick={() => signOut({ callbackUrl: '/' })}
-              className="text-red-500 cursor-pointer"
-            >
-              Cerrar sesión
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <DropdownUserEcommerce session={session} />
       )}
     </div>
   );
