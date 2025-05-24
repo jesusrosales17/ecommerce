@@ -1,5 +1,4 @@
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { getSessionServer } from "@/features/auth/utils/auth-server";
 import { getInitials } from "@/libs/utils";
 import { useSession } from "next-auth/react";
 

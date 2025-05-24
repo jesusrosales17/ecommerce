@@ -5,7 +5,7 @@ import { Product } from "@/features/products/interfaces/product";
 
 
 
-export const CategoriesPage = async () => {
+ const CategoriesPage = async () => {
   const productsRes = await fetch(
     `${process.env.NEXT_PUBLIC_URL}/api/products`,
     {

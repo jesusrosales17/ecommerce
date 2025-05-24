@@ -19,6 +19,7 @@ import { useProductStore } from "../store/useProductStore";
 import { useCategoryStore } from "@/features/categories/store/useCategoryStore";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectGroup, SelectItem } from "@/components/ui/select";
 import { useEffect} from "react";
+
 export const ProductGeneralForm = forwardRef((_, ref) => {
   const { setGeneral, general } = useProductStore();
   const { categories} = useCategoryStore();
@@ -49,7 +50,6 @@ export const ProductGeneralForm = forwardRef((_, ref) => {
       return isValid;
     },
   }));
-  console.log(general)
 
   useEffect(() => {
     form.reset({
@@ -62,8 +62,9 @@ export const ProductGeneralForm = forwardRef((_, ref) => {
       salePrice: Number(general?.salePrice) || undefined,
       isFeatured: general?.isFeatured || false,
       status: general?.status || "ACTIVE",
-      categoryId: general?.categoryId || "",
+      categoryId: general?.categoryId || undefined,
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [general]);
 
 
@@ -286,3 +287,6 @@ export const ProductGeneralForm = forwardRef((_, ref) => {
     </>
   );
 });
+
+
+ProductGeneralForm.displayName = "ProductGeneralForm";

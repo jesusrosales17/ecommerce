@@ -4,7 +4,6 @@ import {
   Sidebar,
   SidebarContent,
   SidebarGroup,
-  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
@@ -26,7 +25,6 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
@@ -45,7 +43,7 @@ const iconMap = {
 interface MenuItem {
   title: string;
   url: string;
-  icon: string;
+  icon: keyof typeof iconMap;
 }
 
 interface ClientSidebarAdminProps {
@@ -66,7 +64,6 @@ export const ClientSidebarAdmin = ({
   const pathname = usePathname();
   const {state} = useSidebar();
   const isCollapsed = state === "collapsed";
-  const [activeTooltip, setActiveTooltip] = useState<string | null>(null);
   const { logout, isLoading } = useAuth();
   
   const handleSignOut = () => {
@@ -86,7 +83,6 @@ export const ClientSidebarAdmin = ({
         <SidebarGroup>
           <SidebarMenu>
             {menuItems.map((item) => {
-              // @ts-ignore - Accedemos al icono dinámicamente
               const Icon = iconMap[item.icon] || Home;
               const isActive = pathname === item.url;
               
@@ -94,7 +90,7 @@ export const ClientSidebarAdmin = ({
                 <SidebarMenuItem key={item.url} className={cn("relative", isActive && "bg-gray-100")}>
                   <Link href={item.url} className="flex items-center py-2 px-3">
                     <SidebarMenuButton
-                      onMouseEnter={() => !isCollapsed && setActiveTooltip(null)}
+                      onMouseEnter={() => !isCollapsed}
                       className={cn(
                         "w-10 h-10 p-0 mr-4 flex items-center justify-center rounded-md",
                         isActive && "text-blue-600 bg-blue-50"

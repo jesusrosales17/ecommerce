@@ -1,9 +1,6 @@
-import Link from "next/link"
-import { ArrowRight } from "lucide-react"
 
 import { Section } from "@/components/ui/section"
 import { CategoryCard } from "@/features/categories/components/CategoryCard"
-import { Button } from "@/components/ui/button"
 
 interface Category {
   id: string

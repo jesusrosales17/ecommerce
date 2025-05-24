@@ -12,11 +12,11 @@ import { ProductActionsCard } from "@/features/products/components/ProductAction
 import { ProductSummaryCard } from "@/features/products/components/ProductSummaryCard";
 
 interface Props {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 const ProductViewPage = async ({ params }: Props) => {
-  const { id } = params;
+  const { id } = await params;
   const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/products/${id}`, {
     method: "GET",
     cache: "no-store",

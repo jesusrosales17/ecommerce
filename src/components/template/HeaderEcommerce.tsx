@@ -12,8 +12,9 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-import { Heart, LogIn, ShoppingCart, User } from "lucide-react";
+import { Heart,  ShoppingCart, User } from "lucide-react";
 import { getSession } from "@/libs/auth/auth";
+import { Category } from "@prisma/client";
 
 const HeaderEcommerce = async () => {
   const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/categories`, {
@@ -21,7 +22,7 @@ const HeaderEcommerce = async () => {
     cache: "no-store",
   });
 
-  const categories = (await res.json().catch(() => [])) || [];
+  const categories: Category[] = (await res.json().catch(() => [])) || [];
   const session = await getSession();
   return (
     <header className="w-full bg-white  shadow-md sticky top-0 z-40">
@@ -67,8 +68,8 @@ const HeaderEcommerce = async () => {
               <HoverCardContent className="w-64 max-h-64 overflow-y-auto">
                 <ul className="space-y-1">
                   {categories.length > 0 ? (
-                    categories.map((cat: any) => (
-                      <li key={cat.id || cat.slug || cat.name}>
+                    categories.map((cat) => (
+                      <li key={cat.id  || cat.name}>
                         <Link
                           href={`/categories/${cat.name}`}
                           className="text-sm hover:underline block"

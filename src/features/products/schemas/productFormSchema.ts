@@ -38,7 +38,6 @@ export const productFormSchema = z.object({
   
   // El categoryId puede ser una cadena vacía desde un form
   if (data.categoryId === "") {
-    // @ts-ignore - Necesario para poder asignar undefined
     data.categoryId = undefined;
   }
 });

@@ -15,6 +15,7 @@ export const StepIndicator = ({ initialSteps = [], className }: Props) => {
 
   useEffect(() => {
     setSteps(initialSteps);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const handleStepClick = (index: number) => {

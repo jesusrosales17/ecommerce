@@ -10,7 +10,6 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { ChevronDown, LogOut } from "lucide-react";
-import { useSession } from "next-auth/react";
 import { getInitials } from "@/libs/utils";
 import { SignOutButton } from "@/components/auth/SignOutButton";
 import { getServerSession } from "next-auth";
@@ -19,7 +18,6 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 export const Header = async () => {
   const session = await getServerSession(authOptions);
   const userName = session?.user?.name || "Usuario";
-  const userEmail = session?.user?.email || "";
   const userImage = session?.user?.image || null;
   const initials = getInitials(userName);
 

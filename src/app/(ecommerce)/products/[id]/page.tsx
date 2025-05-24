@@ -5,11 +5,11 @@ import { ProductInfo } from "@/features/products/components/ProductInfo";
 import { Product } from "@/features/products/interfaces/product";
 
 interface Props {
-  params: Promise<{ id: string }>;
+  params: Promise<{ id: string }>; // Ahora es una Promise
 }
 
-export const ProductPage = async ({ params }: Props) => {
-  const { id } = await params;
+const ProductPage = async ({ params }: Props) => {
+  const { id } = await params; // Usar await para resolver la Promise
 
   const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/products/${id}`);
   if (!res.ok) {

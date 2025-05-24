@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/libs/prisma";
 import { categorySchema } from "@/features/categories/schemas/categorySchema";
 import { z } from "zod";
-import { getSession, requireAuth } from "@/libs/auth/auth";
+import {  requireAuth } from "@/libs/auth/auth";
 import { saveImage } from "@/libs/media/image-handler";
+import { CategoryStatus } from "@prisma/client";
 
 export async function POST(request: NextRequest) {
   try {
@@ -39,10 +40,10 @@ export async function POST(request: NextRequest) {
       data: {
         name: validatedData.name,
         description: validatedData.description,
-        status: validatedData.status as any,
+        status: validatedData.status as CategoryStatus,
         // Using any to bypass TypeScript error until Prisma client is regenerated
         image: imageData?.name || "placeholder.jpg",
-      } as any,
+      } ,
     });
 
     return NextResponse.json({

@@ -49,13 +49,13 @@ export async function PUT(request: Request, { params }: Params) {
             }, { status: 404 });
         }        // Procesar la imagen si se subió una nueva
         let imageData = null;
-        let finalImageName = (category as any).image || null;
-        
+        let finalImageName = category.image || null;
+
         if (imageFile instanceof File) {
             // Eliminar la imagen antigua si existe
-            if ((category as any).image) {
+            if (category.image) {
                 try {
-                    await deleteImage((category as any).image, 'categories');
+                    await deleteImage(category.image, 'categories');
                 } catch (error) {
                     console.error('Error al eliminar la imagen antigua:', error);
                 }
@@ -69,10 +69,10 @@ export async function PUT(request: Request, { params }: Params) {
             }, 
             data: {                
                 name: validatedData.name, 
-                status: validatedData.status as any,
+                status: validatedData.status,
                 description: validatedData.description,
                 image: finalImageName,
-            } as any
+            } 
         })
 
         return NextResponse.json({

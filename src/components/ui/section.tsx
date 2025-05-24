@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 import Link from "next/link";
 import { cn } from "@/libs/utils";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, ArrowRightFromLine, ArrowRightSquare, ChevronRight } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 
 interface SectionProps {
   title: string;

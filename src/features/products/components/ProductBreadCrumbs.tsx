@@ -9,12 +9,12 @@ const ProductBreadCrumbs = ({ productName, category }: Props) => {
    <nav className="flex mb-6" aria-label="Breadcrumb">
         <ol className="inline-flex items-center space-x-1 md:space-x-2">
           <li className="inline-flex items-center">
-            <a
+            <Link
               href="/"
               className="text-sm font-medium text-gray-700 hover:text-blue-600"
             >
               Inicio
-            </a>
+            </Link>
           </li>
           <li>
             <div className="flex items-center">

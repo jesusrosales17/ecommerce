@@ -1,17 +1,14 @@
 "use client";
-import { Button } from "@/components/ui/button";
 import {
   Drawer,
   DrawerContent,
   DrawerDescription,
   DrawerHeader,
   DrawerTitle,
-  DrawerTrigger,
 } from "@/components/ui/drawer";
 
 import { Separator } from "@/components/ui/separator";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { IoMdAdd } from "react-icons/io";
 import { CategoryForm } from "./CategoryForm";
 import { useCategoryStore } from "../store/useCategoryStore";
 

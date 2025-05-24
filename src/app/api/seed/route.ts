@@ -1,7 +1,7 @@
 import prisma from "@/libs/prisma";
 import { hash } from "bcrypt";
 
-export async function GET(request: Request) { 
+export async function GET() { 
   try {
     // Crear usuario administrador
     const adminUser = await prisma.user.upsert({

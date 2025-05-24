@@ -167,7 +167,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Obtener el total de productos para la paginación
-    const total = await prisma.product.count({ where });
+    // const total = await prisma.product.count({ where });
 
     // Obtener los productos con sus relaciones
     const products = await prisma.product.findMany({

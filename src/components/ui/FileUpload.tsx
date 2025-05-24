@@ -16,7 +16,6 @@ interface FileUploadProps {
 export function FileUpload({
   accept = "image/*",
   id,
-  value,
   onChange,
   defaultPreview = null
 }: FileUploadProps) {  const inputRef = useRef<HTMLInputElement>(null)

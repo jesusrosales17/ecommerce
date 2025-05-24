@@ -4,7 +4,6 @@ import prisma from '@/libs/prisma';
 import { requireAuth } from '@/libs/auth/auth';
 import { productFormSchema } from '@/features/products/schemas/productFormSchema';
 import { processMultipleImages, deleteImage } from '@/libs/media/image-handler';
-import { ProductSpecification } from '@prisma/client';
 
 interface Params {
   params: Promise<{

@@ -20,7 +20,7 @@ import { useAuth } from "../hooks/useAuth";
 
 export function LoginForm() {
   const [passwordVisible, setPasswordVisible] = useState<boolean>(false);
-  const { login, isLoading, error } = useAuth();
+  const { login, isLoading } = useAuth();
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),

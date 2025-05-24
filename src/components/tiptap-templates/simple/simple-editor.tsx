@@ -38,7 +38,6 @@ import "@/components/tiptap-node/paragraph-node/paragraph-node.scss"
 
 // --- Tiptap UI ---
 import { HeadingDropdownMenu } from "@/components/tiptap-ui/heading-dropdown-menu"
-import { ImageUploadButton } from "@/components/tiptap-ui/image-upload-button"
 import { ListDropdownMenu } from "@/components/tiptap-ui/list-dropdown-menu"
 import { BlockQuoteButton } from "@/components/tiptap-ui/blockquote-button"
 import { CodeBlockButton } from "@/components/tiptap-ui/code-block-button"
@@ -67,7 +66,6 @@ import { useWindowSize } from "@/hooks/use-window-size"
 import { useCursorVisibility } from "@/hooks/use-cursor-visibility"
 
 // --- Components ---
-import { ThemeToggle } from "@/components/tiptap-templates/simple/theme-toggle"
 
 // --- Lib ---
 import { handleImageUpload, MAX_FILE_SIZE } from "@/utils/tiptap-utils"
@@ -75,10 +73,8 @@ import { handleImageUpload, MAX_FILE_SIZE } from "@/utils/tiptap-utils"
 // --- Styles ---
 import "@/components/tiptap-templates/simple/simple-editor.scss"
 
-import content from "@/components/tiptap-templates/simple/data/content.json"
 import { sonnerNotificationAdapter } from "@/libs/adapters/sonnerAdapter"
 import { useProductStore } from "@/features/products/store/useProductStore"
-import { set } from "zod"
 
 const MainToolbarContent = ({
   onHighlighterClick,
@@ -296,3 +292,5 @@ return (
 )
  
 })
+
+SimpleEditor.displayName = "SimpleEditor"

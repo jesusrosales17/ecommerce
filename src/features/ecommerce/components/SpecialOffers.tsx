@@ -1,7 +1,4 @@
 import { Section } from "@/components/ui/section"
-import { Card } from "@/components/ui/card"
-import Image from "next/image"
-import Link from "next/link"
 import { Product } from "@/features/products/interfaces/product"
 import { ProductCard } from "@/features/products/components/ProductCard"
 

@@ -10,13 +10,14 @@ const ProductPageContent = () => {
     reset();
     setProductSelectedId(undefined);
     setImagesToDelete([]);
-  }, [reset]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   return (
     <>
       <StepIndicator
         className="my-4"
         initialSteps={[
-          { id: "genetal", label: "General" },
+          { id: "general", label: "General" },
           { id: "specifications", label: "Especificaciones" },
           { id: "description", label: "Descripcion" },
           { id: "images", label: "Imagenes" },

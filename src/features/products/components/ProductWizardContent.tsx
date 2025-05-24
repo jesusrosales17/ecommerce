@@ -12,7 +12,6 @@ import axios from "axios";
 import { sonnerNotificationAdapter } from "@/libs/adapters/sonnerAdapter";
 import { useRouter } from "next/navigation";
 import { useCategoryStore } from "@/features/categories/store/useCategoryStore";
-import { useMemo } from "react";
 
 export const ProductWizardContent = () => {
   const {
@@ -48,6 +47,8 @@ export const ProductWizardContent = () => {
       }));
 
     setOriginalImages(productOriginalImages.map((image) => image.preview));
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [images]);
 
 
@@ -71,19 +72,20 @@ export const ProductWizardContent = () => {
     formData.append("general", JSON.stringify(data.general));
     formData.append("specifications", JSON.stringify(data.specifications));
     formData.append("description", data.description);
-    data.images.forEach((image, index) => {
+    data.images.forEach((image) => {
       if (image.file) {
         formData.append(`images`, image.file);
       }
     });
     formData.append("imagesToDelete", JSON.stringify(imagesToDelete));
+    
    
     try {
       if (!productSelectedId) {
-        const response = await axios.post("/api/products", formData);
+        await axios.post("/api/products", formData);
         sonnerNotificationAdapter.success("Producto creado con éxito");
       } else {
-        const response = await axios.put(
+         await axios.put(
           `/api/products/${productSelectedId}`,
           formData
         );
@@ -154,11 +156,14 @@ export const ProductWizardContent = () => {
       setStepClicked(null);
     };
     validateStep();
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stepClicked]);
 
   useEffect(() => {
     resetWizard();
     categoriesFetch();
+// eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
     <div>

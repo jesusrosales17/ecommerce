@@ -4,8 +4,8 @@ import { CalendarIcon } from "lucide-react";
 import { formatRelativeTime } from "@/utils/date";
 
 interface ProductDatesCardProps {
-  createdAt: string;
-  updatedAt: string;
+  createdAt: Date | string;
+  updatedAt: Date | string;
 }
 
 export const ProductDatesCard = ({ createdAt, updatedAt }: ProductDatesCardProps) => {
@@ -18,10 +18,10 @@ export const ProductDatesCard = ({ createdAt, updatedAt }: ProductDatesCardProps
         </div>
         <ul className="text-sm space-y-1">
           <li>
-            <strong>Creado:</strong> {formatRelativeTime(createdAt)}
+            <strong>Creado:</strong> {formatRelativeTime(createdAt.toString())}
           </li>
           <li>
-            <strong>Actualizado:</strong> {formatRelativeTime(updatedAt)}
+            <strong>Actualizado:</strong> {formatRelativeTime(updatedAt.toString())}
           </li>
         </ul>
       </CardContent>

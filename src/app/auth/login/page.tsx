@@ -2,7 +2,6 @@ import { Logo } from "@/components/template/Logo";
 import { LoginForm } from "@/features/auth/components/LoginForm";
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
 
 const page = () => {
   return (
@@ -22,9 +21,9 @@ const page = () => {
             </h1>
             <p className="text-base sm:text-base lg:text-base text-gray-600">
               ¿No tienes una cuenta?{" "}
-              <a href="#" className="text-blue-600 hover:underline">
+              <Link href="#" className="text-blue-600 hover:underline">
                 Crea una aqui
-              </a>
+              </Link>
             </p>
           </div>
 

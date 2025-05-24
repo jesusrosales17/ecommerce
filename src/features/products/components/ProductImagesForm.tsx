@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { forwardRef, useEffect, useImperativeHandle, useMemo} from "react";
+import { forwardRef, useEffect, useImperativeHandle } from "react";
 import { ImagePlus, Trash2 } from "lucide-react";
 import { sonnerNotificationAdapter } from "@/libs/adapters/sonnerAdapter";
 import { useProductStore } from "../store/useProductStore";
@@ -7,7 +7,7 @@ import Image from "next/image";
 
 export const ProductImagesForm = forwardRef<{ submit: () => boolean | string  }>(
   (_, ref) => {
-    const { images, setImages, productSelectedId, setImagesToDelete } = useProductStore();
+    const { images, setImages, productSelectedId } = useProductStore();
     // guardar imagenes originales (no cambian)
    
 
@@ -52,7 +52,6 @@ export const ProductImagesForm = forwardRef<{ submit: () => boolean | string  }>
         return  hasImages 
       },
     }));
-
     useEffect(() => {
       if(images.length === 0) {
            setImages([
@@ -85,7 +84,8 @@ export const ProductImagesForm = forwardRef<{ submit: () => boolean | string  }>
         }
         setImages(newImages);
       }
-    }, []);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);  
     return (
       <>
         <div>
@@ -161,3 +161,6 @@ export const ProductImagesForm = forwardRef<{ submit: () => boolean | string  }>
     );
   }
 );
+
+
+ProductImagesForm.displayName = "ProductImagesForm";

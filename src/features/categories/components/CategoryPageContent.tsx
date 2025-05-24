@@ -3,11 +3,10 @@ import { CategoryTable } from "./CategoryTable";
 import { CategoryFormDrawer } from "./CategoryFormDrawer";
 import { useCategoryStore } from "../store/useCategoryStore";
 import { Category } from "@prisma/client";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { IoMdAdd } from "react-icons/io";
 import { CategoryInfoDrawer } from "./CategoryInfoDrawer";
-import { SearchInput } from "@/components/ui/SearchInput";
 
 interface Props {
   initialCategories: Category[];
@@ -18,6 +17,8 @@ export const CategoryPageContent = ({ initialCategories }: Props) => {
 
   useEffect(() => {
     setCategories(initialCategories);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
 

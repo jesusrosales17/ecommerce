@@ -7,7 +7,7 @@ interface CategoryCardProps {
   image: string
 }
 
-export function CategoryCard({ id, name,  image }: CategoryCardProps) {
+export function CategoryCard({  name,  image }: CategoryCardProps) {
   return (
     <Link href={`/categories/${name}`} className="block">
       <div className="group relative overflow-hidden rounded-lg border hover:border-primary transition-colors">

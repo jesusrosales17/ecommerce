@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { sonnerNotificationAdapter } from "@/libs/adapters/sonnerAdapter";
-import { forwardRef, useImperativeHandle, useState } from "react";
+import { forwardRef, useImperativeHandle} from "react";
 import { useProductStore } from "../store/useProductStore";
 
 export const ProductSpecificationsForm = forwardRef<{submit: () => string | boolean}>((_, ref) => {
@@ -100,3 +100,5 @@ export const ProductSpecificationsForm = forwardRef<{submit: () => string | bool
     </>
   );
 })
+
+ProductSpecificationsForm.displayName = "ProductSpecificationsForm";

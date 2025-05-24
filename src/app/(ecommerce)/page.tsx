@@ -2,7 +2,6 @@ import { HeroCarousel } from "@/features/ecommerce/components/HeroCarousel";
 import { FeaturedCategories } from "@/features/ecommerce/components/FeaturedCategories";
 import { FeaturedProducts } from "@/features/ecommerce/components/FeaturedProducts";
 import { SpecialOffers } from "@/features/ecommerce/components/SpecialOffers";
-import { FooterEcommerce } from "@/components/template/FooterEcommerce";
 
 export default async function HomePage() {
   // Fetch categories

@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 import { NextRequestWithAuth } from "next-auth/middleware";
-import path from "path";
 
 export default async function middleware(request: NextRequestWithAuth) {
   const { pathname } = request.nextUrl;
@@ -9,7 +8,7 @@ export default async function middleware(request: NextRequestWithAuth) {
   // Rutas públicas que no requieren autenticación
   const publicRoutes = ["/login", "/"];
   const isPublicRoute = publicRoutes.some((route) => pathname.startsWith(route));
-
+  console.log(isPublicRoute)
   // Rutas protegidas por rol de administrador
   const adminRoutes = ["/admin"];
   const isAdminRoute = adminRoutes.some((route) => pathname.startsWith(route));

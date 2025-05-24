@@ -1,6 +1,5 @@
 import { SimpleEditor } from "@/components/tiptap-templates/simple/simple-editor";
 import { forwardRef } from "react";
-import { useProductStore } from "../store/useProductStore";
 export const ProductDescriptionForm = forwardRef<{
   submit: () => string | boolean;
 }>((_, ref) => {
@@ -20,3 +19,6 @@ export const ProductDescriptionForm = forwardRef<{
     </>
   );
 });
+
+
+ProductDescriptionForm.displayName = "ProductDescriptionForm";
