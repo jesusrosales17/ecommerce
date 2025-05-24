@@ -35,6 +35,8 @@ model User {
  
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  Cart Cart[]
 }
  
 model Account {
@@ -143,6 +145,8 @@ model Product {
   category  Category? @relation(fields: [categoryId], references: [id])
   images ProductImage[]
   specifications ProductSpecification[]
+
+  CartItem CartItem[]
 }
 
 // imagenes del produco
@@ -155,7 +159,7 @@ model ProductImage{
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
  
-  Product Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
+  Product Product? @relation(fields: [productId], references: [id])
  
   @@index([name])
 }
@@ -169,7 +173,35 @@ model ProductSpecification{
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
  
-  Product Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
+  Product Product? @relation(fields: [productId], references: [id])
  
   @@index([name])
+}
+
+// Carrito de compras
+model Cart {
+  id          String   @id @default(uuid())
+  userId      String
+  items       CartItem[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+ 
+  user User @relation(fields: [userId], references: [id])
+ 
+  @@index([userId])
+}
+
+// Items del carrito de compras
+model CartItem {
+  id          String   @id @default(uuid())
+  productId   String
+  quantity    Int      @default(1)
+  cartId      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+ 
+  Product Product? @relation(fields: [productId], references: [id])
+  Cart Cart? @relation(fields: [cartId], references: [id])
+ 
+  @@index([productId])
 }

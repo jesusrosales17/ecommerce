@@ -55,11 +55,13 @@ export const ProductCardLong = ({ product }: Props) => {
               {product.isOnSale && product.salePrice && (
                 <span className="text-sm text-muted-foreground line-through">
                   {formattedPrice(product.price)}
-                </span>
-              )}
+                </span>              )}
             </div>
 
-            <ButtonsCardProduct className="justify-between lg:justify-start gap-4" />
+            <ButtonsCardProduct 
+              productId={product.id} 
+              className="justify-between lg:justify-start gap-4" 
+            />
           </div>
         </div>
       </div>

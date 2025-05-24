@@ -77,11 +77,10 @@ export function ProductCard({
                   <span className="text-sm text-muted-foreground line-through">
                     {formattedPrice(price)}
                   </span>
-                )}
-              </div>
+                )}              </div>
             </div>
           </div>
-          <ButtonsCardProduct />
+          <ButtonsCardProduct productId={id} />
         </div>
       </div>
     </Link>

@@ -4,6 +4,7 @@ import { HeartIcon, ShoppingCartIcon } from "lucide-react";
 
 interface Props {
   product: {
+    id: string;
     name: string;
     price: number;
     salePrice?: number;
@@ -12,6 +13,8 @@ interface Props {
     category?: string;
   };
 }
+import { AddToCartButton } from "@/features/cart/components/AddToCartButton";
+
 export const ProductInfo = ({ product }: Props) => {
   return (
     <>
@@ -83,41 +86,16 @@ export const ProductInfo = ({ product }: Props) => {
               : "Agotado"}
           </p>
         </div>
-      </div>
-                {/* Botones de acción */}
+      </div>                {/* Botones de acción */}
       <div className="space-y-4">
-        <div className="flex items-center">
-          <label
-            htmlFor="quantity"
-            className="mr-4 text-sm font-medium text-gray-700"
-          >
-            Cantidad
-          </label>
-          <div className="flex items-center border border-gray-300 rounded-md overflow-hidden">
-            <button
-              className="px-3 py-2 text-gray-600 hover:bg-gray-100 transition"
-              disabled={product.stock <= 0}
-            >
-              -
-            </button>
-            <span className="px-4 py-2 border-x border-gray-300">1</span>
-            <button
-              className="px-3 py-2 text-gray-600 hover:bg-gray-100 transition"
-              disabled={product.stock <= 0}
-            >
-              +
-            </button>
-          </div>
-        </div>
-
+        {/* Utilizamos el componente AddToCartButton */}
         <div className="flex gap-3">
-          <button
-            className="flex-1 flex items-center justify-center bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 transition disabled:bg-blue-400"
-            disabled={product.stock <= 0}
-          >
-            <ShoppingCartIcon className="h-5 w-5 mr-2" />
-            Añadir al carrito
-          </button>
+          <AddToCartButton 
+            productId={product.id} 
+            stock={product.stock}
+            className="flex-1"
+          />
+          
           <button
             className="p-3 border border-gray-300 rounded-md hover:bg-gray-50 transition"
             title="Guardar en favoritos"

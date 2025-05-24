@@ -42,12 +42,11 @@ const ProductPage = async ({ params }: Props) => {
           {/* Galería de imágenes */}
           <div className="w-full">
             <ProductImagesGallery images={product.images} alt={product.name} />
-          </div>
-
-          {/* Información del producto */}
+          </div>          {/* Información del producto */}
           <div className="flex flex-col space-y-6">
           <ProductInfo 
             product={{ 
+              id: product.id,
               isOnSale: product.isOnSale,
               name: product.name,
               price: product.price,

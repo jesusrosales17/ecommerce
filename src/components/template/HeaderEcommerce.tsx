@@ -15,6 +15,9 @@ import {
 import { Heart,  ShoppingCart, User } from "lucide-react";
 import { getSession } from "@/libs/auth/auth";
 import { Category } from "@prisma/client";
+import { HeaderClient } from "./HeaderClient";
+import { CartToggleButton } from "@/features/cart/components/CartToggleButton";
+import { CartButton } from "@/features/cart/components/CartButton";
 
 const HeaderEcommerce = async () => {
   const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/categories`, {
@@ -29,16 +32,14 @@ const HeaderEcommerce = async () => {
       <div className="xl:container mx-auto px-4 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
         {/* Logo */}
         <div className="flex items-center gap-4 w-full md:w-auto justify-between">
-          <Logo />
-
-          {/* Icons en mobile */}
+          <Logo />          {/* Icons en mobile */}
           <div className="md:hidden flex items-center gap-4">
             <Link href="/favorites">
               <Heart className="w-5 h-5 text-muted-foreground" />
             </Link>
-            <Link href="/cart">
-              <ShoppingCart className="w-5 h-5 text-muted-foreground" />
-            </Link>
+            
+            {/* CartToggleButton en versión móvil */}
+            <CartToggleButton showCount={true} />
 
             {/* Dropdown de cuenta en mobile */}
             <DropdownMenu>
@@ -103,39 +104,10 @@ const HeaderEcommerce = async () => {
             >
               <Link href="/sales">Descuentos</Link>
             </Button>
-          </nav>
-
-          {/* Acciones (desktop) */}
+          </nav>          {/* Acciones (desktop) */}
           <div className="hidden md:flex items-center gap-4">
-            <Link href="/favorites">
-              <Button variant="ghost" size="icon">
-                <Heart className="w-5 h-5" />
-              </Button>
-            </Link>
-            <Link href="/cart">
-              <Button variant="ghost" size="icon">
-                <ShoppingCart className="w-5 h-5" />
-              </Button>
-            </Link>
-
-            {!session && (
-              <>
-                <Link href="/auth/login">
-                  <Button variant="outline">Iniciar sesión</Button>
-                </Link>
-                <Link href="/auth/register">
-                  <Button>Registrarse</Button>
-                </Link>
-              </>
-            )}
-
-            {
-              session && session.user.role === "ADMIN" && (
-                <Link href="/admin">
-                  <Button variant="outline">Panel</Button>
-                </Link>
-              )
-            }
+            {/* Reemplazado con HeaderClient */}
+            <HeaderClient />
           </div>
         </div>
       </div>
