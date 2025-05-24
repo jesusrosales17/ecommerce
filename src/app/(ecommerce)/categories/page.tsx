@@ -3,9 +3,7 @@ import { ProductsByCategory } from "@/features/ecommerce/interfaces/products";
 import { ProductCard } from "@/features/products/components/ProductCard";
 import { Product } from "@/features/products/interfaces/product";
 
-
-
- const CategoriesPage = async () => {
+const CategoriesPage = async () => {
   const productsRes = await fetch(
     `${process.env.NEXT_PUBLIC_URL}/api/products`,
     {
@@ -22,8 +20,8 @@ import { Product } from "@/features/products/interfaces/product";
     );
   }
   const products: Product[] = (await productsRes.json().catch(() => [])) || [];
-  //    separar por categorias 
- 
+  //    separar por categorias
+
   const productByCategories = products.reduce(
     (acc: ProductsByCategory, product: Product) => {
       const category = product.category?.name || "Sin categoria";
@@ -48,7 +46,7 @@ import { Product } from "@/features/products/interfaces/product";
       <div>
         {Object.entries(productByCategories).map(([category, data]) => (
           <Section
-          key={category}
+            key={category}
             title={category}
             description={data.category}
             viewAllLink={`/categories/${category}`}
@@ -56,19 +54,23 @@ import { Product } from "@/features/products/interfaces/product";
             className="mb-10"
           >
             <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-5 2xl:grid-cols-6 lg:gap-6 overflow-hidden lg:mx-4 lg:max-h-[350px] 2xl:max-h-[380px]">
-              {data.products.map((product) => (
-                <ProductCard
-                  key={product.id}
-                  id={product.id}
-                  name={product.name}
-                  description={product.description}
-                  price={product.price}
-                  salePrice={product.salePrice as number | undefined}
-                  isOnSale={product.isOnSale}
-                  category={product.category?.name || "Sin categoria"}
-                  image={product.images?.[0]?.name}
-                />
-              ))}
+              {data.products.map((product) => {
+                
+          const image = product.images.find((img) => img.isPrincipal) || product.images[0];
+                return (
+                  <ProductCard
+                    key={product.id}
+                    id={product.id}
+                    name={product.name}
+                    description={product.description}
+                    price={product.price}
+                    salePrice={product.salePrice as number | undefined}
+                    isOnSale={product.isOnSale}
+                    category={product.category?.name || "Sin categoria"}
+                    image={image?.name}
+                  />
+                );
+              })}
             </div>
           </Section>
         ))}
