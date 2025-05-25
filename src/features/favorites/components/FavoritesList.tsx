@@ -1,53 +1,21 @@
-'use client';
-
-import { useFavoriteStore } from '../store/useFavoriteStore';
-import { useFavoriteActions } from '../hooks/useFavoriteActions';
-import { useEffect } from 'react';
-import { AlertCircle } from 'lucide-react';
+'use client'
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { FavoriteCard } from './FavoriteCard';
 
+
+
 export const FavoritesList = () => {
-  const { favorites, isLoading } = useFavoriteStore();
-  const { fetchFavorites, removeFromFavorites, isAuthenticated } = useFavoriteActions();
-
-  // Fetch favorites on component mount
-  useEffect(() => {
-    if (isAuthenticated) {
-      fetchFavorites();
-    }
-  }, [isAuthenticated]);
-
-  if (!isAuthenticated) {
-    return (
-      <div className="flex flex-col items-center justify-center py-12 space-y-4">
-        <AlertCircle className="w-12 h-12 text-gray-400" />
-        <h2 className="text-2xl font-medium text-gray-600">
-          Necesitas iniciar sesión para ver tus favoritos
-        </h2>
-        <Button asChild>
-          <Link href="/auth/login">
-            Iniciar sesión
-          </Link>
-        </Button>
-      </div>
-    );
-  }
-
-
+  const {favorites} = useFavoriteStore();
 
   if (!favorites || favorites.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-12 space-y-4">
-        <Heart className="w-12 h-12 text-gray-400" />
-        <h2 className="text-2xl font-medium text-gray-600">
-          No tienes productos favoritos
-        </h2>
+        <h1 className="text-2xl font-medium text-gray-600">
+          No tienes favoritos
+        </h1>
         <Button asChild>
-          <Link href="/products">
-            Explorar productos
-          </Link>
+          <Link href="/products">Ver productos</Link>
         </Button>
       </div>
     );
@@ -55,14 +23,14 @@ export const FavoritesList = () => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       {favorites.map((item) => (
-        <FavoriteCard 
-          key={item.id} 
-          item={item} 
-          onRemove={removeFromFavorites} 
+        <FavoriteCard
+          key={item.id}
+          item={item}
         />
       ))}
     </div>
   );
 };
 
-import { Heart } from 'lucide-react';
+import { Heart } from 'lucide-react';import { useFavoriteStore } from '../store/useFavoriteStore';
+

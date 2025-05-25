@@ -2,19 +2,22 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/libs/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
+import {  requireAuth } from "@/libs/auth/auth";
 
 // Get all favorite items for the current user
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
-    const session = await getServerSession(authOptions);
+    
+    const session = await requireAuth(["USER", "ADMIN"]);
 
-    if (!session || !session.user.id) {
-      return NextResponse.json({ error: "No estás autenticado" }, { status: 401 });
+
+   if( !session.isAutenticated) {
+      return session.response;
     }
 
     // Get all favorite items with product details
     const favorites = await prisma.favorite.findMany({
-      where: { userId: session.user.id },
+      where: { userId: session.user?.id },
       include: {
         Product: {
           include: {
@@ -24,7 +27,7 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    return NextResponse.json({ items: favorites });
+    return NextResponse.json({ items: favorites }, { status: 200 });
   } catch (error) {
     console.error("Error al obtener favoritos:", error);
     return NextResponse.json(

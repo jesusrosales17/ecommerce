@@ -6,15 +6,11 @@ export interface FavoriteItemWithProduct {
     userId: string;
     productId: string;
     Product?: {
-        id: string;
-        name: string;
-        price: number;
-        isOnSale?: boolean;
-        salePrice?: number;
-        stock: number;
-        // Otras propiedades del producto según sea necesario
-        images?: ProductImage[];
-    };
+        
+        images: ProductImage[];
+        
+    } & Product; // Extender con los campos de Product
+    
     createdAt: Date;
     updatedAt: Date;
 }

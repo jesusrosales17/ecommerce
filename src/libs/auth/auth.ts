@@ -11,7 +11,7 @@ export const getSession = async () => {
     return session;
 }
 
-export const requireAuth = async (role = "ADMIN") => {
+export const requireAuth = async (roles = ['ADMIN']) => {
     const session = await getSession();
 
     if (!session) {
@@ -24,7 +24,7 @@ export const requireAuth = async (role = "ADMIN") => {
         }
     }
 
-    if (session.user.role !== role) {
+    if (!roles.includes(session.user.role)) {
         return {
             isAutenticated: false,
             response: NextResponse.json(
@@ -34,8 +34,10 @@ export const requireAuth = async (role = "ADMIN") => {
         }
     }
 
+
     return {
         isAutenticated: true,
+        user: session.user,
         response: NextResponse.json(
             { message: "Autenticado" }, {
             status: 200,
