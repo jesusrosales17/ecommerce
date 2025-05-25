@@ -111,7 +111,7 @@ export function ProductFilters({
   return (
     <div className="space-y-4 rounded-md">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold">Filtros</h2>
+        {/* <h2 className="text-lg font-semibold">Filtros</h2> */}
         {hasActiveFilters() && (
           <Button 
             variant="ghost" 
