@@ -18,7 +18,7 @@ export const ProductCardLong = ({ product }: Props) => {
     <Link
       href={`/products/${product.id}`}
       key={product.id}
-      className="p-4 group grid grid-cols-[35%_62%] lg:grid-cols-[1fr_3fr] gap-4 border-b items-center shadow cursor-default"
+      className="p-4 group grid grid-cols-[35%_62%] lg:grid-cols-[1fr_3fr] gap-4 border-b items-center shadow cursor-default bg-white"
     >
       <Image
         src={`/api/uploads/products/${image?.name}`}
