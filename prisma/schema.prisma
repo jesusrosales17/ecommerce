@@ -35,9 +35,10 @@ model User {
  
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
   Cart Cart[]
   Favorite Favorite[]
+  Address Address[]
+  Order Order[]
 }
  
 model Account {
@@ -148,6 +149,8 @@ model Product {
 
   CartItem CartItem[]
   Favorite Favorite[]
+
+  OrderItem OrderItem[]
 }
 
 // imagenes del produco
@@ -219,5 +222,74 @@ model Favorite {
   Product Product @relation(fields: [productId], references: [id])
  
   @@index([userId])
+  @@index([productId])
+}
+
+// Direcciones de envío
+model Address {
+  id          String   @id @default(uuid())
+  userId      String
+  name        String
+  street      String
+  city        String
+  state       String
+  postalCode  String
+  country     String   @default("México")
+  phone       String
+  reference   String?
+  isDefault   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+ 
+  User User @relation(fields: [userId], references: [id])
+  Order Order[]
+ 
+  @@index([userId])
+}
+
+// Estado de órdenes
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+// Órdenes de compra
+model Order {
+  id            String      @id @default(uuid())
+  userId        String
+  addressId     String
+  total         Decimal     @db.Decimal(10, 2)
+  status        OrderStatus @default(PENDING)
+  paymentId     String?     // ID de la transacción en Stripe
+  paymentStatus String?     // Estado del pago en Stripe
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+ 
+  User    User    @relation(fields: [userId], references: [id])
+  Address Address @relation(fields: [addressId], references: [id])
+  items   OrderItem[]
+ 
+  @@index([userId])
+  @@index([addressId])
+}
+
+// Items de órdenes
+model OrderItem {
+  id        String   @id @default(uuid())
+  orderId   String
+  productId String
+  name      String   // Guardamos el nombre en caso de que el producto cambie después
+  price     Decimal  @db.Decimal(10, 2) // Precio al momento de la compra
+  quantity  Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+ 
+  Order   Order   @relation(fields: [orderId], references: [id])
+  Product Product @relation(fields: [productId], references: [id])
+ 
+  @@index([orderId])
   @@index([productId])
 }

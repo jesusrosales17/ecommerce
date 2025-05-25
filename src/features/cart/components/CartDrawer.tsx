@@ -140,23 +140,25 @@ export const CartDrawer = () => {
             </div>
           ))}
         </div>
-        
-        {/* Cart Total */}
-        {!cart || cart?.length > 0  && (
+          {/* Cart Total */}
+        {cart && cart.length > 0 && (
           <div className="py-4 m-4">
             <div className="flex justify-between items-center border-t pt-4">
               <span className="font-medium">Total:</span>
               <span className="font-semibold text-lg">{formatPrice(total)}</span>
             </div>
-            
-            <div className="mt-6 space-y-2">
+              <div className="mt-6 space-y-2">
               <Button className="w-full" asChild>
                 <Link href="/checkout">
-            Comprar
+                  Proceder al pago
                 </Link>
               </Button>
               
-        
+              <Button variant="outline" className="w-full" asChild>
+                <Link href="/cart">
+                  Ver carrito
+                </Link>
+              </Button>
             </div>
           </div>
         )}
