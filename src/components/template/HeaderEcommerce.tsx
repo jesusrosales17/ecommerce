@@ -12,12 +12,13 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-import { Heart,  ShoppingCart, User } from "lucide-react";
+import { Heart, User } from "lucide-react";
 import { getSession } from "@/libs/auth/auth";
 import { Category } from "@prisma/client";
 import { HeaderClient } from "./HeaderClient";
 import { CartToggleButton } from "@/features/cart/components/CartToggleButton";
-import { CartButton } from "@/features/cart/components/CartButton";
+import { SearchInput } from "../ui/SearchInput";
+import { SearchProduct } from "@/features/products/components/SearchProduct";
 
 const HeaderEcommerce = async () => {
   const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/categories`, {
@@ -32,12 +33,12 @@ const HeaderEcommerce = async () => {
       <div className="xl:container mx-auto px-4 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
         {/* Logo */}
         <div className="flex items-center gap-4 w-full md:w-auto justify-between">
-          <Logo />          {/* Icons en mobile */}
+          <Logo /> {/* Icons en mobile */}
           <div className="md:hidden flex items-center gap-4">
             <Link href="/favorites">
               <Heart className="w-5 h-5 text-muted-foreground" />
             </Link>
-            
+
             {/* CartToggleButton en versión móvil */}
             <CartToggleButton showCount={true} />
 
@@ -70,7 +71,7 @@ const HeaderEcommerce = async () => {
                 <ul className="space-y-1">
                   {categories.length > 0 ? (
                     categories.map((cat) => (
-                      <li key={cat.id  || cat.name}>
+                      <li key={cat.id || cat.name}>
                         <Link
                           href={`/categories/${cat.name}`}
                           className="text-sm hover:underline block"
@@ -86,16 +87,8 @@ const HeaderEcommerce = async () => {
                   )}
                 </ul>
               </HoverCardContent>
-            </HoverCard>            {/* Enlaces principales */}
-            
-            {/* <Button
-              asChild
-              variant="link"
-              className="text-muted-foreground hover:text-primary"
-            >
-              <Link href="/products">Todos los productos</Link>
-            </Button> */}
-            
+            </HoverCard>{" "}
+            {/* Enlaces principales */}
             <Button
               asChild
               variant="link"
@@ -110,7 +103,10 @@ const HeaderEcommerce = async () => {
             >
               <Link href="/sales">Descuentos</Link>
             </Button>
-          </nav>          {/* Acciones (desktop) */}
+          </nav>{" "}
+          {/* buscador */}
+          <SearchProduct classname="flex-1 md:justify-end" />
+          {/* Acciones (desktop) */}
           <div className="hidden md:flex items-center gap-4">
             {/* Reemplazado con HeaderClient */}
             <HeaderClient />
