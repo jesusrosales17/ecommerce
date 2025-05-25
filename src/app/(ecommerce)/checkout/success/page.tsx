@@ -9,7 +9,7 @@ import { getSession } from "@/libs/auth/auth";
 export default async function CheckoutSuccessPage({
   searchParams,
 }: {
-  searchParams: { session_id: string };
+  searchParams: Promise<{ session_id: string }>;
 }) {
   const session = await getSession();
 
@@ -17,7 +17,7 @@ export default async function CheckoutSuccessPage({
     redirect("/auth/login");
   }
 
-  const { session_id } = searchParams;
+  const { session_id } = await searchParams;
 
   if (!session_id) {
     redirect("/");
@@ -27,7 +27,7 @@ export default async function CheckoutSuccessPage({
   // by querying the Stripe API using the session_id
 
   return (
-    <div className="container max-w-md py-16">
+    <div className="container max-w-md py-16 px-4 mx-auto">
       <Card className="p-8 text-center">
         <div className="flex justify-center mb-4">
           <div className="bg-green-100 p-3 rounded-full">

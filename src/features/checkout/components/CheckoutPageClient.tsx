@@ -136,7 +136,7 @@ export default function CheckoutPageClient({
                   <p className="font-medium mb-2">Método de pago:</p>
                   <div className="p-4 bg-muted rounded-lg flex items-center shadow-sm border">
                     <CreditCard className="h-4 w-4 mr-2" />
-                    Tarjeta de crédito / débito (Stripe)
+                    Tarjeta de crédito / débito 
                   </div>
                 </div>
               </CardContent>
@@ -146,7 +146,7 @@ export default function CheckoutPageClient({
                   Volver
                 </Button>
                 <Button onClick={handlePayment} disabled={isLoading}>
-                  {isLoading ? "Procesando..." : "Pagar con Stripe"}
+                  {isLoading ? "Procesando..." : "Pagar"}
                 </Button>
               </CardFooter>
             </Card>
