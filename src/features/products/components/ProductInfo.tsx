@@ -14,6 +14,8 @@ interface Props {
   };
 }
 import { AddToCartButton } from "@/features/cart/components/AddToCartButton";
+import { Button } from "@/components/ui/button";
+import ButtonsCardProduct from "./ButtonsCardProduct";
 
 export const ProductInfo = ({ product }: Props) => {
   return (
@@ -90,18 +92,15 @@ export const ProductInfo = ({ product }: Props) => {
       <div className="space-y-4">
         {/* Utilizamos el componente AddToCartButton */}
         <div className="flex gap-3">
-          <AddToCartButton 
-            productId={product.id} 
-            stock={product.stock}
+            <Button
             className="flex-1"
-          />
-          
-          <button
-            className="p-3 border border-gray-300 rounded-md hover:bg-gray-50 transition"
-            title="Guardar en favoritos"
-          >
-            <HeartIcon className="h-5 w-5 text-gray-500" />
-          </button>
+            >
+              Comprar
+            </Button>
+
+            <div>
+              <ButtonsCardProduct productId={product.id} />
+            </div>
         </div>
       </div>
     </>
