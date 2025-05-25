@@ -1,7 +1,7 @@
 import { ProductCardLong } from "@/features/products/components/ProductCardLong";
 import { Product } from "@/features/products/interfaces/product";
 import { formmatNumber } from "@/utils/number";
-import { ProductFilters } from "@/components/ui/ProductFilters";
+import { ProductFilters } from "@/features/products/components/ProductFilters";
 
 const FeaturedProducsPage = async ({ searchParams }: { searchParams: Promise<{ [key: string]: string | undefined }> }) => {
   // Construir la URL con los parámetros de búsqueda
@@ -62,7 +62,7 @@ const FeaturedProducsPage = async ({ searchParams }: { searchParams: Promise<{ [
   }
   
   return (
-    <main className="container mx-auto lg:px-3 py-3 grid grid-cols-1 md:grid-cols-[20%_77%] mt-5 gap-8 relative w-full  ">
+    <main className="container mx-auto lg:px-3 py-3 grid grid-cols-1 md:grid-cols-[20%_77%] mt-5 gap-4 relative w-full  ">
       <div className="px-3 lg:px-0">
         <h1 className="text-xl font-bold">Destacados</h1>
         <p className="text-accent-foreground mb-4">

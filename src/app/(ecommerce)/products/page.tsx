@@ -1,7 +1,7 @@
 import { ProductCardLong } from "@/features/products/components/ProductCardLong";
 import { Product } from "@/features/products/interfaces/product";
 import { formmatNumber } from "@/utils/number";
-import { ProductFilters } from "@/components/ui/ProductFilters";
+import { ProductFilters } from "@/features/products/components/ProductFilters";
 
 const ProductsPage = async ({
   searchParams,

@@ -1,6 +1,6 @@
 import { ProductCardLong } from "@/features/products/components/ProductCardLong";
 import { Product } from "@/features/products/interfaces/product";
-import { ProductFilters } from "@/components/ui/ProductFilters";
+import { ProductFilters } from "@/features/products/components/ProductFilters";
 
 const SalesProducsPage = async ({
   searchParams,
