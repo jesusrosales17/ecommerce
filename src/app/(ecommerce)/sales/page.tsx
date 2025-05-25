@@ -1,6 +1,7 @@
 import { ProductCardLong } from "@/features/products/components/ProductCardLong";
 import { Product } from "@/features/products/interfaces/product";
 import { ProductFilters } from "@/features/products/components/ProductFilters";
+import { formmatNumber } from "@/utils/number";
 
 const SalesProducsPage = async ({
   searchParams,
@@ -71,9 +72,13 @@ const SalesProducsPage = async ({
   }
 
   return (
-    <main className="container mx-auto lg:px-3 py-3 grid grid-cols-1 md:grid-cols-[20%_77%] mt-5 gap-4">
-      <div>
-        <h1 className="text-xl font-bold mb-4">En oferta</h1>{" "}
+    <main className="container mx-auto lg:px-3 py-3 grid grid-cols-1 md:grid-cols-[20%_77%] mt-5 gap-4 relative w-full  ">
+      <div className="px-3 lg:px-0">
+        <h1 className="text-xl font-bold">En oferta</h1>
+        <p className="text-accent-foreground ">
+          {formmatNumber(products.length)}{" "}
+          {products.length > 1 ? "resultados" : "resultado"}
+        </p>
         <ProductFilters
           defaultOnSale={true}
           showSaleFilter={false} // Ocultamos el filtro de ofertas porque ya estamos en la página de ofertas

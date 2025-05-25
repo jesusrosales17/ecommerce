@@ -150,7 +150,7 @@ export function ProductFilters({
             variant="outline"
             size="sm"
             onClick={() => setShowFilters(!showFilters)}
-            className="text-xs flex items-center gap-4 w-full lg:hidden"
+            className=" flex items-center gap-4 w-full lg:hidden h-10"
             >
                 <FilterIcon />
             {showFilters ? "Ocultar filtros" : "Mostrar filtros"}
