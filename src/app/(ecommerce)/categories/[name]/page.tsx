@@ -51,7 +51,8 @@ const ProductsByCategoryPage = async ({ params, searchParams }: Props) => {
   const products: Product[] = (await res.json().catch(() => [])) || [];
   if (products.length === 0) {
     return (
-      <main className="container mx-auto lg:px-3 py-3 grid grid-cols-1 md:grid-cols-[20%_77%] mt-5 gap-4">
+
+    <main className="container mx-auto lg:px-3 py-3 grid grid-cols-1 md:grid-cols-[30%_70%] lg:grid-cols-[20%_77%] mt-5 gap-4 relative w-full  ">
         <div className="px-3 lg:px-0">
           <h1 className="text-xl font-bold">{decodeURIComponent(name)}</h1>
           
@@ -70,7 +71,9 @@ const ProductsByCategoryPage = async ({ params, searchParams }: Props) => {
       </main>
     );
   }  return (
-    <main className="container mx-auto lg:px-3 py-3 grid grid-cols-1 md:grid-cols-[20%_77%] mt-5 gap-4 relative w-full">
+
+    <main className="container mx-auto lg:px-3 py-3 grid grid-cols-1 md:grid-cols-[30%_70%] lg:grid-cols-[20%_77%] mt-5 gap-4 relative w-full  ">
+
       <div className="px-3 lg:px-0">
         <h1 className="text-xl font-bold">{decodeURIComponent(name)}</h1>
         <p className="text-accent-foreground mb-4">

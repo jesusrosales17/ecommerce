@@ -45,7 +45,7 @@ const SalesProducsPage = async ({
   const products: Product[] = (await res.json().catch(() => [])) || [];
   if (products.length === 0) {
     return (
-      <main className="container mx-auto lg:px-3 py-3 grid grid-cols-1 md:grid-cols-[20%_77%] mt-5 gap-4">
+      <main className="container mx-auto lg:px-3 py-3 grid grid-cols-1 md:grid-cols-[30%_70%] lg:grid-cols-[20%_77%] mt-5 gap-4 relative w-full  ">
         <div>
           <h1 className="text-xl font-bold mb-4">En oferta</h1>{" "}
           <ProductFilters
@@ -72,7 +72,7 @@ const SalesProducsPage = async ({
   }
 
   return (
-    <main className="container mx-auto lg:px-3 py-3 grid grid-cols-1 md:grid-cols-[20%_77%] mt-5 gap-4 relative w-full  ">
+    <main className="container mx-auto lg:px-3 py-3 grid grid-cols-1 md:grid-cols-[30%_70%] lg:grid-cols-[20%_77%] mt-5 gap-4 relative w-full  ">
       <div className="px-3 lg:px-0">
         <h1 className="text-xl font-bold">En oferta</h1>
         <p className="text-accent-foreground ">
@@ -86,7 +86,6 @@ const SalesProducsPage = async ({
           showPriceFilter={true}
         />
       </div>
-
       <div className="grid grid-cols-1 bg-white">
         {products.map((product) => (
           <ProductCardLong key={product.id} product={product} />
