@@ -11,6 +11,10 @@ const ProductsPage = async ({
   // Construir la URL con los parámetros de búsqueda
   const queryParams = new URLSearchParams();
 
+  const search = (await searchParams).search;
+  if( search) {
+    queryParams.append("search", search);
+  }
   // Añadir todos los filtros si están presentes
   const onSale = (await searchParams).onSale;
   if (onSale) {
@@ -38,6 +42,7 @@ const ProductsPage = async ({
     queryParams.append("maxPrice", maxPrice);
   }
 
+  console.log(await searchParams);
   // Realizar la petición con los filtros aplicados
   const res = await fetch(
     `${process.env.NEXT_PUBLIC_URL}/api/products${
@@ -61,7 +66,7 @@ const ProductsPage = async ({
       <div className="flex flex-col items-center justify-center h-screen">
         <h1 className="text-2xl font-bold">No hay productos</h1>
         <p className="text-gray-500">
-          No se encontraron productos con los filtros seleccionados
+          No se encontraron productos que coincidan con tu búsqueda.
         </p>
       </div>
     );
@@ -81,7 +86,7 @@ const ProductsPage = async ({
           showSaleFilter={true}
           showFeaturedFilter={true}
           showPriceFilter={true}
-          
+          defaultSearch= {search} 
         />
       </div>
 

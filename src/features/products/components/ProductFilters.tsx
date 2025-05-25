@@ -18,6 +18,7 @@ interface ProductFiltersProps {
   defaultFeatured?: boolean;
   defaultMinPrice?: number;
   defaultMaxPrice?: number;
+  defaultSearch?: string;
 }
 
 export function ProductFilters({
@@ -28,6 +29,7 @@ export function ProductFilters({
   defaultFeatured = false,
   defaultMinPrice,
   defaultMaxPrice,
+  defaultSearch
 }: ProductFiltersProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -101,6 +103,11 @@ export function ProductFilters({
     if (defaultFeatured) {
       params.set("featured", "true");
     }
+
+    if (defaultSearch) {
+      params.set("search", defaultSearch);
+    }
+
 
     router.push(`?${params.toString()}`, { scroll: false });
   };
