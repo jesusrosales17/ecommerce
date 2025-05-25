@@ -1,4 +1,3 @@
-
 import { CartToggleButton } from "@/features/cart/components/CartToggleButton";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
@@ -9,17 +8,17 @@ import { getSession } from "@/libs/auth/auth";
 import { DropdownUserEcommerce } from "./DropdownUserEcommerce";
 
 export const HeaderClient = async () => {
-    const session = await getSession();
+  const session = await getSession();
 
   return (
-    <div className="flex items-center gap-4">      <Link href="/favorites">
+    <div className="flex items-center gap-4">
+      {" "}
+      <Link href="/favorites">
         <Button variant="ghost" size="icon">
           <Heart className="w-5 h-5" />
         </Button>
       </Link>
-      
       <CartToggleButton showCount={true} variant="ghost" />
-
       {!session && (
         <>
           <Link href="/auth/login">
@@ -30,10 +29,7 @@ export const HeaderClient = async () => {
           </Link>
         </>
       )}
-
-      {session && (
-        <DropdownUserEcommerce session={session} />
-      )}
+      {session && <DropdownUserEcommerce session={session} />}
     </div>
   );
 };

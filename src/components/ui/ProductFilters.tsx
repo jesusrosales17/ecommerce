@@ -1,12 +1,12 @@
 "use client"
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Input } from "@/components/ui/input"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
-import { XCircle } from "lucide-react"
+import { XCircle, Filter } from "lucide-react"
 
 interface ProductFiltersProps {
   showSaleFilter?: boolean
@@ -24,26 +24,29 @@ export function ProductFilters({
   showPriceFilter = true,
   defaultOnSale = false,
   defaultFeatured = false,
-  defaultMinPrice = 0,
-  defaultMaxPrice = 10000
+  defaultMinPrice,
+  defaultMaxPrice
 }: ProductFiltersProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
-    const [isOnSale, setIsOnSale] = useState(defaultOnSale || searchParams.get('onSale') === 'true')
-  const [isFeatured, setIsFeatured] = useState(defaultFeatured || searchParams.get('featured') === 'true')
-  const [minPrice, setMinPrice] = useState(searchParams.get('minPrice') ? Number(searchParams.get('minPrice')) : defaultMinPrice)
-  const [maxPrice, setMaxPrice] = useState(searchParams.get('maxPrice') ? Number(searchParams.get('maxPrice')) : defaultMaxPrice)
   
-  // Debounce function to prevent too many router changes
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      updateFilters()
-    }, 500)
-    
-    return () => clearTimeout(timeout)
-  }, [isOnSale, isFeatured, minPrice, maxPrice])
+  // Inicializar estados con valores de searchParams o defaults
+  const [isOnSale, setIsOnSale] = useState(
+    defaultOnSale || (searchParams.get('onSale') === 'true')
+  )
   
-  const updateFilters = () => {
+  const [isFeatured, setIsFeatured] = useState(
+    defaultFeatured || (searchParams.get('featured') === 'true')
+  )
+  
+  const [minPrice, setMinPrice] = useState<number | undefined>(
+    searchParams.get('minPrice') ? Number(searchParams.get('minPrice')) : defaultMinPrice
+  )
+  
+  const [maxPrice, setMaxPrice] = useState<number | undefined>(
+    searchParams.get('maxPrice') ? Number(searchParams.get('maxPrice')) : defaultMaxPrice
+  )
+    const updateFilters = () => {
     const params = new URLSearchParams(searchParams.toString())
     
     // Update or remove onSale param
@@ -52,7 +55,8 @@ export function ProductFilters({
     } else {
       params.delete('onSale')
     }
-      // Update or remove featured param
+    
+    // Update or remove featured param
     if (isFeatured) {
       params.set('featured', 'true')
     } else {
@@ -60,13 +64,13 @@ export function ProductFilters({
     }
     
     // Update or remove price params
-    if (minPrice !== defaultMinPrice) {
+    if (minPrice !== undefined && minPrice > 0) {
       params.set('minPrice', minPrice.toString())
     } else {
       params.delete('minPrice')
     }
     
-    if (maxPrice !== defaultMaxPrice) {
+    if (maxPrice !== undefined && maxPrice > 0) {
       params.set('maxPrice', maxPrice.toString())
     } else {
       params.delete('maxPrice')
@@ -74,11 +78,11 @@ export function ProductFilters({
     
     router.push(`?${params.toString()}`, { scroll: false })
   }
-    const resetFilters = () => {
+  const resetFilters = () => {
     setIsOnSale(defaultOnSale)
     setIsFeatured(defaultFeatured)
-    setMinPrice(defaultMinPrice)
-    setMaxPrice(defaultMaxPrice)
+    setMinPrice(undefined)
+    setMaxPrice(undefined)
     
     // Limpiar los parámetros de la URL
     const params = new URLSearchParams()
@@ -100,14 +104,14 @@ export function ProductFilters({
     return (
       (isOnSale !== defaultOnSale) || 
       (isFeatured !== defaultFeatured) || 
-      (minPrice !== defaultMinPrice) ||
-      (maxPrice !== defaultMaxPrice)
+      (minPrice !== undefined && minPrice > 0) ||
+      (maxPrice !== undefined && maxPrice > 0)
     )
   }
-
   return (
-    <div className="space-y-4   rounded-md ">
+    <div className="space-y-4 rounded-md">
       <div className="flex items-center justify-between">
+        <h2 className="text-lg font-semibold">Filtros</h2>
         {hasActiveFilters() && (
           <Button 
             variant="ghost" 
@@ -127,7 +131,7 @@ export function ProductFilters({
           <Switch 
             id="sale-filter" 
             checked={isOnSale}
-            onCheckedChange={setIsOnSale}
+            onCheckedChange={(checked) => setIsOnSale(checked)}
           />
         </div>
       )}
@@ -138,7 +142,7 @@ export function ProductFilters({
           <Switch 
             id="featured-filter" 
             checked={isFeatured}
-            onCheckedChange={setIsFeatured}
+            onCheckedChange={(checked) => setIsFeatured(checked)}
           />
         </div>
       )}
@@ -150,23 +154,38 @@ export function ProductFilters({
             <Input
               type="number"
               placeholder="Min"
-              value={minPrice}
+              value={minPrice === undefined ? '' : minPrice}
               min={0}
-              onChange={(e) => setMinPrice(Number(e.target.value))}
+              onChange={(e) => {
+                const value = e.target.value === '' ? undefined : Number(e.target.value);
+                setMinPrice(value);
+              }}
               className="w-full bg-white"
             />
             <span>-</span>
             <Input
               type="number"
               placeholder="Max"
-              value={maxPrice}
-              min={minPrice}
-              onChange={(e) => setMaxPrice(Number(e.target.value))}
+              value={maxPrice === undefined ? '' : maxPrice}
+              min={minPrice || 0}
+              onChange={(e) => {
+                const value = e.target.value === '' ? undefined : Number(e.target.value);
+                setMaxPrice(value);
+              }}
               className="w-full bg-white"
             />
           </div>
         </div>
       )}
+      
+      <Button 
+        onClick={updateFilters}
+        className="w-full mt-4" 
+        variant="default"
+      >
+        <Filter className="h-4 w-4 mr-2" />
+        Aplicar filtros
+      </Button>
     </div>
   )
 }

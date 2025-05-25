@@ -88,13 +88,13 @@ const HeaderEcommerce = async () => {
               </HoverCardContent>
             </HoverCard>            {/* Enlaces principales */}
             
-            <Button
+            {/* <Button
               asChild
               variant="link"
               className="text-muted-foreground hover:text-primary"
             >
               <Link href="/products">Todos los productos</Link>
-            </Button>
+            </Button> */}
             
             <Button
               asChild

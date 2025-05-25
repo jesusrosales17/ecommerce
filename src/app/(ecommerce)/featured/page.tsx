@@ -3,23 +3,25 @@ import { Product } from "@/features/products/interfaces/product";
 import { formmatNumber } from "@/utils/number";
 import { ProductFilters } from "@/components/ui/ProductFilters";
 
-const FeaturedProducsPage = async ({ searchParams }: { searchParams: { [key: string]: string | undefined } }) => {
+const FeaturedProducsPage = async ({ searchParams }: { searchParams: Promise<{ [key: string]: string | undefined }> }) => {
   // Construir la URL con los parámetros de búsqueda
   const queryParams = new URLSearchParams();
     // Siempre incluir featured=true por defecto en la página de destacados
   queryParams.append('featured', 'true');
-  
-  // Añadir filtros adicionales si están presentes
-  if (searchParams.onSale) {
-    queryParams.append('onSale', searchParams.onSale);
+    // Añadir filtros adicionales si están presentes
+  const onSale = (await searchParams).onSale;
+  if (onSale) {
+    queryParams.append('onSale', onSale);
   }
-  
-  if (searchParams.minPrice) {
-    queryParams.append('minPrice', searchParams.minPrice);
+
+  const minPrice = (await searchParams).minPrice;
+  if (minPrice) {
+    queryParams.append('minPrice', minPrice);
   }
-  
-  if (searchParams.maxPrice) {
-    queryParams.append('maxPrice', searchParams.maxPrice);
+
+  const maxPrice = (await searchParams).maxPrice;
+  if (maxPrice) {
+    queryParams.append('maxPrice', maxPrice);
   }
   
   const res = await fetch(
@@ -38,7 +40,7 @@ const FeaturedProducsPage = async ({ searchParams }: { searchParams: { [key: str
   const products: Product[] = (await res.json().catch(() => [])) || [];
   if (products.length === 0) {
     return (
-      <main className="container mx-auto lg:px-3 py-3 grid grid-cols-1 md:grid-cols-[30%_70%] mt-5 gap-4">
+      <main className="container mx-auto lg:px-3 py-3 grid grid-cols-1 md:grid-cols-[20%_77%] mt-5 gap-4">
         <div className="px-3 lg:px-0">
           <h1 className="text-xl font-bold">Destacados</h1>
           
@@ -50,7 +52,7 @@ const FeaturedProducsPage = async ({ searchParams }: { searchParams: { [key: str
           />
         </div>
         
-        <div className="flex flex-col items-center justify-center min-h-[300px] bg-white p-6">
+        <div className="flex flex-col items-center justify-center min-h-[300px]  p-6">
           <h2 className="text-2xl font-bold mb-2">No hay productos destacados</h2>
           <p className="text-gray-500 text-center">No se encontraron productos destacados con los filtros seleccionados</p>
           <p className="text-gray-500 text-center mt-1">Prueba con otros criterios de búsqueda</p>
@@ -67,16 +69,14 @@ const FeaturedProducsPage = async ({ searchParams }: { searchParams: { [key: str
           {formmatNumber(products.length)}{" "}
           {products.length > 1 ? "resultados" : "resultado"}
         </p>
-        
-        <ProductFilters 
+          <ProductFilters 
           defaultFeatured={true}
           showFeaturedFilter={false} // Ocultamos el filtro de destacados porque ya estamos en la página de destacados
           showSaleFilter={true}
           showPriceFilter={true}
         />
       </div>
-      
-      <div className="grid grid-cols-1 bg-red-400 grid-1">
+        <div className="grid grid-cols-1 bg-white">
         {products.map(product => (
           <ProductCardLong key={product.id} product={product} />
         ))}
