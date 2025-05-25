@@ -1,17 +1,46 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useCartStore } from '../store/useCartStore';
 import { toast } from 'sonner';
+import { useSession } from 'next-auth/react';
+import { signIn } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 
 export const useCartActions = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const { data: session, status } = useSession();
+  const router = useRouter();
   const { 
     setCart, 
     setTotal, 
     setPendingCartItem, 
     setRedirectAfterLogin,
     pendingCartItem,
+    redirectAfterLogin,
+    clearPendingData,
     setIsLoading: setStoreLoading
   } = useCartStore();
+  
+  // Check if user is authenticated
+  const isAuthenticated = status === 'authenticated';
+  const isAdmin = session?.user?.role === 'ADMIN';
+  
+  // Effect for handling redirects and processing pending items after login
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    
+    // If user just became authenticated and there's a redirect path
+    if (redirectAfterLogin) {
+      // Redirect admin users to admin panel
+      if (isAdmin) {
+        router.push('/admin');
+      } 
+      // Redirect normal users back to where they were
+      else if (redirectAfterLogin) {
+        router.push(redirectAfterLogin);
+      }
+    }
+  }, [isAuthenticated, redirectAfterLogin, isAdmin, router]);
+  
   // Fetch cart data from API
   const fetchCart = async () => {
     // Evitar múltiples solicitudes simultáneas
@@ -49,13 +78,14 @@ export const useCartActions = () => {
       setStoreLoading(false);
     }
   };
-
   // Add item to cart
-  const addToCart = async (productId: string, quantity: number, isAuthenticated: boolean) => {
-    // If user is not authenticated, save for later and return
+  const addToCart = async (productId: string, quantity: number) => {
+    // If user is not authenticated, save for later and redirect to login
     if (!isAuthenticated) {
       setPendingCartItem({ productId, quantity });
       setRedirectAfterLogin(window.location.pathname);
+      // Use Next-Auth's signIn to redirect to login page
+      signIn(undefined, { callbackUrl: window.location.pathname });
       return;
     }
 
@@ -63,7 +93,7 @@ export const useCartActions = () => {
     setStoreLoading(true);
     
     try {
-        console.log('ad to cart')
+      // User is authenticated, make API call
       const response = await fetch('/api/cart/items', {
         method: 'POST',
         headers: {
@@ -181,22 +211,21 @@ export const useCartActions = () => {
       setStoreLoading(false);
     }
   };
-
   // Process pending cart item after login
   const processPendingCartItem = async () => {
-    if (pendingCartItem) {
+    if (pendingCartItem && isAuthenticated) {
       await addToCart(
         pendingCartItem.productId,
-        pendingCartItem.quantity,
-        true // User is now authenticated
+        pendingCartItem.quantity
       );
       // Clear the pending item after processing
       setPendingCartItem(null);
     }
-  };
-
-  return {
+  };  return {
     isLoading,
+    isAuthenticated,
+    isAdmin,
+    status,
     fetchCart,
     addToCart,
     removeFromCart,

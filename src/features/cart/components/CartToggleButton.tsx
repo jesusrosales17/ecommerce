@@ -3,9 +3,8 @@
 import { Button } from '@/components/ui/button';
 import { ShoppingCart } from 'lucide-react';
 import { useCartStore } from '../store/useCartStore';
-import { useCartAuth } from '../hooks/useCartAuth';
-import { signIn } from 'next-auth/react';
 import { Badge } from '@/components/ui/badge';
+import { useCartActions } from '../hooks/useCartActions';
 import { useEffect } from 'react';
 
 interface CartToggleButtonProps {
@@ -17,21 +16,16 @@ export const CartToggleButton = ({
   showCount = true,
   variant = 'ghost'
 }: CartToggleButtonProps) => {
-  const { cart, isCartOpen, setIsCartOpen, setRedirectAfterLogin } = useCartStore();
-  const { isAuthenticated } = useCartAuth();
+  const { cart, isCartOpen, setIsCartOpen } = useCartStore();
+  const { isAuthenticated } = useCartActions();
 
   // Calculate total items in cart
   const itemCount = cart?.reduce((sum, item) => sum + item.quantity, 0) || 0;
 
   const handleToggleCart = () => {
-    if (!isAuthenticated) {
-      // Save current location and redirect to login
-      setRedirectAfterLogin(window.location.pathname);
-      signIn(undefined, { callbackUrl: window.location.pathname });
-    } else {
       // Toggle cart drawer for authenticated users
       setIsCartOpen(!isCartOpen);
-    }
+    
   };
 
  

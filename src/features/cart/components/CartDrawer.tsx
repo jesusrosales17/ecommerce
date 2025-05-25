@@ -1,6 +1,5 @@
 import React from 'react';
 import { useCartStore } from '../store/useCartStore';
-import { useCartAuth } from '../hooks/useCartAuth';
 import { useCartActions } from '../hooks/useCartActions';
 import { Trash2, X, Plus, Minus } from 'lucide-react';
 import Image from 'next/image';
@@ -24,17 +23,16 @@ export const CartDrawer = () => {
     isLoading,
   } = useCartStore();
   
-  const { isAuthenticated } = useCartAuth();
-  const { removeFromCart, updateQuantity } = useCartActions();
+  const { isAuthenticated, removeFromCart, updateQuantity } = useCartActions();
 
   const handleQuantityChange = (productId: string, currentQuantity: number, change: number) => {
     const newQuantity = Math.max(1, currentQuantity + change);
     updateQuantity(productId, newQuantity);
   };
 
-  if (!isAuthenticated) {
-    return null;
-  }
+  // if (!isAuthenticated) {
+  //   return null;
+  // }
 
   return (
     <Sheet open={isCartOpen} onOpenChange={setIsCartOpen}>
@@ -46,7 +44,7 @@ export const CartDrawer = () => {
           <SheetDescription>
             {cart?.length === 0 
               ? 'Tu carrito está vacío.' 
-              : `Tienes ${cart?.length} productos en tu carrito.`
+              : `Tienes ${cart?.length || 0} productos en tu carrito.`
             }
           </SheetDescription>
         </SheetHeader>

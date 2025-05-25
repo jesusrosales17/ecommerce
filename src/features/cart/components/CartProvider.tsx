@@ -2,20 +2,18 @@
 
 import React, { useEffect } from "react";
 import { useCartStore } from "../store/useCartStore";
-import { useCartAuth } from "../hooks/useCartAuth";
 import { useCartActions } from "../hooks/useCartActions";
 import { CartDrawer } from "./CartDrawer";
 import { usePathname } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const pathname = usePathname();
-  const { status } = useCartAuth();
+  const { data: session, status } = useSession();
   const { pendingCartItem, clearPendingData } = useCartStore();
-  const { fetchCart, processPendingCartItem} = useCartActions();
-  const { isAuthenticated } = useCartAuth();
-  // No necesitamos llamar a fetchCart aquí, ya lo hace useCartAuth
+  const { fetchCart, processPendingCartItem, isAuthenticated } = useCartActions();
 
   useEffect(() => {
     if (!isAuthenticated) return;
@@ -27,16 +25,15 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
     fetchCart();
     clearPendingData();
   }, [isAuthenticated, pendingCartItem]);
-
   // Clear pending cart data when user explicitly logs out
   useEffect(() => {
     if (status === "unauthenticated") {
       // Only clear if we're not on the login page (to preserve redirect info)
       if (!pathname.includes("/auth/login")) {
-        useCartStore.getState().clearPendingData();
+        clearPendingData();
       }
     }
-  }, [status, pathname]);
+  }, [status, pathname, clearPendingData]);
 
   return (
     <>

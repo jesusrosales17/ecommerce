@@ -1,10 +1,7 @@
 'use client';
 import { Button } from '@/components/ui/button'
 import { ShoppingCart } from 'lucide-react'
-import { useCartStore } from '../store/useCartStore'
-import { useCartAuth } from '../hooks/useCartAuth'
 import { useCartActions } from '../hooks/useCartActions'
-import { signIn } from 'next-auth/react'
 import { toast } from 'sonner';
 
 interface CartButtonProps {
@@ -24,29 +21,19 @@ export const CartButton = ({
   showText = false,
   className = ''
 }: CartButtonProps) => {
-  const { setPendingCartItem, setRedirectAfterLogin } = useCartStore();
-  const { isAuthenticated } = useCartAuth();
   const { addToCart, isLoading } = useCartActions();
+  
   const handleAddToCart = async (e: React.MouseEvent) => {
     // Evitar que el evento se propague a elementos padres (como el Link de la tarjeta)
     e.preventDefault();
     e.stopPropagation();
     
-    if (!isAuthenticated) {
-      // Save intended product and redirect to login
-      setPendingCartItem({ productId, quantity });
-      setRedirectAfterLogin(window.location.pathname);
-      // Use Next-Auth's signIn to redirect to login page
-      signIn(undefined, { callbackUrl: window.location.pathname });
-      
-    } else {
-      // User is authenticated, directly add to cart
-      try {
-        await addToCart(productId, quantity, true);
-        toast.success('Producto agregado al carrito');
-      } catch (error) {
-        toast.error('Error al agregar al carrito');
-      }
+    try {
+      // La lógica de autenticación está ahora dentro de useCartActions
+      await addToCart(productId, quantity);
+      // El toast de éxito se muestra en useCartActions si la operación es exitosa
+    } catch (error) {
+      toast.error('Error al agregar al carrito');
     }
   };
   return (
