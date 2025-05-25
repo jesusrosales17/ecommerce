@@ -42,10 +42,7 @@ export default function CheckoutPageClient({
   };
 
   const handleContinue = () => {
-    if (activeTab === "direccion") {
-      if (!selectedAddressId) {
-        return;
-      }
+    if (activeTab === "direccion" && selectedAddressId) {
       setActiveTab("pago");
     }
   };
@@ -57,52 +54,51 @@ export default function CheckoutPageClient({
   };
 
   const handlePayment = async () => {
-    if (!selectedAddressId) {
-      return;
+    if (selectedAddressId) {
+      await createCheckoutSession(selectedAddressId);
     }
-    await createCheckoutSession(selectedAddressId);
   };
 
   return (
-    <div className="flex flex-col md:flex-row gap-6">
+    <div className="flex flex-col lg:flex-row gap-8 py-6">
       <div className="flex-1">
-        <Tabs
-          value={activeTab}
-          onValueChange={setActiveTab}
-          className="w-full"
-        >
-          <TabsList className="w-full mb-6">
-            <TabsTrigger value="direccion" className="flex-1">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="w-full mb-6 grid grid-cols-2">
+            <TabsTrigger value="direccion" className="w-auto">
               <Home className="h-4 w-4 mr-2" />
               Dirección
             </TabsTrigger>
-            <TabsTrigger value="pago" className="flex-1" disabled={!selectedAddressId}>
+            <TabsTrigger value="pago" disabled={!selectedAddressId} className="w-auto">
               <CreditCard className="h-4 w-4 mr-2" />
               Pago
             </TabsTrigger>
           </TabsList>
-          <TabsContent value="direccion">
-            <AddressList
-              addresses={addresses}
-              selectable
-              onAddressSelect={handleAddressSelect}
-            />
 
-            <div className="mt-6 flex justify-between">
-              <Link href="/cart">
-                <Button variant="outline">
-                  <ArrowLeft className="mr-2 h-4 w-4" />
-                  Volver al carrito
+          <TabsContent value="direccion">
+            <Card>
+              <CardHeader>
+                <CardTitle>Selecciona una dirección</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <AddressList
+                  addresses={addresses}
+                  selectable
+                  onAddressSelect={handleAddressSelect}
+                />
+              </CardContent>
+              <CardFooter className="flex flex-col gap-4 md:flex-row justify-between">
+                <Button variant="outline" asChild className="w-full md:w-auto">
+                  <Link href="/cart">
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    Volver al carrito
+                  </Link>
                 </Button>
-              </Link>
-              <Button
-                onClick={handleContinue}
-                disabled={!selectedAddressId}
-              >
-                Continuar al pago
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </div>
+                <Button onClick={handleContinue} disabled={!selectedAddressId} className="w-full md:w-auto">
+                  Continuar al pago
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </CardFooter>
+            </Card>
           </TabsContent>
 
           <TabsContent value="pago">
@@ -110,43 +106,37 @@ export default function CheckoutPageClient({
               <CardHeader>
                 <CardTitle>Finalizar compra</CardTitle>
                 <CardDescription>
-                  Revisa los detalles y procede al pago seguro con Stripe
+                  Revisa los detalles y paga de forma segura
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div>
-                    <p className="font-medium">Dirección de envío:</p>
-                    {selectedAddressId && (
-                      <div className="mt-1 p-3 bg-gray-50 rounded-md">
-                        {addresses
-                          .find((addr) => addr.id === selectedAddressId)
-                          ?.street}, {" "}
-                        {
-                          addresses.find(
-                            (addr) => addr.id === selectedAddressId
-                          )?.city
-                        }, {" "}
-                        {
-                          addresses.find(
-                            (addr) => addr.id === selectedAddressId
-                          )?.state
-                        }, {" "}
-                        {
-                          addresses.find(
-                            (addr) => addr.id === selectedAddressId
-                          )?.postalCode
-                        }
-                      </div>
-                    )}
-                  </div>
-
-                  <div>
-                    <p className="font-medium">Método de pago:</p>
-                    <div className="mt-1 p-3 bg-gray-50 rounded-md flex items-center">
-                      <CreditCard className="h-4 w-4 mr-2" />
-                      Tarjeta de crédito / débito (Stripe)
+              <CardContent className="space-y-6">
+                <div>
+                  <p className="font-medium mb-2">Dirección de envío:</p>
+                  {selectedAddressId && (
+                    <div className="p-4 bg-muted rounded-lg text-sm leading-relaxed shadow-sm border">
+                      {(() => {
+                        const addr = addresses.find(
+                          (a) => a.id === selectedAddressId
+                        );
+                        return addr ? (
+                          <>
+                            <p>{addr.street}</p>
+                            <p>
+                              {addr.city}, {addr.state}
+                            </p>
+                            <p>{addr.postalCode}</p>
+                          </>
+                        ) : null;
+                      })()}
                     </div>
+                  )}
+                </div>
+
+                <div>
+                  <p className="font-medium mb-2">Método de pago:</p>
+                  <div className="p-4 bg-muted rounded-lg flex items-center shadow-sm border">
+                    <CreditCard className="h-4 w-4 mr-2" />
+                    Tarjeta de crédito / débito (Stripe)
                   </div>
                 </div>
               </CardContent>
@@ -155,10 +145,7 @@ export default function CheckoutPageClient({
                   <ArrowLeft className="mr-2 h-4 w-4" />
                   Volver
                 </Button>
-                <Button 
-                  onClick={handlePayment}
-                  disabled={isLoading}
-                >
+                <Button onClick={handlePayment} disabled={isLoading}>
                   {isLoading ? "Procesando..." : "Pagar con Stripe"}
                 </Button>
               </CardFooter>
@@ -167,26 +154,24 @@ export default function CheckoutPageClient({
         </Tabs>
       </div>
 
-      <div className="w-full md:w-80">
-        <Card>
+      <div className="w-full md:w-96 lg:mt-16">
+        <Card className="">
           <CardHeader>
             <CardTitle>Resumen del pedido</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="flex justify-between">
-                <span>Productos ({itemsCount}):</span>
-                <span>${cartTotal.toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Envío:</span>
-                <span>Gratis</span>
-              </div>
-              <Separator />
-              <div className="flex justify-between font-bold">
-                <span>Total:</span>
-                <span>${cartTotal.toFixed(2)}</span>
-              </div>
+          <CardContent className="space-y-4 text-sm">
+            <div className="flex justify-between">
+              <span>Productos ({itemsCount})</span>
+              <span>${cartTotal.toFixed(2)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Envío</span>
+              <span className="text-green-600 font-medium">Gratis</span>
+            </div>
+            <Separator />
+            <div className="flex justify-between text-base font-semibold">
+              <span>Total</span>
+              <span>${cartTotal.toFixed(2)}</span>
             </div>
           </CardContent>
         </Card>

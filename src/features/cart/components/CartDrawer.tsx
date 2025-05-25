@@ -148,13 +148,17 @@ export const CartDrawer = () => {
               <span className="font-semibold text-lg">{formatPrice(total)}</span>
             </div>
               <div className="mt-6 space-y-2">
-              <Button className="w-full" asChild>
+              <Button
+               onClick={() => setIsCartOpen(false)}
+               className="w-full" asChild>
                 <Link href="/checkout">
                   Proceder al pago
                 </Link>
               </Button>
               
-              <Button variant="outline" className="w-full" asChild>
+              <Button
+              onClick={() => setIsCartOpen(false)}
+               variant="outline" className="w-full" asChild>
                 <Link href="/cart">
                   Ver carrito
                 </Link>

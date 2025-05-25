@@ -24,7 +24,7 @@ export default async function CartPage() {
   const itemsCount = cartData?.itemsCount || 0;
 
   return (
-    <div className="container py-8 mx-auto px-4 lg:px-0">
+    <div className="container py-8 mx-auto px-4 2xl:px-0 min-h-[100dvh]">
       <h1 className="text-2xl font-bold mb-6">Mi carrito</h1>
 
       {cartItems.length === 0 ? (
