@@ -73,7 +73,7 @@ const ProductsPage = async ({
   }
 
   return (
-    <main className="container mx-auto lg:px-3 py-3 grid grid-cols-1 md:grid-cols-[30%_70%] mt-5 gap-4">
+    <main className="container mx-auto lg:px-3 py-3 grid grid-cols-1 md:grid-cols-[20%_77%] mt-5 gap-4">
       <div className="px-3 lg:px-0">
         <h1 className="text-xl font-bold">Todos los productos</h1>
         <p className="text-accent-foreground mb-4">
