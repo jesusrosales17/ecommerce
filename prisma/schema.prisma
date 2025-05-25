@@ -37,6 +37,7 @@ model User {
   updatedAt DateTime @updatedAt
 
   Cart Cart[]
+  Favorite Favorite[]
 }
  
 model Account {
@@ -141,12 +142,12 @@ model Product {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
  
- 
-  category  Category? @relation(fields: [categoryId], references: [id])
+   category  Category? @relation(fields: [categoryId], references: [id])
   images ProductImage[]
   specifications ProductSpecification[]
 
   CartItem CartItem[]
+  Favorite Favorite[]
 }
 
 // imagenes del produco
@@ -203,5 +204,20 @@ model CartItem {
   Product Product? @relation(fields: [productId], references: [id])
   Cart Cart? @relation(fields: [cartId], references: [id])
  
+  @@index([productId])
+}
+
+// Favoritos de usuarios
+model Favorite {
+  id          String   @id @default(uuid())
+  userId      String
+  productId   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+ 
+  User User @relation(fields: [userId], references: [id])
+  Product Product @relation(fields: [productId], references: [id])
+ 
+  @@index([userId])
   @@index([productId])
 }

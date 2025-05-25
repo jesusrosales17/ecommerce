@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { CartButton } from "@/features/cart/components/CartButton";
+import { FavoriteButton } from "@/features/favorites/components/FavoriteButton";
 import { Heart } from "lucide-react";
 
 interface Props {
@@ -10,14 +11,8 @@ interface Props {
 const ButtonsCardProduct = ({ className, productId }: Props) => {
   return (
     <div className={`flex justify-between items-center mt-2 ${className}`}>
-      <Button
-        size="icon"
-        variant="ghost"
-        className="rounded-full bg-white hover:bg-red-500 hover:text-white transition-all duration-300 "
-      >
-        <Heart className="h-4 w-4" />
-      </Button>
-      <CartButton 
+      <FavoriteButton productId={productId} />
+      <CartButton
         productId={productId}
         variant="ghost"
         size="icon"
