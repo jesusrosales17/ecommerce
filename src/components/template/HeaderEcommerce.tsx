@@ -7,6 +7,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import {
@@ -16,12 +17,18 @@ import {
   ChevronDown,
   Star,
   Percent,
+  LogOut,
+  ShoppingBag,
+  UserCircle,
+  Settings,
 } from "lucide-react";
 import { Category } from "@prisma/client";
 import { HeaderClient } from "./HeaderClient";
 import { CartToggleButton } from "@/features/cart/components/CartToggleButton";
 import { SearchProduct } from "@/features/products/components/SearchProduct";
 import { CategoryMenu } from "./CategoryMenu";
+import { getSession } from "@/libs/auth/auth";
+import { LogoutButton } from "./LogoutButton";
 
 const HeaderEcommerce = async () => {
   const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/categories`, {
@@ -30,6 +37,7 @@ const HeaderEcommerce = async () => {
   });
 
   const categories: Category[] = (await res.json().catch(() => [])) || [];
+  const session = await getSession();
 
   return (
     <header className="w-full bg-white shadow-md sticky top-0 z-40">
@@ -45,20 +53,24 @@ const HeaderEcommerce = async () => {
             </Link>
             {/* CartToggleButton en versión móvil */}
             <CartToggleButton showCount={true} />
-            {/* Dropdown de cuenta en mobile */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <User className="w-5 h-5 text-muted-foreground cursor-pointer" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem asChild>
-                  <Link href="/auth/login">Iniciar sesión</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/auth/register">Registrarse</Link>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>{" "}
+            
+            {/* Dropdown de cuenta en mobile (solo cuando no hay sesión) */}
+            {!session && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <User className="w-5 h-5 text-muted-foreground cursor-pointer" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem asChild>
+                    <Link href="/auth/login">Iniciar sesión</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/auth/register">Registrarse</Link>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+            
             {/* Menú hamburguesa para móviles */}
             <Sheet>
               <SheetTrigger asChild>
@@ -69,9 +81,8 @@ const HeaderEcommerce = async () => {
 
               <SheetContent side="left">
                 <div className="py-4">
-
-              <SheetTitle className="text-lg font-semibold mb-4 px-4  pb-2" >Menú</SheetTitle>
-                 
+                  <SheetTitle className="text-lg font-semibold mb-4 px-4  pb-2" >Menú</SheetTitle>
+                  
                   <nav className="flex flex-col space-y-2 px-4">
                     {/* Categorías con menú desplegable hacia abajo */}
                     <CategoryMenu categories={categories} />
@@ -94,9 +105,70 @@ const HeaderEcommerce = async () => {
                       <span>Descuentos</span>
                     </Link>
 
+                    {/* Opciones de usuario (solo si hay sesión) */}
+                    {session && (
+                      <>
+                        {/* Separador */}
+                        <div className="border-t my-2" />
+                        
+                        {/* Mi cuenta */}
+                        <Link
+                          href="/account"
+                          className="flex items-center gap-2 text-sm font-medium hover:text-primary px-2 py-2 rounded-md transition-colors hover:bg-accent"
+                        >
+                          <UserCircle className="h-4 w-4 text-muted-foreground" />
+                          <span>Mi cuenta</span>
+                        </Link>
+                        
+                        {/* Mis pedidos */}
+                        <Link
+                          href="/orders"
+                          className="flex items-center gap-2 text-sm font-medium hover:text-primary px-2 py-2 rounded-md transition-colors hover:bg-accent"
+                        >
+                          <ShoppingBag className="h-4 w-4 text-muted-foreground" />
+                          <span>Mis pedidos</span>
+                        </Link>
+                        
+                        {/* Panel de administración (solo para admin) */}
+                        {session.user.role === "ADMIN" && (
+                          <Link
+                            href="/admin"
+                            className="flex items-center gap-2 text-sm font-medium hover:text-primary px-2 py-2 rounded-md transition-colors hover:bg-accent"
+                          >
+                            <Settings className="h-4 w-4 text-muted-foreground" />
+                            <span>Panel de administración</span>
+                          </Link>
+                        )}
+                          {/* Cerrar sesión */}
+                        <LogoutButton />
+                      </>
+                    )}
 
-                    {/* Otros enlaces o acciones futuras */}
-                    {/* Puedes agregar más aquí si es necesario */}
+                    {/* Opciones de iniciar sesión/registro (cuando no hay sesión) */}
+                    {!session && (
+                      <>
+                        {/* Separador */}
+                        <div className="border-t my-2" />
+                        
+                        {/* Iniciar sesión */}
+                        <Link
+                          href="/auth/login"
+                          className="flex items-center gap-2 text-sm font-medium hover:text-primary px-2 py-2 rounded-md transition-colors hover:bg-accent"
+                        >
+                          <User className="h-4 w-4 text-muted-foreground" />
+                          <span>Iniciar sesión</span>
+                        </Link>
+                        
+                        {/* Registrarse */}
+                        <Link
+                          href="/auth/register"
+                          className="flex items-center gap-2 text-sm font-medium hover:text-primary px-2 py-2 rounded-md transition-colors hover:bg-accent"
+                        >
+                          <User className="h-4 w-4 text-muted-foreground" />
+                          <span>Registrarse</span>
+                        </Link>
+                      </>
+                    )}
                   </nav>
                 </div>
               </SheetContent>
