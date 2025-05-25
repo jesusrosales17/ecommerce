@@ -41,11 +41,11 @@ const HeaderEcommerce = async () => {
 
   return (
     <header className="w-full bg-white shadow-md sticky top-0 z-40">
-      <div className="xl:container mx-auto px-4 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
+      <div className="xl:container mx-auto px-4 py-4 flex flex-col xl:flex-row items-center justify-between gap-4">
         {/* Logo */}
-        <div className="flex items-center gap-4 w-full md:w-auto justify-between">
+        <div className="flex items-center gap-4 w-full xl:w-auto justify-between">
           <Logo /> {/* Icons en mobile */}
-          <div className="md:hidden flex items-center gap-4">
+          <div className="xl:hidden flex items-center gap-4">
             {/* Búsqueda en versión móvil */}
             <SearchProduct compact={true} />
             <Link href="/favorites">
@@ -176,7 +176,7 @@ const HeaderEcommerce = async () => {
           </div>
         </div>
 
-        <div className="hidden md:flex justify-between flex-grow w-full">
+        <div className="hidden xl:flex justify-between flex-grow w-full">
           {/* Menú superior */}
           <nav className="hidden md:flex items-center gap-4">
             {/* Hover de categorías */}
