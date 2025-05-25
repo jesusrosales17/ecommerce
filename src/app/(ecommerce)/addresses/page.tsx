@@ -9,7 +9,7 @@ import { ArrowLeft } from "lucide-react";
 export default async function AddressesPage({
   searchParams,
 }: {
-  searchParams: { checkout?: string };
+  searchParams: Promise<{ checkout?: string }>;
 }) {
   const session = await getSession();
 
@@ -25,10 +25,10 @@ export default async function AddressesPage({
       isDefault: "desc",
     },
   });
-  const isFromCheckout = searchParams.checkout === "true";
+  const isFromCheckout = (await searchParams).checkout === "true";
 
   return (
-    <div className="container py-8 max-w-4xl">
+    <div className="container py-8 mx-auto h-dvh">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold">Mis direcciones</h1>
         {isFromCheckout && (

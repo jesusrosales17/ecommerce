@@ -1,23 +1,19 @@
-import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
-import { authOptions } from "@/libs/auth/auth-options";
 import prisma from "@/libs/prisma";
+import { requireAuth } from "@/libs/auth/auth";
 
 export async function GET() {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await requireAuth(["ADMIN", "USER"]);
 
-    if (!session?.user) {
-      return NextResponse.json(
-        { error: "Debe iniciar sesión" },
-        { status: 401 }
-      );
-    }
+   if(!session.isAutenticated)  {
+    return session.response
+   };
 
     const addresses = await prisma.address.findMany({
       where: {
-        userId: session.user.id,
+        userId: session.user?.id,
       },
       orderBy: {
         isDefault: "desc",
@@ -36,15 +32,12 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await requireAuth(["ADMIN", "USER"]);
 
-    if (!session?.user) {
-      return NextResponse.json(
-        { error: "Debe iniciar sesión" },
-        { status: 401 }
-      );
+    if (!session.isAutenticated !|| !session.user) {
+      return session.response;
+      
     }
-
     const body = await request.json();
     const { isDefault, ...addressData } = body;
 
@@ -52,7 +45,7 @@ export async function POST(request: Request) {
     if (isDefault) {
       await prisma.address.updateMany({
         where: {
-          userId: session.user.id,
+          userId: session.user?.id,
           isDefault: true,
         },
         data: {
@@ -72,7 +65,7 @@ export async function POST(request: Request) {
       data: {
         ...addressData,
         isDefault: isDefault || addressCount === 0, // Primera dirección o explícitamente marcada
-        userId: session.user.id,
+        userId: session.user?.id,
       },
     });
 

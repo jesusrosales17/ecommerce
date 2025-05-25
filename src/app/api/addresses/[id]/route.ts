@@ -1,8 +1,8 @@
 import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 
-import { authOptions } from "@/libs/auth/auth-options";
 import prisma from "@/libs/prisma";
+import { requireAuth } from "@/libs/auth/auth";
 
 interface Params {
   params: {
@@ -13,13 +13,10 @@ interface Params {
 export async function GET(request: NextRequest, { params }: Params) {
   try {
     const { id } = params;
-    const session = await getServerSession(authOptions);
+    const session = await requireAuth(["ADMIN", "USER"]);
 
-    if (!session?.user) {
-      return NextResponse.json(
-        { error: "Debe iniciar sesión" },
-        { status: 401 }
-      );
+    if (!session.isAutenticated || !session.user) {
+      return session.response; 
     }
 
     const address = await prisma.address.findUnique({
@@ -49,13 +46,10 @@ export async function GET(request: NextRequest, { params }: Params) {
 export async function PUT(request: NextRequest, { params }: Params) {
   try {
     const { id } = params;
-    const session = await getServerSession(authOptions);
+    const session = await requireAuth(["ADMIN", "USER"]);
 
-    if (!session?.user) {
-      return NextResponse.json(
-        { error: "Debe iniciar sesión" },
-        { status: 401 }
-      );
+    if (!session.isAutenticated || !session.user) {
+      return session.response;
     }
 
     // Verificar que la dirección pertenezca al usuario
@@ -112,13 +106,11 @@ export async function PUT(request: NextRequest, { params }: Params) {
 export async function DELETE(request: NextRequest, { params }: Params) {
   try {
     const { id } = params;
-    const session = await getServerSession(authOptions);
 
-    if (!session?.user) {
-      return NextResponse.json(
-        { error: "Debe iniciar sesión" },
-        { status: 401 }
-      );
+    const session = await requireAuth(["ADMIN", "USER"]);
+
+    if (!session.isAutenticated || !session.user) {
+      return session.response;
     }
 
     // Verificar que la dirección pertenezca al usuario

@@ -38,7 +38,7 @@ export default async function CheckoutPage() {
   const { cartTotal, itemsCount } = cartData;
 
   return (
-    <div className="container py-8 max-w-6xl">
+    <div className="container py-8 mx-auto px-4 lg:px-0">
       <h1 className="text-2xl font-bold mb-6">Checkout</h1>
       <CheckoutPageClient
         addresses={addresses}
