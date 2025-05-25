@@ -1,14 +1,18 @@
 "use client";
+import { ProductImage } from "@prisma/client";
 import Image from "next/image";
 import { useState } from "react";
 
 interface Props {
-  images: { name: string }[];
+  images: ProductImage[];
   alt: string;
 }
 
 export default function ProductImagesGallery({ images, alt }: Props) {
-  const [selected, setSelected] = useState(0);
+  const principal = images.findIndex((img) => img.isPrincipal) || 0;
+  const [selected, setSelected] = useState(principal);
+
+
 
   return (
     <div className="flex flex-col-reverse md:flex-row gap-4 items-start">
