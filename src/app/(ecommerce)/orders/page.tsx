@@ -58,7 +58,7 @@ export default async function OrdersPage() {
   });
 
   return (
-    <div className="container py-8">
+    <div className="container py-8 mx-auto px-4 2xl:px-0">
       <h1 className="text-2xl font-bold mb-6">Mis pedidos</h1>
 
       {orders.length === 0 ? (
