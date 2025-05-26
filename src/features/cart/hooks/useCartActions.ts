@@ -50,7 +50,6 @@ export const useCartActions = () => {
     setStoreLoading(true);
     
     try {
-        console.log('fetchCart')
       const response = await fetch('/api/cart', {
         method: 'GET',
         headers: {
@@ -59,7 +58,7 @@ export const useCartActions = () => {
         // Evitar caché para esta solicitud
         cache: 'no-store'
       });
-
+      console.log(response)
       if (!response.ok) {
         throw new Error('Error al obtener el carrito');
       }

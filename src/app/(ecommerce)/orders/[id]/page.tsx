@@ -20,6 +20,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { OrderStatus } from "@prisma/client";
 import { Separator } from "@/components/ui/separator";
+import OrderImprimButton from "@/features/orders/components/OrderImprimButton";
 
 // Helper function to get status badge
 const getStatusBadge = (status: OrderStatus) => {
@@ -67,14 +68,11 @@ export default async function OrderDetailPage({
   }
 
   return (
-    <div className="container py-8 max-w-4xl">
+    <div className="container py-8 px-4 2xl:px-0 mx-auto">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Detalles del pedido</h1>
         <div className="flex space-x-2">
-          <Button variant="outline" size="sm" onClick={() => window.print()}>
-            <Printer className="h-4 w-4 mr-2" />
-            Imprimir
-          </Button>
+          {/* <OrderImprimButton />  */}
           <Button variant="outline" size="sm" asChild>
             <Link href="/orders">
               <ArrowLeft className="h-4 w-4 mr-2" />

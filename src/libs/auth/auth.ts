@@ -14,6 +14,7 @@ export const getSession = async () => {
 export const requireAuth = async (roles = ['ADMIN']) => {
     const session = await getSession();
 
+    console.log(session)
     if (!session) {
         return {
             isAutenticated: false,

@@ -33,3 +33,9 @@ export const formatPrice = (
     maximumFractionDigits,
   }).format(Number(price));
 };
+
+// Formatter for consistent price formatting
+export const formatter = new Intl.NumberFormat('es-MX', {
+  style: 'currency',
+  currency: 'MXN',
+});
