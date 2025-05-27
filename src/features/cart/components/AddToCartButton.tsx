@@ -1,7 +1,6 @@
 "use client";
 import { Button } from '@/components/ui/button';
 import { ShoppingCart, Minus, Plus } from 'lucide-react';
-import { useState } from 'react';
 import { useAddToCart } from '../hooks/useAddToCart';
 
 interface AddToCartProps {

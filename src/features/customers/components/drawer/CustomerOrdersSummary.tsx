@@ -14,8 +14,6 @@ import {
 } from "@/components/ui/table";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { useOrderStore } from "@/features/orders/store/useOrderStore";
-import { OrderWithRelations } from "@/features/orders/interfaces/order";
 
 interface Order {
   id: string;
@@ -28,7 +26,6 @@ interface CustomerOrdersSummaryProps {
 }
 
 export function CustomerOrdersSummary({ orders = [] }: CustomerOrdersSummaryProps) {
-  const {setOrderToShow, setIsOpenInfoDrawer} = useOrderStore();
   // Verificamos que orders sea un array
   const safeOrders = Array.isArray(orders) ? orders : [];
   

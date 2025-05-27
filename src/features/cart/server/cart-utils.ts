@@ -1,6 +1,5 @@
 import prisma from "@/libs/prisma";
 import { getSession } from "@/libs/auth/auth";
-import { redirect } from "next/navigation";
 
 /**
  * Get the user's cart with items and calculate totals

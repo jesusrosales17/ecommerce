@@ -3,7 +3,6 @@
 import { OrdersClient } from "./OrdersClient";
 import { OrderInfoDrawer } from "./OrderInfoDrawer";
 import { OrderWithRelations } from "../interfaces/order";
-import { OrderStatus } from "@prisma/client";
 
 interface OrdersListProps {
   orders: OrderWithRelations[];

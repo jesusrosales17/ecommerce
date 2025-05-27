@@ -2,6 +2,7 @@
 
 import { formatter } from '@/utils/price';
 import { Prisma } from '@prisma/client';
+import Image from 'next/image';
 import Link from 'next/link';
 
 interface OrderItemsListProps {
@@ -36,10 +37,12 @@ export const OrderItemsList = ({ items = [] }: OrderItemsListProps) => {
                   <p className="text-sm text-slate-500">Cantidad: {item.quantity}</p>
                     {item.Product?.images && item.Product.images.length > 0 && (
                     <div className="mt-2">
-                      <img 
+                      <Image 
                         src={`/api/uploads/products/${item.Product.images[0].name}`} 
                         alt={item.name}
                         className="w-16 h-16 object-cover rounded-md"
+                        width={64}
+                        height={64}
                       />
                     </div>
                   )}

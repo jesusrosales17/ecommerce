@@ -1,4 +1,4 @@
-import { Address, Order, User } from "@prisma/client";
+import { Address,  User } from "@prisma/client";
 
 export interface CustomerWithRelations extends User {
   Address: Address[];

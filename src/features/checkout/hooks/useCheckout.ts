@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { getStripe } from "@/libs/stripe-client";
 
 export const useCheckout = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -33,7 +32,8 @@ export const useCheckout = () => {
       const { url } = await response.json();
 
       if (url) {
-        const stripe = await getStripe();
+        // !TODO: verificar si getStripe es necesario aquí
+        // const stripe = await getStripe();
         // Redirect to Stripe Checkout
         router.push(url);
       } else {

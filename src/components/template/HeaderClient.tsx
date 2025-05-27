@@ -1,8 +1,7 @@
 import { CartToggleButton } from "@/features/cart/components/CartToggleButton";
-import { signOut } from "next-auth/react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Heart, User } from "lucide-react";
+import { Heart} from "lucide-react";
 
 import { getSession } from "@/libs/auth/auth";
 import { DropdownUserEcommerce } from "./DropdownUserEcommerce";

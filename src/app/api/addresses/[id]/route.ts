@@ -1,18 +1,17 @@
-import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 
 import prisma from "@/libs/prisma";
 import { requireAuth } from "@/libs/auth/auth";
 
 interface Params {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
-export async function GET(request: NextRequest, { params }: Params) {
+export async function GET(_: NextRequest, { params }: Params) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const session = await requireAuth(["ADMIN", "USER"]);
 
     if (!session.isAutenticated || !session.user) {
@@ -45,7 +44,7 @@ export async function GET(request: NextRequest, { params }: Params) {
 
 export async function PUT(request: NextRequest, { params }: Params) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const session = await requireAuth(["ADMIN", "USER"]);
 
     if (!session.isAutenticated || !session.user) {
@@ -103,9 +102,9 @@ export async function PUT(request: NextRequest, { params }: Params) {
   }
 }
 
-export async function DELETE(request: NextRequest, { params }: Params) {
+export async function DELETE(_: NextRequest, { params }: Params) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     const session = await requireAuth(["ADMIN", "USER"]);
 

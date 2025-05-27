@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import { OrderTable } from "./OrderTable";
 import { OrderInfoDrawer } from "./OrderInfoDrawer";
@@ -22,15 +22,20 @@ interface OrdersClientProps {
 export function OrdersClient({ orders, counts }: OrdersClientProps) {
   const [status, setStatus] = useState<"ALL" | OrderStatus>("ALL");
 
-  const filteredOrders = status === "ALL" 
-    ? orders 
-    : orders.filter(order => order.status === status);
+  const filteredOrders =
+    status === "ALL"
+      ? orders
+      : orders.filter((order) => order.status === status);
   return (
-    <>      <Tabs defaultValue="ALL" onValueChange={(value) => setStatus(value as any)}>
+    <>
+      <Tabs
+        defaultValue="ALL"
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        onValueChange={(value) => setStatus(value as any)}
+      >
         <div className="relative mb-4 w-full">
           {/* Indicadores de scroll */}
-    
-          
+
           {/* Contenedor con scroll horizontal para móvil */}
           <TabsList className="mb-0 w-full flex-nowrap overflow-x-auto scrollbar-hide">
             <TabsTrigger value="ALL" className="whitespace-nowrap">
@@ -52,7 +57,7 @@ export function OrdersClient({ orders, counts }: OrdersClientProps) {
               Cancelados ({counts.CANCELLED})
             </TabsTrigger>
           </TabsList>
-          
+
           {/* Indicador de scroll para móviles */}
           <div className="mt-1 flex justify-center sm:hidden">
             <div className="h-1 w-16 rounded-full bg-gray-200">
@@ -60,12 +65,11 @@ export function OrdersClient({ orders, counts }: OrdersClientProps) {
             </div>
           </div>
         </div>
-        
+
         <TabsContent value={status} className="mt-0">
           <OrderTable orders={filteredOrders} />
         </TabsContent>
       </Tabs>
-      
       <OrderInfoDrawer />
     </>
   );

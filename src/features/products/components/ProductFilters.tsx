@@ -8,7 +8,6 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { XCircle, Filter, FilterIcon } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { set } from "date-fns";
 
 interface ProductFiltersProps {
   showSaleFilter?: boolean;

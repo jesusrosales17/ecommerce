@@ -17,7 +17,6 @@ import {
 } from "@/components/ui/select";
 import { OrderStatus } from "@prisma/client";
 import { useState } from "react";
-import { useOrderStore } from "../store/useOrderStore";
 import { BadgeCheck, Clock, ShoppingBag, Truck, XCircle } from "lucide-react";
 import { toast } from "sonner";
 
@@ -29,7 +28,6 @@ interface UpdateOrderStatusDialogProps {
 }
 
 export const UpdateOrderStatusDialog = ({
-  orderId,
   currentStatus,
   onStatusUpdated,
   trigger,
@@ -37,7 +35,7 @@ export const UpdateOrderStatusDialog = ({
   const [isOpen, setIsOpen] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState<OrderStatus>(currentStatus);
   const [isLoading, setIsLoading] = useState(false);
-  const { changeOrderStatus } = useOrderStore();
+  // const { changeOrderStatus } = useOrderStore();
 
   // Function to get status label
   const getStatusLabel = (status: OrderStatus) => {
@@ -57,23 +55,23 @@ export const UpdateOrderStatusDialog = ({
     }
   };
 
-  // Function to get status icon
-  const getStatusIcon = (status: OrderStatus) => {
-    switch (status) {
-      case "PENDING":
-        return <Clock className="h-4 w-4 mr-2" />;
-      case "PROCESSING":
-        return <ShoppingBag className="h-4 w-4 mr-2" />;
-      case "SHIPPED":
-        return <Truck className="h-4 w-4 mr-2" />;
-      case "DELIVERED":
-        return <BadgeCheck className="h-4 w-4 mr-2" />;
-      case "CANCELLED":
-        return <XCircle className="h-4 w-4 mr-2" />;
-      default:
-        return null;
-    }
-  };
+  // // Function to get status icon
+  // const getStatusIcon = (status: OrderStatus) => {
+  //   switch (status) {
+  //     case "PENDING":
+  //       return <Clock className="h-4 w-4 mr-2" />;
+  //     case "PROCESSING":
+  //       return <ShoppingBag className="h-4 w-4 mr-2" />;
+  //     case "SHIPPED":
+  //       return <Truck className="h-4 w-4 mr-2" />;
+  //     case "DELIVERED":
+  //       return <BadgeCheck className="h-4 w-4 mr-2" />;
+  //     case "CANCELLED":
+  //       return <XCircle className="h-4 w-4 mr-2" />;
+  //     default:
+  //       return null;
+  //   }
+  // };
 
   const handleUpdateStatus = async () => {
     if (selectedStatus === currentStatus) {
@@ -84,7 +82,7 @@ export const UpdateOrderStatusDialog = ({
     setIsLoading(true);
     
     try {
-      await changeOrderStatus(orderId, selectedStatus);
+      // await changeOrderStatus(orderId, selectedStatus);
       toast.success(`El pedido ha sido actualizado a ${getStatusLabel(selectedStatus)}`);
 
       // Close dialog and run callback
@@ -94,6 +92,7 @@ export const UpdateOrderStatusDialog = ({
         onStatusUpdated();
       }
     } catch (error) {
+      console.log(error)
       toast.error("No se pudo actualizar el estado del pedido");
     } finally {
       setIsLoading(false);

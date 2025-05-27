@@ -1,4 +1,3 @@
-import { Order } from "@prisma/client";
 
 export const getOrders = async () => {
   try {

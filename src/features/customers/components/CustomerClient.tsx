@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import {  useEffect } from 'react';
 import { CustomerTable } from './CustomerTable';
 import { CustomerInfoDrawer } from './CustomerInfoDrawer';
 import { SearchInput } from '@/components/ui/SearchInput';

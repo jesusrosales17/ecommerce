@@ -1,5 +1,5 @@
 import { formatPrice } from "@/utils/price";
-import { ChevronRight, Heart } from "lucide-react";
+import { ChevronRight} from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";

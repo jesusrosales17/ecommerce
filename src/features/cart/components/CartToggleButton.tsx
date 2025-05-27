@@ -4,8 +4,6 @@ import { Button } from '@/components/ui/button';
 import { ShoppingCart } from 'lucide-react';
 import { useCartStore } from '../store/useCartStore';
 import { Badge } from '@/components/ui/badge';
-import { useCartActions } from '../hooks/useCartActions';
-import { useEffect } from 'react';
 
 interface CartToggleButtonProps {
   showCount?: boolean;
@@ -17,7 +15,6 @@ export const CartToggleButton = ({
   variant = 'ghost'
 }: CartToggleButtonProps) => {
   const { cart, isCartOpen, setIsCartOpen } = useCartStore();
-  const { isAuthenticated } = useCartActions();
 
   // Calculate total items in cart
   const itemCount = cart?.reduce((sum, item) => sum + item.quantity, 0) || 0;

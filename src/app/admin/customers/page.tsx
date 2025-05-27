@@ -1,7 +1,6 @@
 
 import { CustomerClient } from "@/features/customers/components/CustomerClient";
 import prisma from "@/libs/prisma";
-import { Separator } from "@/components/ui/separator";
 
 export const metadata = {
   title: "Clientes | Panel de Administración",

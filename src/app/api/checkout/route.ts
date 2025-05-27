@@ -77,14 +77,14 @@ export async function POST(request: Request) {
       );
     }
 
-    // Calculate total amount
-    const amount = cart.items.reduce((total: number, item: CartItemWithProduct) => {
-      const price = item.Product?.isOnSale && item.Product.salePrice
-        ? Number(item.Product.salePrice)
-        : Number(item.Product?.price);
+    // // Calculate total amount
+    // const amount = cart.items.reduce((total: number, item: CartItemWithProduct) => {
+    //   const price = item.Product?.isOnSale && item.Product.salePrice
+    //     ? Number(item.Product.salePrice)
+    //     : Number(item.Product?.price);
       
-      return total + price * item.quantity;
-    }, 0);
+    //   return total + price * item.quantity;
+    // }, 0);
 
 
     // Create a Stripe checkout session

@@ -5,6 +5,14 @@ export type AddressData = Omit<
   "id" | "userId" | "createdAt" | "updatedAt"
 >;
 
-export interface AddressForm extends Omit<AddressData, "isDefault"> {
-  isDefault?: boolean;
+export interface AddressForm {
+  name: string;
+  street: string;
+  city: string;
+  state: string;
+  postalCode: string;
+  country: string;
+  phone: string;
+  reference: string;
+  isDefault: boolean;
 }

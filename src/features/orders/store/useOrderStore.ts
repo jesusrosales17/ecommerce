@@ -1,4 +1,3 @@
-import { OrderStatus } from '@prisma/client';
 import { create } from 'zustand';
 import { OrderStore } from '../interfaces/orderStore';
 

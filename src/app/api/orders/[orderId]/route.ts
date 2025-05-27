@@ -4,8 +4,8 @@ import { requireAuth } from "@/libs/auth/auth";
 
 // Get a specific order by ID
 export async function GET(
-  req: Request,
-  { params }: { params: { orderId: string } }
+  _: Request,
+  { params }: { params: Promise<{ orderId: string }> }
 ) {
   try {
     const session = await requireAuth(["USER", "ADMIN"]);
@@ -13,8 +13,8 @@ export async function GET(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { orderId } = params;
-    
+    const { orderId } = await params;
+
     // For admins, allow accessing any order
     // For regular users, only allow accessing their own orders
     const where = session.user.role !== "ADMIN" 

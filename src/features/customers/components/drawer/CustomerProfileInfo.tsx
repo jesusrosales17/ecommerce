@@ -1,9 +1,8 @@
 'use client';
 
 import { CustomerWithRelations } from "../../interfaces/customer";
-import { Calendar, Mail, User } from "lucide-react";
+import { Calendar, Mail} from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 

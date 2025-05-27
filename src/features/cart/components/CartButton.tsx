@@ -33,6 +33,7 @@ export const CartButton = ({
       await addToCart(productId, quantity);
       // El toast de éxito se muestra en useCartActions si la operación es exitosa
     } catch (error) {
+      console.log(error)
       toast.error('Error al agregar al carrito');
     }
   };

@@ -39,6 +39,7 @@ export function AddressForm({
   const { createAddress, updateAddress } = useAddressActions();
 
   const form = useForm<AddressFormValues>({
+    // 
     resolver: zodResolver(addressFormSchema),
     defaultValues: initialData
       ? {
@@ -71,9 +72,15 @@ export function AddressForm({
       
       let result;
       if (initialData) {
-        result = await updateAddress(initialData.id, data);
+        result = await updateAddress(initialData.id, {
+          ...data,
+          reference: data.reference || "" // Ensure reference is always a string
+        });
       } else {
-        result = await createAddress(data);
+        result = await createAddress({
+          ...data,
+          reference: data.reference || "" // Ensure reference is always a string
+        });
       }
       
       if (result && onSuccess) {

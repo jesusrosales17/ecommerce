@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import Link from "next/link";
-import { ArrowLeft, Printer } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 
 import { getSession } from "@/libs/auth/auth";
 import prisma from "@/libs/prisma";
@@ -20,7 +20,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { OrderStatus } from "@prisma/client";
 import { Separator } from "@/components/ui/separator";
-import OrderImprimButton from "@/features/orders/components/OrderImprimButton";
 
 // Helper function to get status badge
 const getStatusBadge = (status: OrderStatus) => {
@@ -43,9 +42,9 @@ const getStatusBadge = (status: OrderStatus) => {
 export default async function OrderDetailPage({
   params
 }: {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }) {
-  const { id } = params;
+  const { id } = await params;
   const session = await getSession();
 
   if (!session?.user) {

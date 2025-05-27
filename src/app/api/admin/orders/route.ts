@@ -74,6 +74,7 @@ export async function PATCH(req: Request) {
     try {
       OrderStatusSchema.parse(status);
     } catch (error) {
+      console.log(error)
       return NextResponse.json(
         { error: "Invalid order status" },
         { status: 400 }

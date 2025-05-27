@@ -80,7 +80,7 @@ export const ProductWizardContent = () => {
       // Enviar información sobre imágenes existentes y su estado principal
       const existingImages = images
         .filter(img => !img.file && img.preview) // Solo imágenes existentes (sin nuevos archivos)
-        .map((img, index) => ({
+        .map((img) => ({
           url: img.preview,
           isPrincipal: img.isPrincipal || false,
           name: img.preview.split('/').pop() || '' // Extraer el nombre del archivo de la URL

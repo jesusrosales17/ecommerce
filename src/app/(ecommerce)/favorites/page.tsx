@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { FavoritesList } from "@/features/favorites/components/FavoritesList";
 import { getSession } from "@/libs/auth/auth";
-import prisma from "@/libs/prisma";
 import { Info} from "lucide-react";
 import Link from "next/link";
 

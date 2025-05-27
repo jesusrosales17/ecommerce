@@ -1,6 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { OrderStatus } from "@prisma/client";
-import { BadgeCheck, Clock, PackageCheck, ShoppingBag, Truck, XCircle } from "lucide-react";
+import { BadgeCheck, Clock,  ShoppingBag, Truck, XCircle } from "lucide-react";
 
 interface OrderStatusBadgeProps {
   status: OrderStatus;

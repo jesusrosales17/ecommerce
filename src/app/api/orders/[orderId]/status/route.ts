@@ -31,6 +31,7 @@ export async function PATCH(
     try {
       OrderStatusSchema.parse(status);
     } catch (error) {
+      console.log(error)
       return NextResponse.json(
         { error: "Estado de pedido inválido" },
         { status: 400 }

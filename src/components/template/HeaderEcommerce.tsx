@@ -8,26 +8,16 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import {
   Heart,
-  Menu,
   User,
   ChevronDown,
-  Star,
-  Percent,
-  LogOut,
-  ShoppingBag,
-  UserCircle,
-  Settings,
 } from "lucide-react";
 import { Category } from "@prisma/client";
 import { HeaderClient } from "./HeaderClient";
 import { CartToggleButton } from "@/features/cart/components/CartToggleButton";
 import { SearchProduct } from "@/features/products/components/SearchProduct";
-import { CategoryMenu } from "./CategoryMenu";
 import { getSession } from "@/libs/auth/auth";
-import { LogoutButton } from "./LogoutButton";
 import ClientsSidebar from "./ClientsSidebar";
 
 const HeaderEcommerce = async () => {

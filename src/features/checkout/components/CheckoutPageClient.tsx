@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowLeft, ArrowRight, Check, CreditCard, Home } from "lucide-react";
+import { ArrowLeft, ArrowRight,  CreditCard, Home } from "lucide-react";
 import { Address } from "@prisma/client";
 import Link from "next/link";
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { Address } from "@prisma/client";
-import { Home, MapPin } from "lucide-react";
+import { Home} from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 

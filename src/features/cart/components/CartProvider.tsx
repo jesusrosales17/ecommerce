@@ -11,7 +11,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const pathname = usePathname();
-  const { data: session, status } = useSession();
+  const {  status } = useSession();
   const { pendingCartItem, clearPendingData } = useCartStore();
   const { fetchCart, processPendingCartItem, isAuthenticated } = useCartActions();
 
@@ -24,6 +24,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({
     }
     fetchCart();
     clearPendingData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated, pendingCartItem]);
   // Clear pending cart data when user explicitly logs out
   useEffect(() => {

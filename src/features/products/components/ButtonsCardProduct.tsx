@@ -1,7 +1,5 @@
-import { Button } from "@/components/ui/button";
 import { CartButton } from "@/features/cart/components/CartButton";
 import { FavoriteButton } from "@/features/favorites/components/FavoriteButton";
-import { Heart } from "lucide-react";
 
 interface Props {
     className?: string;

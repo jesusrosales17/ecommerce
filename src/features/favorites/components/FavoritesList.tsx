@@ -32,5 +32,5 @@ export const FavoritesList = () => {
   );
 };
 
-import { Heart } from 'lucide-react';import { useFavoriteStore } from '../store/useFavoriteStore';
+import { useFavoriteStore } from '../store/useFavoriteStore';
 

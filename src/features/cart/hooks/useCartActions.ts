@@ -16,7 +16,6 @@ export const useCartActions = () => {
     setRedirectAfterLogin,
     pendingCartItem,
     redirectAfterLogin,
-    clearPendingData,
     setIsLoading: setStoreLoading
   } = useCartStore();
   

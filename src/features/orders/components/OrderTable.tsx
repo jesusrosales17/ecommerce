@@ -26,7 +26,6 @@ import {
   Edit,
   Eye,
   MoreVertical,
-  Package,
   ShoppingBag,
   Truck,
   X,
@@ -38,7 +37,6 @@ import { useOrderStore } from "../store/useOrderStore";
 import { formattedPrice } from "@/utils/price";
 import { OrderWithRelations } from "../interfaces/order";
 import { getBadgeVariant, getStatusText } from "../utils/orders";
-import { toast } from "sonner";
 import { useOrderActions } from "../hooks/useOrderActions";
 
 interface Props {

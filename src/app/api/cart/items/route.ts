@@ -158,7 +158,7 @@ export async function PUT(request: NextRequest) {
 // Delete cart item
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { productId: string } }
+  // { params }: { params: { productId: string } }
 ) {
   try {
     const session = await getServerSession(authOptions);

@@ -3,12 +3,10 @@ import { useFavoriteStore } from '../store/useFavoriteStore';
 import { toast } from 'sonner';
 import { useSession } from 'next-auth/react';
 import { signIn } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
 
 export const useFavoriteActions = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { data: session, status } = useSession();
-  const router = useRouter();
   const { 
     setFavorites, 
     setIsLoading: setStoreLoading,

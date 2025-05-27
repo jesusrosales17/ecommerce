@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { useFavoriteStore } from '../store/useFavoriteStore';
 import { useFavoriteActions } from '../hooks/useFavoriteActions';
 import { useRouter } from 'next/navigation';
+import { signIn } from 'next-auth/react';
 
 interface FavoriteToggleButtonProps {
   showCount?: boolean;
@@ -29,7 +30,6 @@ export const FavoriteToggleButton = ({
       router.push('/favorites');
     } else {
       // If user is not authenticated, redirect to login
-      const { signIn } = require('next-auth/react');
       signIn(undefined, { callbackUrl: '/favorites' });
     }
   };

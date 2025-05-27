@@ -1,6 +1,5 @@
 import { Badge } from "@/components/ui/badge";
 import { formattedPrice } from "@/utils/price";
-import { HeartIcon, ShoppingCartIcon } from "lucide-react";
 
 interface Props {
   product: {
@@ -13,7 +12,6 @@ interface Props {
     category?: string;
   };
 }
-import { AddToCartButton } from "@/features/cart/components/AddToCartButton";
 import { Button } from "@/components/ui/button";
 import ButtonsCardProduct from "./ButtonsCardProduct";
 

@@ -12,12 +12,12 @@ export const addressFormSchema = z.object({
   postalCode: z
     .string()
     .min(5, { message: "El código postal debe tener al menos 5 caracteres" }),
-  country: z.string().default("México"),
+  country: z.string().min(1, { message: "El país es requerido" }),
   phone: z
     .string()
     .min(10, { message: "El teléfono debe tener al menos 10 caracteres" }),
   reference: z.string().optional(),
-  isDefault: z.boolean().default(false),
+  isDefault: z.boolean(),
 });
 
 export type AddressFormValues = z.infer<typeof addressFormSchema>;
