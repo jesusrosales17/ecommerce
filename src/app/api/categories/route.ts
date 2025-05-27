@@ -5,6 +5,7 @@ import { z } from "zod";
 import {  requireAuth } from "@/libs/auth/auth";
 import { saveImage } from "@/libs/media/image-handler";
 import { CategoryStatus } from "@prisma/client";
+import {File} from "node:buffer";
 
 export async function POST(request: NextRequest) {
   try {
@@ -20,7 +21,7 @@ export async function POST(request: NextRequest) {
     const name = formData.get('name') as string;
     const description = formData.get('description') as string || undefined;
     const status = formData.get('status') as string;
-    const imageFile = formData.get('image') as File;
+    const imageFile = formData.get('image') ;
 
     // Validate data
     const validatedData = categorySchema.parse({
@@ -32,8 +33,10 @@ export async function POST(request: NextRequest) {
     
     // Save the image if provided
     let imageData = null;
-    if (imageFile) {
-      imageData = await saveImage(imageFile, 'categories');
+    if (imageFile && imageFile instanceof File) {
+      const buffer = Buffer.from(await imageFile.arrayBuffer());
+      const filename = imageFile.name || 'image.jpg';
+      imageData = await saveImage(buffer, filename, 'categories');
     }    // Create category in the database with necessary fields
     // We'll use a type assertion to handle the mismatch until Prisma client can be updated
     const category = await prisma.category.create({
