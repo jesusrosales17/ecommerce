@@ -19,10 +19,12 @@ import { OrderPaymentInfo } from "./order-drawer/OrderPaymentInfo";
 import { OrderDateInfo } from "./order-drawer/OrderDateInfo";
 import { OrderAddressInfo } from "./order-drawer/OrderAddressInfo";
 import { OrderItemsList } from "./order-drawer/OrderItemsList";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export const OrderInfoDrawer = () => {
   const { isOpenInfoDrawer, setIsOpenInfoDrawer, orderToShow } =
     useOrderStore();
+  const isMobile = useIsMobile();
 
   if (!orderToShow) return null;
 
@@ -30,16 +32,16 @@ export const OrderInfoDrawer = () => {
     <Drawer
       open={isOpenInfoDrawer}
       onOpenChange={setIsOpenInfoDrawer}
-      direction="right"
+      direction={isMobile ? "bottom" : "right"}
     >
-      <DrawerContent className=" overflow-y-auto overflow-x-hidden">
-        <DrawerHeader>
-          <DrawerTitle>Detalles del Pedido</DrawerTitle>
-          <DrawerDescription>
-            Información completa del pedido #{orderToShow.id.substring(0, 8)}
-          </DrawerDescription>
-        </DrawerHeader>
-          {" "}
+      <DrawerContent className="  ">
+        <ScrollArea className="h-full overflow-y-auto ">
+          <DrawerHeader>
+            <DrawerTitle>Detalles del Pedido</DrawerTitle>
+            <DrawerDescription>
+              Información completa del pedido #{orderToShow.id.substring(0, 8)}
+            </DrawerDescription>
+          </DrawerHeader>
           <div className="space-y-6 px-4">
             {/* Estado del Pedido */}
             <OrderStatusDisplay status={orderToShow.status} />
@@ -63,11 +65,12 @@ export const OrderInfoDrawer = () => {
             {/* Productos del Pedido */}
             <OrderItemsList items={orderToShow.items} />
           </div>
-        <DrawerFooter>
-          <DrawerClose asChild>
-            <Button variant="outline">Cerrar</Button>
-          </DrawerClose>
-        </DrawerFooter>
+          <DrawerFooter>
+            <DrawerClose asChild>
+              <Button variant="outline">Cerrar</Button>
+            </DrawerClose>
+          </DrawerFooter>
+        </ScrollArea>
       </DrawerContent>
     </Drawer>
   );
