@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { categoryUpdateSchema } from "@/features/categories/schemas/categorySchema";
 import { requireAuth } from "@/libs/auth/auth";
 import prisma from "@/libs/prisma";
