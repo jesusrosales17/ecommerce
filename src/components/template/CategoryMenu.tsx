@@ -7,9 +7,10 @@ import { ChevronDown, Tag } from "lucide-react";
 
 interface CategoryMenuProps {
   categories: Category[];
+  onLinkClick?: () => void;
 }
 
-export const CategoryMenu = ({ categories }: CategoryMenuProps) => {
+export const CategoryMenu = ({ categories, onLinkClick }: CategoryMenuProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -32,10 +33,10 @@ export const CategoryMenu = ({ categories }: CategoryMenuProps) => {
       {isOpen && (
         <div className="mt-1 p-2  bg-white w-full">
           {categories.length > 0 ? (
-            categories.map((cat) => (
-              <Link
+            categories.map((cat) => (              <Link
                 key={cat.id || cat.name}
                 href={`/categories/${cat.name}`}
+                onClick={onLinkClick}
                 className="block w-full text-sm py-1 px-2 rounded hover:bg-accent transition-colors"
               >
                 {cat.name}
@@ -45,10 +46,10 @@ export const CategoryMenu = ({ categories }: CategoryMenuProps) => {
             <div className="text-sm text-muted-foreground py-1 px-2">
               Sin categorías
             </div>
-          )}
-    <div className="mt-2 pt-2">
+          )}    <div className="mt-2 pt-2">
             <Link
               href="/categories"
+              onClick={onLinkClick}
               className="block text-sm text-primary hover:underline py-1 px-2"
             >
               Ver todas las categorías
