@@ -13,30 +13,14 @@ import { OrderStatusBadge } from "./OrderStatusBadge";
 import { UpdateOrderStatusDialog } from "./UpdateOrderStatusDialog";
 import { Button } from "@/components/ui/button";
 import { Eye, Printer } from "lucide-react";
-import { useOrderStore } from "../store/useOrderStore";
+import { Order, useOrderStore } from "../store/useOrderStore";
 import { formatDate } from "@/utils/date";
 import { formatPrice } from "@/utils/price";
+import { OrderWithRelations } from "../interfaces/order";
 
-interface Order {
-  id: string;
-  userId: string;
-  addressId: string;
-  total: number;
-  status: OrderStatus;
-  paymentId: string | null;
-  paymentStatus: string | null;
-  createdAt: string;
-  updatedAt: string;
-  User: {
-    name: string | null;
-    email: string | null;
-  };
-  items: any[];
-  Address: any;
-}
 
 export const OrdersTable = () => {
-  const [orders, setOrders] = useState<Order[]>([]);
+  const [orders, setOrders] = useState<OrderWithRelations[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [filter, setFilter] = useState<OrderStatus | "ALL">("ALL");
   const { setIsOpenInfoDrawer, setOrderToShow } = useOrderStore();
@@ -143,10 +127,10 @@ export const OrdersTable = () => {
                     </div>
                   </TableCell>
                   <TableCell>
-                    {formatDate(order.createdAt)}
+                    {formatDate(String(order.createdAt))}
                   </TableCell>
                   <TableCell>
-                    {formatPrice(order.total)}
+                    {formatPrice(String(order.total))}
                   </TableCell>
                   <TableCell>
                     <OrderStatusBadge status={order.status} />

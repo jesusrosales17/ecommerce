@@ -2,10 +2,10 @@
 
 import { OrderTable } from "./OrderTable";
 import { OrderInfoDrawer } from "./OrderInfoDrawer";
-import { Order } from "../store/useOrderStore";
+import { OrderWithRelations } from "../interfaces/order";
 
 interface OrdersListProps {
-  orders: Order[];
+  orders: OrderWithRelations[];
 }
 
 export function OrdersList({ orders }: OrdersListProps) {

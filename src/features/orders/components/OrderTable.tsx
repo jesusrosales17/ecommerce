@@ -101,9 +101,9 @@ export function OrderTable({ orders }: Props) {
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
           classname="mb-4"
-        />
-      <div className="rounded-md border" >
-        <Table >          <TableHeader>
+        />      <div className="rounded-md border">
+        <Table>
+          <TableHeader>
             <TableRow>
               <TableHead>ID Pedido</TableHead>
               <TableHead>Total</TableHead>
@@ -119,10 +119,10 @@ export function OrderTable({ orders }: Props) {
                   colSpan={5}
                   className="text-center py-6 text-gray-500"
                 >
-                  No hay pedidos para mostrar
-                </TableCell>
+                  No hay pedidos para mostrar                </TableCell>
               </TableRow>
-            ) : (              orders.map((order) => (
+            ) : (
+              orders.map((order) => (
                 <TableRow key={order.id}>
                   <TableCell className="font-medium">#{order.id.substring(0, 8)}</TableCell>
                   <TableCell>{formattedPrice(Number(order.total))}</TableCell>
