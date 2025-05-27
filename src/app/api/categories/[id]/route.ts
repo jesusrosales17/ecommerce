@@ -64,8 +64,7 @@ export async function PUT(request: Request, { params }: Params) {
             // Verificar si tiene las propiedades de un archivo
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             
-            const file = imageFile as Blob & { name: string };
-            if (file.size && file.type && file.name) {
+            if ((imageFile as File).size && (imageFile as File).type && (imageFile as File).name) {
                 // Eliminar la imagen antigua si existe
                 if (category.image) {
                     try {
@@ -76,9 +75,9 @@ export async function PUT(request: Request, { params }: Params) {
                 }
                 
                 // Convertir File a Buffer y guardar la nueva imagen
-                const arrayBuffer = await file.arrayBuffer();
+                const arrayBuffer = await (imageFile as File).arrayBuffer();
                 const buffer = Buffer.from(arrayBuffer);
-                imageData = await saveImage(buffer, file.name, 'categories');
+                imageData = await saveImage(buffer, (imageFile as File).name, 'categories');
                 finalImageName = imageData.name;
             }
         }
