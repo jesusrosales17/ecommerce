@@ -1,4 +1,4 @@
-import { File } from 'node:buffer'
+import { File } from 'formdata-node'
 import { categoryUpdateSchema } from "@/features/categories/schemas/categorySchema";
 import { requireAuth } from "@/libs/auth/auth";
 import prisma from "@/libs/prisma";

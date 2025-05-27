@@ -5,7 +5,7 @@ import { z } from "zod";
 import {  requireAuth } from "@/libs/auth/auth";
 import { saveImage } from "@/libs/media/image-handler";
 import { CategoryStatus } from "@prisma/client";
-import {File} from "node:buffer";
+import {File} from "formdata-node";
 
 export async function POST(request: NextRequest) {
   try {
