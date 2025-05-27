@@ -28,6 +28,7 @@ import { useOrderStore } from "../store/useOrderStore";
 import { formattedPrice } from "@/utils/price";
 import { OrderWithRelations } from "../interfaces/order";
 import { getBadgeVariant, getStatusText } from "../utils/orders";
+import { toast } from "sonner";
 
 interface Props {
   orders: OrderWithRelations[];

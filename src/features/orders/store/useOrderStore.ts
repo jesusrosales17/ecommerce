@@ -1,22 +1,11 @@
-import { Order as PrismaOrder, OrderStatus, OrderItem, Prisma } from '@prisma/client';
+import {  OrderStatus } from '@prisma/client';
 import { create } from 'zustand';
-import { OrderWithRelations } from '../interfaces/order';
+import { OrderStore } from '../interfaces/orderStore';
 
 // Tipo que coincide con lo que devuelve Prisma en la consulta
 
 
-// Usamos este tipo para nuestra aplicación
-export type Order = OrderWithRelations;
-
-interface OrderState {
-  isOpenInfoDrawer: boolean;
-  orderToShow: Order | null;
-  setIsOpenInfoDrawer: (isOpen: boolean) => void;
-  setOrderToShow: (order: Order | null) => void;
-  changeOrderStatus: (orderId: string, status: OrderStatus) => Promise<void>;
-}
-
-export const useOrderStore = create<OrderState>((set) => ({
+export const useOrderStore = create<OrderStore>((set) => ({
   isOpenInfoDrawer: false,
   orderToShow: null,
   setIsOpenInfoDrawer: (isOpen) => set({ isOpenInfoDrawer: isOpen }),
