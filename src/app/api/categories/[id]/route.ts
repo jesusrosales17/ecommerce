@@ -63,7 +63,8 @@ export async function PUT(request: Request, { params }: Params) {
         if (imageFile && typeof imageFile === 'object' && imageFile !== null) {
             // Verificar si tiene las propiedades de un archivo
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const file = imageFile as File;
+            
+            const file = imageFile as Blob & { name: string };
             if (file.size && file.type && file.name) {
                 // Eliminar la imagen antigua si existe
                 if (category.image) {
