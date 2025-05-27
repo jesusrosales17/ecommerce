@@ -6,9 +6,14 @@ export type Order = OrderWithRelations;
 
 
 export interface OrderStore {
+  // Estado
+  orders: Order[];
   isOpenInfoDrawer: boolean;
   orderToShow: Order | null;
+  
+  // Métodos para manipular estado
   setIsOpenInfoDrawer: (isOpen: boolean) => void;
   setOrderToShow: (order: Order | null) => void;
-  changeOrderStatus: (orderId: string, status: OrderStatus) => Promise<void>;
+  setOrders: (orders: Order[]) => void;
+  updateOrderStatus: (orderId: string, status: OrderStatus) => void;
 }

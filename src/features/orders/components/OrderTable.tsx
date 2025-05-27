@@ -23,12 +23,13 @@ import {
 import { Check, Clock, Edit, Eye, MoreVertical, Package, ShoppingBag, Truck, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SearchInput } from "@/components/ui/SearchInput";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useOrderStore } from "../store/useOrderStore";
 import { formattedPrice } from "@/utils/price";
 import { OrderWithRelations } from "../interfaces/order";
 import { getBadgeVariant, getStatusText } from "../utils/orders";
 import { toast } from "sonner";
+import { useOrderActions } from "../hooks/useOrderActions";
 
 interface Props {
   orders: OrderWithRelations[];
@@ -38,10 +39,17 @@ export function OrderTable({ orders }: Props) {
   const {
     setIsOpenInfoDrawer,
     setOrderToShow,
-    changeOrderStatus,
+    setOrders,
   } = useOrderStore();
+  
+  const { changeOrderStatus } = useOrderActions();
  
   const [searchQuery, setSearchQuery] = useState("");
+
+  // Cuando los pedidos cambien (por props), los guardamos en el store
+  useEffect(() => {
+    setOrders(orders);
+  }, [orders, setOrders]);
 
   const handleShowOrder = (order: OrderWithRelations) => {
     setIsOpenInfoDrawer(true);

@@ -32,7 +32,7 @@ export const OrderInfoDrawer = () => {
       onOpenChange={setIsOpenInfoDrawer}
       direction="right"
     >
-      <DrawerContent className="px-4 overflow-y-auto overflow-x-hidden">
+      <DrawerContent className=" overflow-y-auto overflow-x-hidden">
         <DrawerHeader>
           <DrawerTitle>Detalles del Pedido</DrawerTitle>
           <DrawerDescription>
@@ -40,7 +40,7 @@ export const OrderInfoDrawer = () => {
           </DrawerDescription>
         </DrawerHeader>
           {" "}
-          <div className="space-y-6">
+          <div className="space-y-6 px-4">
             {/* Estado del Pedido */}
             <OrderStatusDisplay status={orderToShow.status} />
 

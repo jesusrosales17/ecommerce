@@ -1,46 +1,28 @@
-import {  OrderStatus } from '@prisma/client';
+import { OrderStatus } from '@prisma/client';
 import { create } from 'zustand';
 import { OrderStore } from '../interfaces/orderStore';
 
-// Tipo que coincide con lo que devuelve Prisma en la consulta
-
-
 export const useOrderStore = create<OrderStore>((set) => ({
+  // Estado
+  orders: [],
   isOpenInfoDrawer: false,
   orderToShow: null,
+  
+  // Métodos para manipular estado
   setIsOpenInfoDrawer: (isOpen) => set({ isOpenInfoDrawer: isOpen }),
   setOrderToShow: (order) => set({ orderToShow: order }),
-  changeOrderStatus: async (orderId: string, status: OrderStatus) => {
-    try {
-      const base_url = process.env.NEXT_PUBLIC_URL;
-      const response = await fetch(`${base_url}/api/orders/${orderId}/status`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ status }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Error al actualizar el estado del pedido');
-      }
-
-      // Si tenemos el pedido abierto en el drawer, actualizamos su estado
-      set((state) => {
-        if (state.orderToShow && state.orderToShow.id === orderId) {
-          return {
-            orderToShow: {
-              ...state.orderToShow,
-              status,
-            },
-          };
-        }
-        return state;
-      });
-      
-    } catch (error) {
-      console.error('Error al cambiar el estado del pedido:', error);
-      throw error;
-    }
-  },
+  setOrders: (orders) => set({ orders }),
+  
+  // Actualiza el estado de una orden específica
+  updateOrderStatus: (orderId, status) => set((state) => ({
+    orders: state.orders.map((order) => 
+      order.id === orderId 
+        ? { ...order, status } 
+        : order
+    ),
+    // Si es la orden que se está mostrando, también la actualizamos
+    orderToShow: state.orderToShow?.id === orderId 
+      ? { ...state.orderToShow, status } 
+      : state.orderToShow
+  })),
 }));
