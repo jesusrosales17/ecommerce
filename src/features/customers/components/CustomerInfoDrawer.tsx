@@ -30,7 +30,7 @@ export function CustomerInfoDrawer() {
       onOpenChange={setIsInfoDrawerOpen}
       direction={isMobile ? "bottom" : "right"}
     >
-      <DrawerContent className="max-h-[90vh]">
+      <DrawerContent className="">
         <ScrollArea className="h-full overflow-y-auto">
           <DrawerHeader>
             <DrawerTitle>Información del Cliente</DrawerTitle>

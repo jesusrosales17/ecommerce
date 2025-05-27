@@ -45,9 +45,9 @@ export function CustomerProfileInfo({ customer }: CustomerProfileInfoProps) {
             Cliente desde {format(new Date(customer.createdAt), "PP", { locale: es })}
           </div>
           <div className="flex items-center gap-2 mt-2">
-            <Badge variant="outline">
+            {/* <Badge variant="outline">
               {customer.emailVerified ? "Email verificado" : "Email no verificado"}
-            </Badge>
+            </Badge> */}
           </div>
         </div>
       </div>

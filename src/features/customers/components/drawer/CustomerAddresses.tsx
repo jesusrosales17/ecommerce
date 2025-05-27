@@ -22,7 +22,7 @@ export function CustomerAddresses({ addresses = [] }: CustomerAddressesProps) {
           <Home className="mb-2 h-12 w-12 text-muted-foreground/50" />
           <p>Este cliente no ha registrado ninguna dirección</p>
         </div>      ) : (
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-4 ">
           {safeAddresses.map((address) => (
             <Card key={address.id}>
               <CardContent className="p-4">
