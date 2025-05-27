@@ -2,46 +2,13 @@
 
 import { Badge } from "@/components/ui/badge";
 import { OrderStatus } from "@prisma/client";
+import { getBadgeVariant, getStatusText } from "../../utils/orders";
 
 interface OrderStatusDisplayProps {
   status: OrderStatus;
 }
 
-// Función para traducir el estado
-const getStatusText = (status: OrderStatus): string => {
-  switch (status) {
-    case 'PENDING':
-      return 'Pendiente';
-    case 'PROCESSING':
-      return 'Procesando';
-    case 'SHIPPED':
-      return 'Enviado';
-    case 'DELIVERED':
-      return 'Entregado';
-    case 'CANCELLED':
-      return 'Cancelado';
-    default:
-      return status;
-  }
-};
 
-// Función para obtener el color del badge según el estado
-const getBadgeVariant = (status: OrderStatus): "default" | "secondary" | "destructive" | "outline" => {
-  switch (status) {
-    case 'PENDING':
-      return 'default';
-    case 'PROCESSING':
-      return 'secondary';
-    case 'SHIPPED':
-      return 'secondary';
-    case 'DELIVERED':
-      return 'secondary'; 
-    case 'CANCELLED':
-      return 'destructive';
-    default:
-      return 'outline';
-  }
-};
 
 export const OrderStatusDisplay = ({ status }: OrderStatusDisplayProps) => {
   return (

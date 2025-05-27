@@ -1,6 +1,7 @@
 import { Prisma } from "@prisma/client";
 
-export type OrderWithRelations = Prisma.OrderGetPayload<{
+// Original Prisma type
+type PrismaOrderWithRelations = Prisma.OrderGetPayload<{
   include: {
     User: {
       select: {
@@ -27,3 +28,11 @@ export type OrderWithRelations = Prisma.OrderGetPayload<{
     };
   };
 }>;
+
+// Serializable version for client components where Decimals are converted to strings
+export type OrderWithRelations = Omit<PrismaOrderWithRelations, 'total' | 'items'> & {
+  total: string;
+  items: Array<Omit<PrismaOrderWithRelations['items'][0], 'price'> & {
+    price: string;
+  }>;
+};

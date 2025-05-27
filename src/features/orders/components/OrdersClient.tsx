@@ -3,11 +3,12 @@
 import { OrderTable } from "./OrderTable";
 import { OrderInfoDrawer } from "./OrderInfoDrawer";
 import { useState } from "react";
-import { Order } from "@prisma/client";
+import { OrderStatus } from "@prisma/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { OrderWithRelations } from "../interfaces/order";
 
 interface OrdersClientProps {
-  orders: Order[];
+  orders: OrderWithRelations[];
   counts: {
     ALL: number;
     PENDING: number;
@@ -19,7 +20,7 @@ interface OrdersClientProps {
 }
 
 export function OrdersClient({ orders, counts }: OrdersClientProps) {
-  const [status, setStatus] = useState<"ALL" | "PENDING" | "PROCESSING" | "SHIPPED" | "DELIVERED" | "CANCELLED">("ALL");
+  const [status, setStatus] = useState<"ALL" | OrderStatus>("ALL");
 
   const filteredOrders = status === "ALL" 
     ? orders 

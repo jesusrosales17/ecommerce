@@ -27,7 +27,6 @@ import { useState, useMemo } from "react";
 import { useOrderStore } from "../store/useOrderStore";
 import { formattedPrice } from "@/utils/price";
 import { OrderWithRelations } from "../interfaces/order";
-import { getBadgeVariant, getStatusText } from "../utils/orders";
 
 interface Props {
   orders: OrderWithRelations[];
@@ -57,35 +56,73 @@ export function OrderTable({ orders }: Props) {
 
   const filteredOrders = useMemo(() => {
     return orders.filter((order) =>
-      order.id.toLowerCase().includes(searchQuery.toLowerCase())
+      order.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (order.User?.name && order.User.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (order.User?.email && order.User.email.toLowerCase().includes(searchQuery.toLowerCase()))
     );
   }, [orders, searchQuery]);
-    // Función para obtener el color del badge según el estado
-  
+    
+  // Función para obtener el color del badge según el estado
+  const getBadgeVariant = (status: OrderStatus): "default" | "secondary" | "destructive" | "outline" => {
+    switch (status) {
+      case "PENDING":
+        return "secondary";
+      case "PROCESSING":
+        return "default";
+      case "SHIPPED":
+        return "secondary";
+      case "DELIVERED":
+        return "default";
+      case "CANCELLED":
+        return "destructive";
+      default:
+        return "outline";
+    }
+  };
 
- 
+  // Función para traducir el estado
+  const getStatusText = (status: OrderStatus) => {
+    switch (status) {
+      case "PENDING":
+        return "Pendiente";
+      case "PROCESSING":
+        return "Procesando";
+      case "SHIPPED":
+        return "Enviado";
+      case "DELIVERED":
+        return "Entregado";
+      case "CANCELLED":
+        return "Cancelado";
+      default:
+        return status;
+    }
+  };
 
   return (
-    <div className="">      <SearchInput
-          placeholder="Buscar pedido por ID"
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-          classname="mb-4"
-        />      <div className="rounded-md border">
+    <div className="">
+      <SearchInput
+        placeholder="Buscar pedido por ID o cliente"
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        classname="mb-4"
+      />
+      <div className="rounded-md border">
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead>ID Pedido</TableHead>
+              <TableHead>Cliente</TableHead>
               <TableHead>Total</TableHead>
               <TableHead>Estado</TableHead>
               <TableHead>Fecha</TableHead>
               <TableHead>Acciones</TableHead>
             </TableRow>
           </TableHeader>
-          <TableBody>            {filteredOrders.length === 0 ? (
+          <TableBody>
+            {filteredOrders.length === 0 ? (
               <TableRow>
                 <TableCell
-                  colSpan={5}
+                  colSpan={6}
                   className="text-center py-6 text-gray-500"
                 >
                   No hay pedidos para mostrar
@@ -95,6 +132,12 @@ export function OrderTable({ orders }: Props) {
               filteredOrders.map((order) => (
                 <TableRow key={order.id}>
                   <TableCell className="font-medium">#{order.id.substring(0, 8)}</TableCell>
+                  <TableCell>
+                    {order.User?.name || "Usuario"}
+                    <div className="text-xs text-gray-500">
+                      {order.User?.email}
+                    </div>
+                  </TableCell>
                   <TableCell>{formattedPrice(Number(order.total))}</TableCell>
                   <TableCell>
                     <Badge
@@ -166,4 +209,3 @@ export function OrderTable({ orders }: Props) {
     </div>
   );
 }
-

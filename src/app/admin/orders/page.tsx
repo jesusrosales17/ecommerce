@@ -10,7 +10,7 @@ export const metadata = {
 
 const OrdersPage = async () => {
   // Obtener pedidos desde el servidor directamente
-  const orders = await prisma.order.findMany({
+  const ordersData = await prisma.order.findMany({
     include: {
       User: {
         select: {
@@ -41,6 +41,15 @@ const OrdersPage = async () => {
     },
   });
    
+  // Convertir los decimales a strings para serialización
+  const orders = ordersData.map(order => ({
+    ...order,
+    total: order.total.toString(),
+    items: order.items.map(item => ({
+      ...item,
+      price: item.price.toString()
+    }))
+  }));
 
   return (
     <>
