@@ -76,7 +76,9 @@ export async function processMultipleImages(
   for (let i = 0; i < images.length; i++) {
     const image = images[i];
     if (image instanceof File) {
-      const savedImage = await saveImage(image, basePath);
+      const buffer = Buffer.from(await image.arrayBuffer());
+      const originalName = image.name;
+      const savedImage = await saveImage(buffer, originalName, basePath);
       // Marcar la imagen como principal si su índice coincide con el principalImageIndex
       savedImages.push({
         ...savedImage,

@@ -20,7 +20,7 @@ export default async function CartPage() {
   const cartData = await getCartWithTotals();
 
   // Añadimos verificación de existencia más estricta para evitar errores de tipo
-  const cartItems = (cartData?.cart?.items ?? []) as CartItemWithProduct[];
+  const cartItems = cartData?.cart?.items ?? [];
   const cartTotal = cartData?.cartTotal ?? 0;
   const itemsCount = cartData?.itemsCount ?? 0;
 
@@ -44,7 +44,7 @@ export default async function CartPage() {
             <Card>
               <CardContent className="pt-6">
                 <div className="space-y-4">
-                  {cartItems.map((item: CartItemWithProduct) => {
+                  {cartItems.map((item ) => {
                     const product = item.Product;
                     const image =
                       product?.images?.find((img) => img.isPrincipal) ||
