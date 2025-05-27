@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { categoryUpdateSchema } from "@/features/categories/schemas/categorySchema";
 import { requireAuth } from "@/libs/auth/auth";
 import prisma from "@/libs/prisma";
@@ -11,6 +9,14 @@ interface Params {
     params: Promise<{
         id: string;
     }>
+}
+
+// Type guard to check if the value is a File-like object
+function isFileLike(value: unknown): value is { arrayBuffer(): Promise<ArrayBuffer>; name?: string } {
+    return value !== null && 
+           typeof value === 'object' && 
+           'arrayBuffer' in value && 
+           typeof (value as any).arrayBuffer === 'function';
 }
 
 export async function PUT(request: Request, { params }: Params) {
@@ -29,9 +35,7 @@ export async function PUT(request: Request, { params }: Params) {
         const name = formData.get('name') as string;
         const description = formData.get('description') as string || undefined;
         const status = formData.get('status') as string;
-        
-        // Cambiar el tipo aquí - usar unknown en lugar de File
-        const imageFile = formData.get('image') as unknown;
+        const imageFile = formData.get('image');
 
         // Include id in validated data
         const validationData = {
@@ -58,30 +62,28 @@ export async function PUT(request: Request, { params }: Params) {
         }
 
         // Procesar la imagen si se subió una nueva
-        let imageData = null;
         let finalImageName = category.image || null;
 
-        // Verificar si es un archivo válido
-        if (imageFile && typeof imageFile === 'object' && imageFile !== null) {
-            // Verificar si tiene las propiedades de un archivo
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            
-            if ((imageFile as File).size && (imageFile as File).type && (imageFile as File).name) {
-                // Eliminar la imagen antigua si existe
-                if (category.image) {
-                    try {
-                        await deleteImage(category.image, 'categories');
-                    } catch (error) {
-                        console.error('Error al eliminar la imagen antigua:', error);
-                    }
+        if (imageFile && isFileLike(imageFile)) {
+            // Eliminar la imagen antigua si existe
+            if (category.image) {
+                try {
+                    await deleteImage(category.image, 'categories');
+                } catch (error) {
+                    console.error('Error al eliminar la imagen antigua:', error);
                 }
-                
-                // Convertir File a Buffer y guardar la nueva imagen
-                const arrayBuffer = await (imageFile as File).arrayBuffer();
-                const buffer = Buffer.from(arrayBuffer);
-                imageData = await saveImage(buffer, (imageFile as File).name, 'categories');
-                finalImageName = imageData.name;
             }
+            
+            // Convertir el archivo a Buffer
+            const arrayBuffer = await imageFile.arrayBuffer();
+            const buffer = Buffer.from(arrayBuffer);
+            
+            // Obtener el nombre del archivo del FormData
+            const fileName = imageFile.name || 'image.jpg';
+            
+            // Guardar la nueva imagen
+            const imageData = await saveImage(buffer, fileName, 'categories');
+            finalImageName = imageData.name;
         }
 
         // actualizar la categoria en la bd
