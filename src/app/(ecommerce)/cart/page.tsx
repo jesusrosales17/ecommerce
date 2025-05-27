@@ -9,7 +9,6 @@ import { getCartWithTotals } from "@/features/cart/server/cart-utils";
 import { CheckoutButton } from "@/features/checkout/components/CheckoutButton";
 import { getSession } from "@/libs/auth/auth";
 import { formatPrice } from "@/utils/price";
-import { CartItemWithProduct } from "@/features/cart/interfaces/cartStore";
 
 export default async function CartPage() {
   const session = await getSession();
