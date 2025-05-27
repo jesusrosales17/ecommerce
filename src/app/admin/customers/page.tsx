@@ -34,6 +34,15 @@ async function getCustomers() {
 
 export default async function CustomersPage() {
   const customers = await getCustomers();
+  
+  // Convert Decimal to number for each order total
+  const formattedCustomers = customers.map(customer => ({
+    ...customer,
+    Order: customer.Order.map(order => ({
+      ...order,
+      total: Number(order.total)
+    }))
+  }));
 
   return (
     <div className="space-y-4">
@@ -44,9 +53,8 @@ export default async function CustomersPage() {
         </p>
       </div>
       
-      <Separator />
       
-      <CustomerClient initialCustomers={customers} />
+      <CustomerClient initialCustomers={formattedCustomers} />
     </div>
   );
 }

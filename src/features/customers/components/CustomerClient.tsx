@@ -32,7 +32,6 @@ export function CustomerClient({ initialCustomers }: CustomerClientProps) {
             placeholder="Buscar por nombre o email..."
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
-            className="h-9"
           />
         </div>
       </div>

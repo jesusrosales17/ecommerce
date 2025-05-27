@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
+import { useState } from "react";
 import {
   Table,
   TableBody,
@@ -17,12 +17,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Eye, MoreHorizontal, Mail } from "lucide-react";
-import { useCustomerStore } from '../store/useCustomerStore';
-import { useCustomerActions } from '../hooks/useCustomerActions';
-import { CustomerWithRelations } from '../interfaces/customer';
-import { formatDistanceToNow } from 'date-fns';
-import { es } from 'date-fns/locale';
-import { formattedPrice } from '@/utils/price';
+import { useCustomerStore } from "../store/useCustomerStore";
+import { useCustomerActions } from "../hooks/useCustomerActions";
+import { CustomerWithRelations } from "../interfaces/customer";
+import { formatDistanceToNow } from "date-fns";
+import { es } from "date-fns/locale";
+import { formattedPrice } from "@/utils/price";
 
 interface CustomerTableProps {
   customers: CustomerWithRelations[];
@@ -54,7 +54,8 @@ export function CustomerTable({ customers = [] }: CustomerTableProps) {
             <TableHead>Registrado</TableHead>
             <TableHead>Acciones</TableHead>
           </TableRow>
-        </TableHeader>        <TableBody>
+        </TableHeader>
+        <TableBody>
           {safeCustomers.length === 0 ? (
             <TableRow>
               <TableCell colSpan={8} className="text-center py-6 text-gray-500">
@@ -64,7 +65,7 @@ export function CustomerTable({ customers = [] }: CustomerTableProps) {
           ) : (
             safeCustomers.map((customer) => {
               const summary = calculateCustomerSummary(customer);
-              
+
               return (
                 <TableRow key={customer.id}>
                   <TableCell className="font-medium">
@@ -97,12 +98,16 @@ export function CustomerTable({ customers = [] }: CustomerTableProps) {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => handleViewCustomer(customer)}>
+                        <DropdownMenuItem
+                          onClick={() => handleViewCustomer(customer)}
+                        >
                           <Eye className="mr-2 h-4 w-4" />
                           Ver detalles
                         </DropdownMenuItem>
-                        <DropdownMenuItem 
-                          onClick={() => window.location.href = `mailto:${customer.email}`}
+                        <DropdownMenuItem
+                          onClick={() =>
+                            (window.location.href = `mailto:${customer.email}`)
+                          }
                         >
                           <Mail className="mr-2 h-4 w-4" />
                           Contactar
