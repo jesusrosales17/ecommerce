@@ -14,6 +14,8 @@ import {
 } from "@/components/ui/table";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { useOrderStore } from "@/features/orders/store/useOrderStore";
+import { OrderWithRelations } from "@/features/orders/interfaces/order";
 
 interface Order {
   id: string;
@@ -26,6 +28,7 @@ interface CustomerOrdersSummaryProps {
 }
 
 export function CustomerOrdersSummary({ orders = [] }: CustomerOrdersSummaryProps) {
+  const {setOrderToShow, setIsOpenInfoDrawer} = useOrderStore();
   // Verificamos que orders sea un array
   const safeOrders = Array.isArray(orders) ? orders : [];
   
@@ -36,6 +39,7 @@ export function CustomerOrdersSummary({ orders = [] }: CustomerOrdersSummaryProp
   const sortedOrders = [...safeOrders].sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   );
+
   
   // Tomamos solo los últimos 5 pedidos para mostrar
   const recentOrders = sortedOrders.slice(0, 5);
@@ -76,7 +80,10 @@ export function CustomerOrdersSummary({ orders = [] }: CustomerOrdersSummaryProp
                   </TableCell>
                   <TableCell className="text-right">{formattedPrice(Number(order.total))}</TableCell>
                   <TableCell>
-                    <Link href={`/admin/orders/${order.id}`} passHref>
+                    <Link
+                    href={`/admin/orders/`}
+                    
+                    passHref>
                       <Button variant="ghost" size="sm">
                         Ver
                       </Button>

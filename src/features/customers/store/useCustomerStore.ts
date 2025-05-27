@@ -40,7 +40,7 @@ export const useCustomerStore = create<CustomerStore>((set, get) => ({
     const query = searchQuery.toLowerCase();
     const filtered = customers.filter((customer) => 
       customer.name?.toLowerCase().includes(query) || 
-      customer.email.toLowerCase().includes(query)
+      customer.email?.toLowerCase().includes(query)
     );
     
     set({ filteredCustomers: filtered });
