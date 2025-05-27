@@ -1,3 +1,4 @@
+import { File } from 'node:buffer'
 import { categoryUpdateSchema } from "@/features/categories/schemas/categorySchema";
 import { requireAuth } from "@/libs/auth/auth";
 import prisma from "@/libs/prisma";
@@ -62,8 +63,8 @@ export async function PUT(request: Request, { params }: Params) {
         // Verificar si es un archivo válido
         if (imageFile && typeof imageFile === 'object' && imageFile !== null) {
             // Verificar si tiene las propiedades de un archivo
-            // eslind-disable-next-line @typescript-eslint/no-explicit-any
-            const file = imageFile as any;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const file = imageFile as File;
             if (file.size && file.type && file.name) {
                 // Eliminar la imagen antigua si existe
                 if (category.image) {
@@ -74,8 +75,10 @@ export async function PUT(request: Request, { params }: Params) {
                     }
                 }
                 
-                // Guardar la nueva imagen
-                imageData = await saveImage(file, 'categories');
+                // Convertir File a Buffer y guardar la nueva imagen
+                const arrayBuffer = await file.arrayBuffer();
+                const buffer = Buffer.from(arrayBuffer);
+                imageData = await saveImage(buffer, file.name, 'categories');
                 finalImageName = imageData.name;
             }
         }

@@ -1,5 +1,6 @@
 import { promises as fs } from 'fs';
 import path from 'path';
+import {File} from 'node:buffer';
 import { v4 as uuidv4 } from 'uuid';
 
 /**
@@ -9,26 +10,20 @@ import { v4 as uuidv4 } from 'uuid';
  * @returns Objeto con la información de la imagen guardada
  */
 export async function saveImage(
-  file: File, 
+  buffer: Buffer,
+  originalName: string,
   basePath: string = 'products'
 ): Promise<{ name: string; url: string }> {
   try {
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-
-    // Crear la carpeta si no existe con la env NEXT_PUBLIC_UPLOADS_PATH
     const uploadDir = path.join(process.cwd(), process.env.NEXT_PUBLIC_UPLOADS_PATH || 'uploads', basePath);
     await fs.mkdir(uploadDir, { recursive: true });
 
-    // Generar un nombre único para la imagen
-    const fileExtension = path.extname(file.name);
+    const fileExtension = path.extname(originalName);
     const fileName = `${uuidv4()}${fileExtension}`;
     const filePath = path.join(uploadDir, fileName);
 
-    // Guardar la imagen
     await fs.writeFile(filePath, buffer);
 
-    // Retornar la información de la imagen
     return {
       name: fileName,
       url: `/uploads/${basePath}/${fileName}`,
@@ -38,7 +33,6 @@ export async function saveImage(
     throw new Error('Error al guardar la imagen');
   }
 }
-
 /**
  * Elimina una imagen del sistema de archivos
  * @param fileName Nombre del archivo a eliminar
