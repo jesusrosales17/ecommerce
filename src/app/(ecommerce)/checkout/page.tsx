@@ -1,9 +1,9 @@
 import { redirect } from "next/navigation";
 
-import prisma from "@/libs/prisma";
+import { getCartWithTotals } from "@/features/cart/server/cart-utils";
 import CheckoutPageClient from "@/features/checkout/components/CheckoutPageClient";
 import { getSession } from "@/libs/auth/auth";
-import { getCartWithTotals } from "@/features/cart/server/cart-utils";
+import prisma from "@/libs/prisma";
 
 export default async function CheckoutPage() {
   const session = await getSession();

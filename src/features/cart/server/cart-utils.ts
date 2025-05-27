@@ -1,11 +1,28 @@
 import prisma from "@/libs/prisma";
 import { getSession } from "@/libs/auth/auth";
+import { Cart, CartItem, Product, ProductImage } from "@prisma/client";
+
+// Definimos los tipos necesarios para representar la estructura de datos completa
+type CartItemWithProduct = CartItem & {
+  Product?: Product & {
+    images?: ProductImage[];
+  } | null;
+};
+
+// Tipo completo para el retorno de getCartWithTotals
+export type CartWithTotals = {
+  cart: Cart & {
+    items: CartItemWithProduct[];
+  };
+  cartTotal: number;
+  itemsCount: number;
+} | null;
 
 /**
  * Get the user's cart with items and calculate totals
  * For use in server components
  */
-export async function getCartWithTotals() {
+export async function getCartWithTotals(): Promise<CartWithTotals> {
   const session = await getSession();
 
   if (!session?.user) {

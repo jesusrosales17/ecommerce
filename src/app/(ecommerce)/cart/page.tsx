@@ -1,14 +1,14 @@
-import { redirect } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
-import { getSession } from "@/libs/auth/auth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { formatPrice } from "@/utils/price";
-import { CheckoutButton } from "@/features/checkout/components/CheckoutButton";
 import { getCartWithTotals } from "@/features/cart/server/cart-utils";
+import { CheckoutButton } from "@/features/checkout/components/CheckoutButton";
+import { getSession } from "@/libs/auth/auth";
+import { formatPrice } from "@/utils/price";
 
 export default async function CartPage() {
   const session = await getSession();
@@ -16,12 +16,12 @@ export default async function CartPage() {
   if (!session?.user) {
     redirect("/auth/login?callbackUrl=/cart");
   }
-
   const cartData = await getCartWithTotals();
-  
-  const cartItems = cartData?.cart.items || [];
-  const cartTotal = cartData?.cartTotal || 0;
-  const itemsCount = cartData?.itemsCount || 0;
+
+  // Añadimos verificación de existencia más estricta para evitar errores de tipo
+  const cartItems = cartData?.cart?.items ?? [];
+  const cartTotal = cartData?.cartTotal ?? 0;
+  const itemsCount = cartData?.itemsCount ?? 0;
 
   return (
     <div className="container py-8 mx-auto px-4 2xl:px-0 min-h-[100dvh]">
@@ -42,10 +42,9 @@ export default async function CartPage() {
           <div className="flex-1">
             <Card>
               <CardContent className="pt-6">
-                <div className="space-y-4">
-                  {cartItems.map((item) => {
+                <div className="space-y-4">                  {cartItems.map((item) => {
                     const product = item.Product;
-                    const image = product?.images.find((img) => img.isPrincipal) || product?.images[0];
+                    const image = product?.images?.find((img) => img.isPrincipal) || product?.images?.[0];
                     const price = product?.isOnSale && product?.salePrice
                       ? Number(product.salePrice)
                       : Number(product?.price);
