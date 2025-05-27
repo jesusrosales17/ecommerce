@@ -18,21 +18,21 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { OrderStatus } from "@prisma/client";
 import { Separator } from "@/components/ui/separator";
+import {OrderStatus} from "@prisma/client";
 
 // Helper function to get status badge
 const getStatusBadge = (status: OrderStatus) => {
   switch (status) {
-    case "PENDING":
+    case OrderStatus.PENDING:
       return <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">Pendiente</Badge>;
-    case "PROCESSING":
+    case OrderStatus.PROCESSING:
       return <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">Procesando</Badge>;
-    case "SHIPPED":
+    case OrderStatus.SHIPPED:
       return <Badge variant="outline" className="bg-indigo-50 text-indigo-700 border-indigo-200">Enviado</Badge>;
-    case "DELIVERED":
+    case OrderStatus.DELIVERED:
       return <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">Entregado</Badge>;
-    case "CANCELLED":
+    case OrderStatus.CANCELLED:
       return <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">Cancelado</Badge>;
     default:
       return <Badge variant="outline">Desconocido</Badge>;

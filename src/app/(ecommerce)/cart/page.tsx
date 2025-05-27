@@ -9,6 +9,7 @@ import { getCartWithTotals } from "@/features/cart/server/cart-utils";
 import { CheckoutButton } from "@/features/checkout/components/CheckoutButton";
 import { getSession } from "@/libs/auth/auth";
 import { formatPrice } from "@/utils/price";
+import { CartItemWithProduct } from "@/features/cart/interfaces/cartStore";
 
 export default async function CartPage() {
   const session = await getSession();
@@ -19,7 +20,7 @@ export default async function CartPage() {
   const cartData = await getCartWithTotals();
 
   // Añadimos verificación de existencia más estricta para evitar errores de tipo
-  const cartItems = cartData?.cart?.items ?? [];
+  const cartItems = (cartData?.cart?.items ?? []) as CartItemWithProduct[];
   const cartTotal = cartData?.cartTotal ?? 0;
   const itemsCount = cartData?.itemsCount ?? 0;
 
@@ -43,8 +44,7 @@ export default async function CartPage() {
             <Card>
               <CardContent className="pt-6">
                 <div className="space-y-4">
-                  {/* eslint-disable @typescript-eslint/no-explicit-any */}
-                  {cartItems.map((item) => {
+                  {cartItems.map((item: CartItemWithProduct) => {
                     const product = item.Product;
                     const image =
                       product?.images?.find((img) => img.isPrincipal) ||
