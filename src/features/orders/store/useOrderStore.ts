@@ -1,5 +1,34 @@
-import { Order, OrderStatus } from '@prisma/client';
+import { Order as PrismaOrder, OrderStatus, OrderItem } from '@prisma/client';
 import { create } from 'zustand';
+
+// Extendemos el tipo Order para incluir las relaciones
+export interface Order extends PrismaOrder {
+  User?: {
+    name: string | null;
+    email: string | null;
+  };
+  Address?: {
+    id: string;
+    name: string;
+    street: string;
+    city: string;
+    state: string;
+    postalCode: string;
+    country: string;
+    phone: string;
+    reference?: string | null;
+  };
+  items?: (OrderItem & {
+    Product?: {
+      name: string;
+      images?: {
+        id: string;
+        name: string;
+        isPrincipal?: boolean;
+      }[];
+    };
+  })[];
+}
 
 interface OrderState {
   isOpenInfoDrawer: boolean;

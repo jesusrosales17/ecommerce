@@ -1,12 +1,11 @@
-import { auth } from "@/libs/auth";
+import { requireAuth } from "@/libs/auth/auth";
 import prisma from "@/libs/prisma";
 import { NextResponse } from "next/server";
 
 export async function GET() {
     try {
-        const session = await auth();
-
-        if (!session) {
+        const session = await requireAuth();
+        if (!session.isAutenticated || !session.user) {
             return NextResponse.json({ error: "No autorizado" }, { status: 401 });
         }
 

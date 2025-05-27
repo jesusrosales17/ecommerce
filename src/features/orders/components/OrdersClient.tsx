@@ -1,7 +1,7 @@
 'use client'
 
-import { OrderTable } from "@/features/orders/components/OrderTable";
-import { OrderInfoDrawer } from "@/features/orders/components/OrderInfoDrawer";
+import { OrderTable } from "./OrderTable";
+import { OrderInfoDrawer } from "./OrderInfoDrawer";
 import { useState } from "react";
 import { Order } from "@prisma/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";

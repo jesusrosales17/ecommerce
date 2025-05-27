@@ -8,7 +8,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Order, OrderStatus } from "@prisma/client";
+import { OrderStatus } from "@prisma/client";
+import { Order } from "../store/useOrderStore";
 import {
   DropdownMenu,
   DropdownMenuContent,

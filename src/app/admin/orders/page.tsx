@@ -1,8 +1,7 @@
 
 
-import { OrderTable } from "@/features/orders/components/OrderTable";
+import { OrdersList } from "@/features/orders/components/OrdersList";
 import prisma from "@/libs/prisma";
-import { OrdersClient } from "./orders-client";
 
 export const metadata = {
   title: "Pedidos",
@@ -10,8 +9,6 @@ export const metadata = {
 };
 
 const OrdersPage = async () => {
-  
-
   // Obtener pedidos desde el servidor directamente
   const orders = await prisma.order.findMany({
     include: {
@@ -26,6 +23,7 @@ const OrdersPage = async () => {
         include: {
           Product: {
             select: {
+              id: true,
               name: true,
               images: {
                 where: {
@@ -43,16 +41,6 @@ const OrdersPage = async () => {
     },
   });
 
-  // Contamos los pedidos por estado para mostrar en las pestañas
-  const counts = {
-    ALL: orders.length,
-    PENDING: orders.filter(o => o.status === "PENDING").length,
-    PROCESSING: orders.filter(o => o.status === "PROCESSING").length,
-    SHIPPED: orders.filter(o => o.status === "SHIPPED").length,
-    DELIVERED: orders.filter(o => o.status === "DELIVERED").length,
-    CANCELLED: orders.filter(o => o.status === "CANCELLED").length,
-  };
-
   return (
     <>
       <div className="flex md:justify-between gap-4 md:items-center mb-5 flex-col md:flex-row">
@@ -65,7 +53,7 @@ const OrdersPage = async () => {
       </div>
       
       <div className="container-fluid px-0">
-        <OrdersClient orders={orders} counts={counts} />
+        <OrdersList orders={orders} />
       </div>
     </>
   );
