@@ -16,6 +16,7 @@ function isFileLike(value: unknown): value is { arrayBuffer(): Promise<ArrayBuff
     return value !== null && 
            typeof value === 'object' && 
            'arrayBuffer' in value && 
+           // eslint-disable-next-line @typescript-eslint/no-explicit-any
            typeof (value as any).arrayBuffer === 'function';
 }
 
