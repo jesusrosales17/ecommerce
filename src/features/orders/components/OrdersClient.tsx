@@ -29,12 +29,7 @@ export function OrdersClient({ orders, counts }: OrdersClientProps) {
     <>      <Tabs defaultValue="ALL" onValueChange={(value) => setStatus(value as any)}>
         <div className="relative mb-4 w-full">
           {/* Indicadores de scroll */}
-          <div className="absolute left-0 top-1/2 z-10 hidden h-8 w-8 -translate-y-1/2 items-center justify-center bg-gradient-to-r from-background to-transparent sm:flex">
-            <span className="text-muted-foreground">◀</span>
-          </div>
-          <div className="absolute right-0 top-1/2 z-10 hidden h-8 w-8 -translate-y-1/2 items-center justify-center bg-gradient-to-l from-background to-transparent sm:flex">
-            <span className="text-muted-foreground">▶</span>
-          </div>
+    
           
           {/* Contenedor con scroll horizontal para móvil */}
           <TabsList className="mb-0 w-full flex-nowrap overflow-x-auto scrollbar-hide">
