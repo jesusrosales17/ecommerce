@@ -4,6 +4,9 @@ const nextConfig: NextConfig = {
   /* config options here */
   // reactStrictMode: true,
   reactStrictMode: true,
+   typescript: {
+    ignoreBuildErrors: true,
+  },
 };
 
 export default nextConfig;

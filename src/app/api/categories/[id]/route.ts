@@ -11,8 +11,8 @@ interface Params {
     }>
 }
 
-// Type guard to check if the value is a File-like object
-function isFileLike(value: unknown): value is { arrayBuffer(): Promise<ArrayBuffer>; name?: string } {
+// Type guard to check if the value is a Blob-like object
+function isBlobLike(value: unknown): value is { arrayBuffer(): Promise<ArrayBuffer> } {
     return value !== null && 
            typeof value === 'object' && 
            'arrayBuffer' in value && 
@@ -65,7 +65,7 @@ export async function PUT(request: Request, { params }: Params) {
         // Procesar la imagen si se subió una nueva
         let finalImageName = category.image || null;
 
-        if (imageFile && isFileLike(imageFile)) {
+        if (imageFile && isBlobLike(imageFile)) {
             // Eliminar la imagen antigua si existe
             if (category.image) {
                 try {
@@ -79,8 +79,9 @@ export async function PUT(request: Request, { params }: Params) {
             const arrayBuffer = await imageFile.arrayBuffer();
             const buffer = Buffer.from(arrayBuffer);
             
-            // Obtener el nombre del archivo del FormData
-            const fileName = imageFile.name || 'image.jpg';
+            // Generar un nombre único para la imagen
+            const timestamp = Date.now();
+            const fileName = `image_${timestamp}.jpg`;
             
             // Guardar la nueva imagen
             const imageData = await saveImage(buffer, fileName, 'categories');
