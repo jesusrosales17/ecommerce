@@ -1,4 +1,4 @@
-'use client'
+"use client";
 import { Badge } from "@/components/ui/badge";
 import {
   Table,
@@ -20,7 +20,17 @@ import {
   DropdownMenuPortal,
   DropdownMenuSubContent,
 } from "@/components/ui/dropdown-menu";
-import { Check, Clock, Edit, Eye, MoreVertical, Package, ShoppingBag, Truck, X } from "lucide-react";
+import {
+  Check,
+  Clock,
+  Edit,
+  Eye,
+  MoreVertical,
+  Package,
+  ShoppingBag,
+  Truck,
+  X,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SearchInput } from "@/components/ui/SearchInput";
 import { useState, useMemo, useEffect } from "react";
@@ -36,14 +46,10 @@ interface Props {
 }
 
 export function OrderTable({ orders }: Props) {
-  const {
-    setIsOpenInfoDrawer,
-    setOrderToShow,
-    setOrders,
-  } = useOrderStore();
-  
+  const { setIsOpenInfoDrawer, setOrderToShow, setOrders } = useOrderStore();
+
   const { changeOrderStatus } = useOrderActions();
- 
+
   const [searchQuery, setSearchQuery] = useState("");
 
   // Cuando los pedidos cambien (por props), los guardamos en el store
@@ -56,7 +62,10 @@ export function OrderTable({ orders }: Props) {
     setOrderToShow(order);
   };
 
-  const handleChangeStatus = async (order: OrderWithRelations, status: OrderStatus) => {
+  const handleChangeStatus = async (
+    order: OrderWithRelations,
+    status: OrderStatus
+  ) => {
     try {
       await changeOrderStatus(order.id, status);
     } catch (error) {
@@ -69,18 +78,15 @@ export function OrderTable({ orders }: Props) {
       order.id.toLowerCase().includes(searchQuery.toLowerCase())
     );
   }, [orders, searchQuery]);
-    // Función para obtener el color del badge según el estado
-  
-
- 
-
+  // Función para obtener el color del badge según el estado
   return (
-    <div className="">      <SearchInput
-          placeholder="Buscar pedido por ID"
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-          classname="mb-4"
-        />      <div className="rounded-md border">
+    <div className="">
+      <SearchInput
+        placeholder="Buscar pedido por ID"
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        classname="mb-4"
+      /><div className="rounded-md border">
         <Table>
           <TableHeader>
             <TableRow>
@@ -91,7 +97,8 @@ export function OrderTable({ orders }: Props) {
               <TableHead>Acciones</TableHead>
             </TableRow>
           </TableHeader>
-          <TableBody>            {filteredOrders.length === 0 ? (
+          <TableBody>
+            {filteredOrders.length === 0 ? (
               <TableRow>
                 <TableCell
                   colSpan={5}
@@ -103,7 +110,9 @@ export function OrderTable({ orders }: Props) {
             ) : (
               filteredOrders.map((order) => (
                 <TableRow key={order.id}>
-                  <TableCell className="font-medium">#{order.id.substring(0, 8)}</TableCell>
+                  <TableCell className="font-medium">
+                    #{order.id.substring(0, 8)}
+                  </TableCell>
                   <TableCell>{formattedPrice(Number(order.total))}</TableCell>
                   <TableCell>
                     <Badge
@@ -127,12 +136,14 @@ export function OrderTable({ orders }: Props) {
                       </DropdownMenuTrigger>
 
                       <DropdownMenuContent>
-                        <DropdownMenuItem onClick={() => handleShowOrder(order)}>
+                        <DropdownMenuItem
+                          onClick={() => handleShowOrder(order)}
+                        >
                           <Eye className="mr-2 h-4 w-4" />
                           Ver detalles
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        
+
                         <DropdownMenuSub>
                           <DropdownMenuSubTrigger>
                             <Edit className="mr-2 h-4 w-4" />
@@ -140,23 +151,43 @@ export function OrderTable({ orders }: Props) {
                           </DropdownMenuSubTrigger>
                           <DropdownMenuPortal>
                             <DropdownMenuSubContent>
-                              <DropdownMenuItem onClick={() => handleChangeStatus(order, "PENDING")}>
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  handleChangeStatus(order, "PENDING")
+                                }
+                              >
                                 <Clock className="mr-2 h-4 w-4" />
                                 Pendiente
                               </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => handleChangeStatus(order, "PROCESSING")}>
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  handleChangeStatus(order, "PROCESSING")
+                                }
+                              >
                                 <ShoppingBag className="mr-2 h-4 w-4" />
                                 Procesando
                               </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => handleChangeStatus(order, "SHIPPED")}>
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  handleChangeStatus(order, "SHIPPED")
+                                }
+                              >
                                 <Truck className="mr-2 h-4 w-4" />
                                 Enviado
                               </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => handleChangeStatus(order, "DELIVERED")}>
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  handleChangeStatus(order, "DELIVERED")
+                                }
+                              >
                                 <Check className="mr-2 h-4 w-4" />
                                 Entregado
                               </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => handleChangeStatus(order, "CANCELLED")}>
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  handleChangeStatus(order, "CANCELLED")
+                                }
+                              >
                                 <X className="mr-2 h-4 w-4" />
                                 Cancelado
                               </DropdownMenuItem>
@@ -175,4 +206,3 @@ export function OrderTable({ orders }: Props) {
     </div>
   );
 }
-
