@@ -11,6 +11,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { useIsMobile } from "@/hooks/use-mobile";
 import {
   Home,
   Users,
@@ -44,14 +45,21 @@ interface Props {
   session: Session;
 }
 
-export const SidebarAdmin = ({ session }: Props) => {
-  const pathname = usePathname();
-  const { state } = useSidebar();
+export const SidebarAdmin = ({ session }: Props) => {  const pathname = usePathname();
+  const { state, setOpenMobile } = useSidebar();
   const isCollapsed = state === "collapsed";
   const [activeTooltip, setActiveTooltip] = useState<string | null>(null);
+  const isMobile = useIsMobile(); // Detecta si es un dispositivo móvil
+  // Función para cerrar el sidebar en dispositivos móviles
+  const handleMenuItemClick = () => {
+    if (isMobile) {
+      // En dispositivos móviles, cerramos completamente el sidebar
+      setOpenMobile(false);
+    }
+  };
 
   return (
-    <SessionProvider session={session}>
+    <SessionProvider  session={session} >
       <Sidebar className=" h-dvh">
         <SidebarHeader className="p-">
           <div className="flex items-center space-x-2">
@@ -68,8 +76,7 @@ export const SidebarAdmin = ({ session }: Props) => {
             <SidebarMenu>
               {menuItems.slice(0, 5).map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <div className="relative">
-                    <SidebarMenuButton
+                  <div className="relative">                    <SidebarMenuButton
                       asChild
                       isActive={pathname === item.url}
                       onMouseEnter={() =>
@@ -77,7 +84,7 @@ export const SidebarAdmin = ({ session }: Props) => {
                       }
                       onMouseLeave={() => setActiveTooltip(null)}
                     >
-                      <Link href={item.url}>
+                      <Link href={item.url} onClick={handleMenuItemClick}>
                         <item.icon className="h-5 w-5 " />
                         <span className={isCollapsed ? "sr-only" : ""}>
                           {item.title}
@@ -95,9 +102,7 @@ export const SidebarAdmin = ({ session }: Props) => {
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>
-          </SidebarGroup>
-
-          <SidebarGroup className="px-3 py-2 mt-4">
+          </SidebarGroup>          <SidebarGroup className="px-3 py-2 mt-4">
             <SidebarGroupLabel>Análisis</SidebarGroupLabel>
             <SidebarMenu>
               {menuItems.slice(5, 7).map((item) => (
@@ -111,7 +116,7 @@ export const SidebarAdmin = ({ session }: Props) => {
                       }
                       onMouseLeave={() => setActiveTooltip(null)}
                     >
-                      <Link href={item.url}>
+                      <Link href={item.url} onClick={handleMenuItemClick}>
                         <item.icon />
                         <span className={isCollapsed ? "sr-only" : ""}>
                           {item.title}
@@ -129,9 +134,7 @@ export const SidebarAdmin = ({ session }: Props) => {
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>
-          </SidebarGroup>
-
-          <SidebarGroup className="px-3 py-2 mt-4">
+          </SidebarGroup>          <SidebarGroup className="px-3 py-2 mt-4">
             <SidebarGroupLabel>Sistema</SidebarGroupLabel>
             <SidebarMenu>
               {menuItems.slice(7).map((item) => (
@@ -145,7 +148,7 @@ export const SidebarAdmin = ({ session }: Props) => {
                       }
                       onMouseLeave={() => setActiveTooltip(null)}
                     >
-                      <Link href={item.url}>
+                      <Link href={item.url} onClick={handleMenuItemClick}>
                         <item.icon />
                         <span className={isCollapsed ? "sr-only" : ""}>
                           {item.title}
