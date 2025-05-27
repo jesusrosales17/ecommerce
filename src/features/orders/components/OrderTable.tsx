@@ -45,8 +45,8 @@ interface Props {
   orders: OrderWithRelations[];
 }
 
-export function OrderTable({ orders }: Props) {
-  const { setIsOpenInfoDrawer, setOrderToShow, setOrders } = useOrderStore();
+export function OrderTable({ orders: initialOrders }: Props) {
+  const { setIsOpenInfoDrawer, setOrderToShow, setOrders, orders: storeOrders } = useOrderStore();
 
   const { changeOrderStatus } = useOrderActions();
 
@@ -54,8 +54,8 @@ export function OrderTable({ orders }: Props) {
 
   // Cuando los pedidos cambien (por props), los guardamos en el store
   useEffect(() => {
-    setOrders(orders);
-  }, [orders, setOrders]);
+    setOrders(initialOrders);
+  }, [initialOrders, setOrders]);
 
   const handleShowOrder = (order: OrderWithRelations) => {
     setIsOpenInfoDrawer(true);
@@ -73,11 +73,12 @@ export function OrderTable({ orders }: Props) {
     }
   };
 
+  // Usamos los pedidos del store para que se actualicen cuando cambie el estado
   const filteredOrders = useMemo(() => {
-    return orders.filter((order) =>
+    return storeOrders.filter((order) =>
       order.id.toLowerCase().includes(searchQuery.toLowerCase())
     );
-  }, [orders, searchQuery]);
+  }, [storeOrders, searchQuery]);
   // Función para obtener el color del badge según el estado
   return (
     <div className="">

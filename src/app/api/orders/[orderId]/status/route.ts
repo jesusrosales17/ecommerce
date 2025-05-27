@@ -1,12 +1,12 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/libs/prisma";
 import { OrderStatus } from "@prisma/client";
 import { z } from "zod";
 import { requireAuth } from "@/libs/auth/auth";
 
 export async function PATCH(
-  req: Request,
-  { params }: { params: { orderId: string } }
+  req: NextRequest,
+  { params }: { params: Promise<{ orderId: string }> }
 ) {
   try {
     const session = await requireAuth(["ADMIN"]);
@@ -14,19 +14,20 @@ export async function PATCH(
       return NextResponse.json({ error: "Unauthorized" }, { status: 402 });
     }
 
-    const { orderId } = params;
+    // Await params para asegurar que están disponibles
+    const { orderId } = await params;
     const body = await req.json();
     const { status } = body;
 
     // Validate status using zod
     const OrderStatusSchema = z.enum([
-      "PENDING", 
-      "PROCESSING", 
-      "SHIPPED", 
-      "DELIVERED", 
+      "PENDING",
+      "PROCESSING",
+      "SHIPPED",
+      "DELIVERED",
       "CANCELLED"
     ]);
-    
+
     try {
       OrderStatusSchema.parse(status);
     } catch (error) {
