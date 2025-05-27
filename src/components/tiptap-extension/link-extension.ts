@@ -1,5 +1,5 @@
 import TiptapLink from "@tiptap/extension-link"
-import type { EditorView } from "prosemirror-view"
+import type { EditorView } from "@tiptap/pm/view"
 import { getMarkRange } from "@tiptap/react"
 import { Plugin, TextSelection } from "@tiptap/pm/state"
 
