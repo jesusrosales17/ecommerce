@@ -25,30 +25,46 @@ export function OrdersClient({ orders, counts }: OrdersClientProps) {
   const filteredOrders = status === "ALL" 
     ? orders 
     : orders.filter(order => order.status === status);
-
   return (
-    <>
-      <Tabs defaultValue="ALL" onValueChange={(value) => setStatus(value as any)}>
-        <TabsList className="mb-4">
-          <TabsTrigger value="ALL">
-            Todos ({counts.ALL})
-          </TabsTrigger>
-          <TabsTrigger value="PENDING">
-            Pendientes ({counts.PENDING})
-          </TabsTrigger>
-          <TabsTrigger value="PROCESSING">
-            Procesando ({counts.PROCESSING})
-          </TabsTrigger>
-          <TabsTrigger value="SHIPPED">
-            Enviados ({counts.SHIPPED})
-          </TabsTrigger>
-          <TabsTrigger value="DELIVERED">
-            Entregados ({counts.DELIVERED})
-          </TabsTrigger>
-          <TabsTrigger value="CANCELLED">
-            Cancelados ({counts.CANCELLED})
-          </TabsTrigger>
-        </TabsList>
+    <>      <Tabs defaultValue="ALL" onValueChange={(value) => setStatus(value as any)}>
+        <div className="relative mb-4 w-full">
+          {/* Indicadores de scroll */}
+          <div className="absolute left-0 top-1/2 z-10 hidden h-8 w-8 -translate-y-1/2 items-center justify-center bg-gradient-to-r from-background to-transparent sm:flex">
+            <span className="text-muted-foreground">◀</span>
+          </div>
+          <div className="absolute right-0 top-1/2 z-10 hidden h-8 w-8 -translate-y-1/2 items-center justify-center bg-gradient-to-l from-background to-transparent sm:flex">
+            <span className="text-muted-foreground">▶</span>
+          </div>
+          
+          {/* Contenedor con scroll horizontal para móvil */}
+          <TabsList className="mb-0 w-full flex-nowrap overflow-x-auto scrollbar-hide">
+            <TabsTrigger value="ALL" className="whitespace-nowrap">
+              Todos ({counts.ALL})
+            </TabsTrigger>
+            <TabsTrigger value="PENDING" className="whitespace-nowrap">
+              Pendientes ({counts.PENDING})
+            </TabsTrigger>
+            <TabsTrigger value="PROCESSING" className="whitespace-nowrap">
+              Procesando ({counts.PROCESSING})
+            </TabsTrigger>
+            <TabsTrigger value="SHIPPED" className="whitespace-nowrap">
+              Enviados ({counts.SHIPPED})
+            </TabsTrigger>
+            <TabsTrigger value="DELIVERED" className="whitespace-nowrap">
+              Entregados ({counts.DELIVERED})
+            </TabsTrigger>
+            <TabsTrigger value="CANCELLED" className="whitespace-nowrap">
+              Cancelados ({counts.CANCELLED})
+            </TabsTrigger>
+          </TabsList>
+          
+          {/* Indicador de scroll para móviles */}
+          <div className="mt-1 flex justify-center sm:hidden">
+            <div className="h-1 w-16 rounded-full bg-gray-200">
+              <div className="h-1 w-6 rounded-full bg-gray-400"></div>
+            </div>
+          </div>
+        </div>
         
         <TabsContent value={status} className="mt-0">
           <OrderTable orders={filteredOrders} />
