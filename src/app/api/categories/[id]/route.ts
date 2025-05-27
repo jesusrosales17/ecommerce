@@ -6,7 +6,7 @@ import { z } from "zod";
 import { saveImage, deleteImage } from "@/libs/media/image-handler";
 
 interface Params {
-    params: Promise< {
+    params: Promise<{
         id: string;
     }>
 }
@@ -18,16 +18,19 @@ export async function PUT(request: Request, { params }: Params) {
         if (!auth.isAutenticated) {
             return auth.response;
         }
+        
         // obtener el id de la categoria
-        const {id}  = await params;
+        const { id } = await params;
 
         // Parse formData
         const formData = await request.formData();
         const name = formData.get('name') as string;
         const description = formData.get('description') as string || undefined;
         const status = formData.get('status') as string;
-        const imageFile = formData.get('image') as File | string || null;
         
+        // Cambiar el tipo aquí - usar unknown en lugar de File
+        const imageFile = formData.get('image') as unknown;
+
         // Include id in validated data
         const validationData = {
             id,
@@ -36,7 +39,10 @@ export async function PUT(request: Request, { params }: Params) {
             status,
             image: imageFile
         };
-        const validatedData = categoryUpdateSchema.parse(validationData);        //  verificar si la categoria existe
+        
+        const validatedData = categoryUpdateSchema.parse(validationData);
+
+        // verificar si la categoria existe
         const category = await prisma.category.findUnique({
             where: {
                 id,
@@ -47,50 +53,62 @@ export async function PUT(request: Request, { params }: Params) {
             return NextResponse.json({
                 error: "La categoría no existe",
             }, { status: 404 });
-        }        // Procesar la imagen si se subió una nueva
+        }
+
+        // Procesar la imagen si se subió una nueva
         let imageData = null;
         let finalImageName = category.image || null;
 
-        if (imageFile instanceof File) {
-            // Eliminar la imagen antigua si existe
-            if (category.image) {
-                try {
-                    await deleteImage(category.image, 'categories');
-                } catch (error) {
-                    console.error('Error al eliminar la imagen antigua:', error);
+        // Verificar si es un archivo válido
+        if (imageFile && typeof imageFile === 'object' && imageFile !== null) {
+            // Verificar si tiene las propiedades de un archivo
+            const file = imageFile as any;
+            if (file.size && file.type && file.name) {
+                // Eliminar la imagen antigua si existe
+                if (category.image) {
+                    try {
+                        await deleteImage(category.image, 'categories');
+                    } catch (error) {
+                        console.error('Error al eliminar la imagen antigua:', error);
+                    }
                 }
+                
+                // Guardar la nueva imagen
+                imageData = await saveImage(file, 'categories');
+                finalImageName = imageData.name;
             }
-            imageData = await saveImage(imageFile, 'categories');
-            finalImageName = imageData.name;
-        }        // actualizar la categoria en la bd
+        }
+
+        // actualizar la categoria en la bd
         const updatedCategory = await prisma.category.update({
             where: {
                 id
-            }, 
-            data: {                
-                name: validatedData.name, 
+            },
+            data: {
+                name: validatedData.name,
                 status: validatedData.status,
                 description: validatedData.description,
                 image: finalImageName,
-            } 
-        })
+            }
+        });
 
         return NextResponse.json({
             message: "Categoría actualizada correctamente",
             category: updatedCategory,
         }, { status: 200 });
+        
     } catch (error) {
-
         console.log('Error inesperado', error);
+        
         if (error instanceof z.ZodError) {
             return NextResponse.json({
                 error: error.issues[0].message,
-            }, { status: 400 })
+            }, { status: 400 });
         }
 
-
         return NextResponse.json(
-            { error: "Error al actualizar la categoría" }, { status: 500 })
+            { error: "Error al actualizar la categoría" }, 
+            { status: 500 }
+        );
     }
-
 }
