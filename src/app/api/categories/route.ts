@@ -2,10 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/libs/prisma";
 import { categorySchema } from "@/features/categories/schemas/categorySchema";
 import { z } from "zod";
-import {  requireAuth } from "@/libs/auth/auth";
+import { requireAuth } from "@/libs/auth/auth";
 import { saveImage } from "@/libs/media/image-handler";
 import { CategoryStatus } from "@prisma/client";
-import {File} from "formdata-node";
 
 export async function POST(request: NextRequest) {
   try {
@@ -21,7 +20,7 @@ export async function POST(request: NextRequest) {
     const name = formData.get('name') as string;
     const description = formData.get('description') as string || undefined;
     const status = formData.get('status') as string;
-    const imageFile = formData.get('image') ;
+    const imageFile = formData.get('image');
 
     // Validate data
     const validatedData = categorySchema.parse({
@@ -30,14 +29,14 @@ export async function POST(request: NextRequest) {
       status,
       image: imageFile
     });
-    
+
     // Save the image if provided
     let imageData = null;
-    if (imageFile && imageFile instanceof File) {
+    if (imageFile && typeof imageFile === "object" && "arrayBuffer" in imageFile) {
       const buffer = Buffer.from(await imageFile.arrayBuffer());
-      const filename = imageFile.name || 'image.jpg';
+      const filename = (imageFile as File).name || 'image.jpg';
       imageData = await saveImage(buffer, filename, 'categories');
-    }    // Create category in the database with necessary fields
+    }   // Create category in the database with necessary fields
     // We'll use a type assertion to handle the mismatch until Prisma client can be updated
     const category = await prisma.category.create({
       data: {
@@ -46,7 +45,7 @@ export async function POST(request: NextRequest) {
         status: validatedData.status as CategoryStatus,
         // Using any to bypass TypeScript error until Prisma client is regenerated
         image: imageData?.name || "placeholder.jpg",
-      } ,
+      },
     });
 
     return NextResponse.json({
@@ -55,11 +54,11 @@ export async function POST(request: NextRequest) {
     }, { status: 201 });
 
   } catch (error) {
-    if(error instanceof z.ZodError) {
+    if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { 
+        {
           error: error.issues[0].message,
-         },
+        },
         { status: 400 }
       );
     }
@@ -72,7 +71,7 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET() {
-  
+
   try {
     const categories = await prisma.category.findMany({
       orderBy: {
