@@ -169,6 +169,7 @@ model ProductImage{
   Product Product? @relation(fields: [productId], references: [id])
  
   @@index([name])
+  @@map("productimage")
 }
 
 // especificaciones del producto
@@ -183,6 +184,7 @@ model ProductSpecification{
   Product Product? @relation(fields: [productId], references: [id])
  
   @@index([name])
+  @@map("productspecification")
 }
 
 // Carrito de compras
@@ -196,6 +198,7 @@ model Cart {
   user User @relation(fields: [userId], references: [id])
  
   @@index([userId])
+  @@map("cart")
 }
 
 // Items del carrito de compras
@@ -211,6 +214,7 @@ model CartItem {
   Cart Cart? @relation(fields: [cartId], references: [id])
  
   @@index([productId])
+  @@map("cartitem")
 }
 
 // Favoritos de usuarios
@@ -226,6 +230,7 @@ model Favorite {
  
   @@index([userId])
   @@index([productId])
+  @@map("favorite")
 }
 
 // Direcciones de envío
@@ -248,6 +253,7 @@ model Address {
   Order Order[]
  
   @@index([userId])
+  @@map("address")
 }
 
 // Estado de órdenes
@@ -295,4 +301,5 @@ model OrderItem {
  
   @@index([orderId])
   @@index([productId])
+  @@map("orderitem")
 }
