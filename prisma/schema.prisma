@@ -120,6 +120,7 @@ model Category {
   updatedAt   DateTime @updatedAt
  
   @@index([name])
+    @@map("category")
 }
 enum ProductStatus {
   ACTIVE
@@ -152,6 +153,7 @@ model Product {
   Favorite Favorite[]
 
   OrderItem OrderItem[]
+  @@map("product")
 }
 
 // imagenes del produco
