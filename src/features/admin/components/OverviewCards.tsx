@@ -11,6 +11,7 @@ import {
   TrendingDown,
   Layers
 } from "lucide-react";
+import { formmatNumber } from "@/utils/number";
 
 interface OverviewStats {
   totalUsers: number;
@@ -57,23 +58,23 @@ const StatCard = ({
   };
   return (
     <div className="bg-white rounded-lg border border-gray-200 p-3 sm:p-6 hover:shadow-md transition-shadow">
-      <div className="flex items-center justify-between">
+      <div className="flex items-start justify-between">
         <div className="flex-1 min-w-0">
           <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">{title}</p>
           <p className="text-lg sm:text-2xl font-bold text-gray-900 mt-1">{value}</p>
           {trend && trendValue && (
             <div className={`flex items-center mt-1 sm:mt-2 ${trendColors[trend]}`}>
               {trend === "up" ? (
-                <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+                <TrendingUp className="w-3 h-3 sm:w-4 sm:h-2 mr-1" />
               ) : trend === "down" ? (
-                <TrendingDown className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+                <TrendingDown className="w-3 h-3 sm:w-4 sm:h-2 mr-1" />
               ) : null}
               <span className="text-xs sm:text-sm font-medium">{trendValue}</span>
             </div>
           )}
         </div>
         <div className={`p-2 sm:p-3 rounded-lg border ${colorClasses[color]} flex-shrink-0`}>
-          <Icon className="w-4 h-4 sm:w-6 sm:h-6" />
+          <Icon className="w-4 h-4 " />
         </div>
       </div>
     </div>
@@ -81,12 +82,7 @@ const StatCard = ({
 };
 
 export default function OverviewCards({ stats }: OverviewCardsProps) {
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("es-ES", {
-      style: "currency",
-      currency: "USD"
-    }).format(amount);
-  };
+
 
   const formatGrowth = (percentage: number) => {
     const abs = Math.abs(percentage);
@@ -98,7 +94,7 @@ export default function OverviewCards({ stats }: OverviewCardsProps) {
     if (percentage < 0) return "down";
     return "neutral";
   };
-  return (
+      return (
     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-6 mb-6 sm:mb-8">
       <StatCard
         title="Total Usuarios"
@@ -139,7 +135,7 @@ export default function OverviewCards({ stats }: OverviewCardsProps) {
       
       <StatCard
         title="Ingresos Totales"
-        value={formatCurrency(stats.totalRevenue)}
+        value={formmatNumber(stats.totalRevenue)}
         icon={DollarSign}
         color="green"
       />
