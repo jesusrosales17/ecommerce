@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useDashboardStats } from "@/features/admin/hooks/useDashboardStats";
 import OverviewCards from "@/features/admin/components/OverviewCards";
 import RevenueChart from "@/features/admin/components/RevenueChart";
@@ -8,15 +8,34 @@ import RecentOrdersTable from "@/features/admin/components/RecentOrdersTable";
 import TopProducts from "@/features/admin/components/TopProducts";
 import OrderStatusChart from "@/features/admin/components/OrderStatusChart";
 import QuickStats from "@/features/admin/components/QuickStats";
+import TimeRangeFilter from "@/features/admin/components/TimeRangeFilter";
 import RecentActivity from "@/features/admin/components/RecentActivity";
 import { RefreshCw, Settings, Bell } from "lucide-react";
+import { exportToPDF, exportToExcel } from "@/utils/export";
 
 export default function AdminDashboard() {
   const { stats, isLoading, error, refetch } = useDashboardStats();
 
+  const handleExportPDF = () => {
+    if (stats) {
+      exportToPDF(stats);
+    }
+  };
+
+  const handleExportExcel = () => {
+    if (stats) {
+      exportToExcel(stats);
+    }
+  };
+
+  const handleTimeRangeChange = (range: string) => {
+    console.log("Time range changed:", range);
+    // TODO: Implement time range filtering
+  };
+
   if (isLoading) {
     return (
-      <div className="min-h-screen  p-4 sm:p-6">
+      <div className="min-h-screen bg-gray-50 p-4 sm:p-6">
         <div className="max-w-[1400px] mx-auto">
           <div className="animate-pulse">
             <div className="h-6 sm:h-8 bg-gray-200 rounded w-32 sm:w-48 mb-6 sm:mb-8"></div>
@@ -41,7 +60,7 @@ export default function AdminDashboard() {
 
   if (error) {
     return (
-      <div className="min-h-screen  flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <div className="text-center">
           <div className="bg-red-50 border border-red-200 rounded-lg p-4 sm:p-6 max-w-md">
             <h2 className="text-lg font-semibold text-red-800 mb-2">
@@ -60,11 +79,12 @@ export default function AdminDashboard() {
       </div>
     );
   }
+
   if (!stats) return null;
 
   return (
-    <div className="min-h-screen ">
-      <div className=" ">
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-[1400px] mx-auto p-4 sm:p-6">
         {/* Header */}
         <div className="mb-6 sm:mb-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -78,10 +98,10 @@ export default function AdminDashboard() {
             </div>
             
             <div className="flex items-center justify-end space-x-2 sm:space-x-3">
-              {/* <button className="p-2 text-gray-400 hover:text-gray-600 transition-colors rounded-lg border border-gray-200 bg-white">
+              <button className="p-2 text-gray-400 hover:text-gray-600 transition-colors rounded-lg border border-gray-200 bg-white">
                 <Bell className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
-               */}
+              
               <button 
                 onClick={refetch}
                 className="bg-white border border-gray-300 rounded-lg px-3 py-2 sm:px-4 text-gray-700 hover:bg-gray-50 transition-colors inline-flex items-center text-sm"
@@ -104,6 +124,13 @@ export default function AdminDashboard() {
           totalUsers={stats.overview.totalUsers}
           totalOrders={stats.overview.totalOrders}
           userGrowthPercentage={stats.overview.userGrowthPercentage}
+        />
+
+        {/* Time Range Filter */}
+        <TimeRangeFilter 
+          onTimeRangeChange={handleTimeRangeChange}
+          onExportPDF={handleExportPDF}
+          onExportExcel={handleExportExcel}
         />
 
         {/* Overview Cards */}
@@ -157,13 +184,13 @@ export default function AdminDashboard() {
               </button>
               
               <button className="bg-purple-50 border border-purple-200 rounded-lg p-3 sm:p-4 text-left hover:bg-purple-100 transition-colors">
-                <div className="text-purple-600 font-medium text-sm sm:text-base">Clientes</div>
-                <div className="text-xs sm:text-sm text-purple-500 mt-1">Ver clientes</div>
+                <div className="text-purple-600 font-medium text-sm sm:text-base">Inventario</div>
+                <div className="text-xs sm:text-sm text-purple-500 mt-1">Gestionar stock</div>
               </button>
               
               <button className="bg-orange-50 border border-orange-200 rounded-lg p-3 sm:p-4 text-left hover:bg-orange-100 transition-colors">
                 <div className="text-orange-600 font-medium text-sm sm:text-base">Reportes</div>
-                <div className="text-xs sm:text-sm text-orange-500 mt-1">Generar reportes</div>
+                <div className="text-xs sm:text-sm text-orange-500 mt-1">Ver análisis</div>
               </button>
             </div>
           </div>

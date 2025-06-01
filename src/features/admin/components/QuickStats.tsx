@@ -42,7 +42,7 @@ export default function QuickStats({
         
         <div className="flex items-center space-x-8">
           {/* Revenue */}
-          <div className="text-center">
+          <div className="text-center flex flex-col items-center">
             <div className="flex items-center justify-center w-12 h-12 bg-white/20 rounded-lg mb-2">
               <DollarSign className="w-6 h-6" />
             </div>
@@ -51,7 +51,7 @@ export default function QuickStats({
           </div>
 
           {/* Users */}
-          <div className="text-center">
+          <div className="text-center flex flex-col items-center">
             <div className="flex items-center justify-center w-12 h-12 bg-white/20 rounded-lg mb-2">
               <Users className="w-6 h-6" />
             </div>
@@ -74,7 +74,7 @@ export default function QuickStats({
           </div>
 
           {/* Orders */}
-          <div className="text-center">
+          <div className="text-center flex flex-col items-center">
             <div className="flex items-center justify-center w-12 h-12 bg-white/20 rounded-lg mb-2">
               <ShoppingCart className="w-6 h-6" />
             </div>

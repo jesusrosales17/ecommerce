@@ -23,20 +23,22 @@ interface RevenueChartProps {
   data: MonthlyStats[];
 }
 
-export default function RevenueChart({ data }: RevenueChartProps) {
-  // Transform and sort data
+export default function RevenueChart({ data }: RevenueChartProps) {  // Transform and sort data
   const chartData = data
     .map(item => ({
       month: new Date(item.month + "-01").toLocaleDateString("es-ES", {
         month: "short",
         year: "2-digit"
       }),
-      revenue: Number(item.revenue),
-      orders: Number(item.orders)
+      revenue: isNaN(Number(item.revenue)) ? 0 : Number(item.revenue),
+      orders: isNaN(Number(item.orders)) ? 0 : Number(item.orders)
     }))
     .reverse(); // Most recent first in API, but we want chronological order
 
   const formatCurrency = (value: number) => {
+    if (isNaN(value) || value === null || value === undefined) {
+      return "$0";
+    }
     return new Intl.NumberFormat("es-ES", {
       style: "currency",
       currency: "USD",
@@ -44,17 +46,19 @@ export default function RevenueChart({ data }: RevenueChartProps) {
       maximumFractionDigits: 0
     }).format(value);
   };
-
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
+      const revenueValue = payload[0]?.value || 0;
+      const ordersValue = payload[1]?.value || 0;
+      
       return (
         <div className="bg-white p-4 border border-gray-200 rounded-lg shadow-lg">
           <p className="font-medium text-gray-900">{label}</p>
           <p className="text-blue-600">
-            Ingresos: {formatCurrency(payload[0].value)}
+            Ingresos: {formatCurrency(revenueValue)}
           </p>
           <p className="text-green-600">
-            Órdenes: {payload[1]?.value || 0}
+            Órdenes: {ordersValue}
           </p>
         </div>
       );
