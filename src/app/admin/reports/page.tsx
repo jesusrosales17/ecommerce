@@ -70,7 +70,6 @@ export default function ReportsPage() {
       setIsGenerating(null);
     }
   };
-
   // Función para descargar directamente un reporte sin mostrar el diálogo
   const handleDownloadReport = async (reportId: string, format: 'pdf' | 'excel' | 'csv') => {
     setIsDownloading(`${reportId}-${format}`);
@@ -79,33 +78,16 @@ export default function ReportsPage() {
       // Obtener información específica del reporte según su tipo
       const reportInfo = getReportInfo(reportId);
       
-      // Primero, obtener los datos del reporte
-      const generateResponse = await fetch('/api/admin/reports/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          reportId, 
-          reportType: reportInfo.category,
-          dateRange: selectedDateRange,
-          filters: reportInfo.defaultFilters
-        })
-      });
-      
-      if (!generateResponse.ok) {
-        throw new Error(`Error ${generateResponse.status}: ${generateResponse.statusText}`);
-      }
-      
-      const reportResult = await generateResponse.json();
-      
-      // Luego, exportar los datos en el formato solicitado
+      // Llamar directamente a la API de exportación con el reportId
+      // Esto hará que use el mismo endpoint que la vista previa para mantener consistencia
       const exportResponse = await fetch('/api/admin/reports/export', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           format,
           dateRange: selectedDateRange,
-          reportId: reportInfo.id,
-          customData: reportResult.data
+          reportId: reportInfo.id
+          // No enviar customData para que la API obtenga los datos directamente
         })
       });
 
@@ -136,7 +118,7 @@ export default function ReportsPage() {
     }
   };
   const handleDownloadFromDialog = async (format: 'pdf' | 'excel' | 'csv') => {
-    if (!currentReportData || !currentReportInfo) return;
+    if (!currentReportInfo) return;
     
     setIsDownloading(format);
     
@@ -147,8 +129,8 @@ export default function ReportsPage() {
         body: JSON.stringify({
           format,
           dateRange: selectedDateRange,
-          reportId: currentReportInfo.id,
-          customData: currentReportData
+          reportId: currentReportInfo.id
+          // No enviar customData para que obtenga datos frescos de la API
         })
       });
 

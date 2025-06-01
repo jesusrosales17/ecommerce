@@ -267,6 +267,9 @@ export const exportToExcel = (data: ExportData) => {
 
 // Nueva función para generar PDF como Buffer para reportes específicos
 export const generatePDFReport = async (data: ReportData, dateRange: string, reportId?: string): Promise<Buffer> => {
+  // Los datos ya vienen completos del endpoint, no necesitamos volver a buscarlos
+  const completeData = data;
+
   const doc = new jsPDF();
   
   // Título del documento
@@ -279,37 +282,36 @@ export const generatePDFReport = async (data: ReportData, dateRange: string, rep
   doc.text(`Período: ${formatDateRangeText(dateRange)}`, 14, 32);
   doc.text(`Generado: ${new Date().toLocaleDateString('es-ES')}`, 14, 42);
   
-  let currentY = 55;
-  
+  let currentY = 55;  
   // Generar contenido específico según el tipo de reporte
-  if (reportId && data) {
+  if (reportId && completeData) {
     switch (reportId) {
       case 'sales-summary':
-        currentY = await addSalesSummaryContent(doc, data, currentY);
+        currentY = await addSalesSummaryContent(doc, completeData, currentY);
         break;
       case 'customer-analysis':
-        currentY = await addCustomerAnalysisContent(doc, data, currentY);
+        currentY = await addCustomerAnalysisContent(doc, completeData, currentY);
         break;
       case 'product-performance':
-        currentY = await addProductPerformanceContent(doc, data, currentY);
+        currentY = await addProductPerformanceContent(doc, completeData, currentY);
         break;
       case 'financial-report':
-        currentY = await addFinancialReportContent(doc, data, currentY);
+        currentY = await addFinancialReportContent(doc, completeData, currentY);
         break;
       case 'orders-analysis':
-        currentY = await addOrdersAnalysisContent(doc, data, currentY);
+        currentY = await addOrdersAnalysisContent(doc, completeData, currentY);
         break;
       case 'growth-trends':
-        currentY = await addGrowthTrendsContent(doc, data, currentY);
+        currentY = await addGrowthTrendsContent(doc, completeData, currentY);
         break;
       default:
         // Fallback para reportes generales
-        currentY = await addGeneralReportContent(doc, data, currentY);
+        currentY = await addGeneralReportContent(doc, completeData, currentY);
         break;
     }
   } else {
     // Fallback para reportes sin tipo específico
-    currentY = await addGeneralReportContent(doc, data, currentY);
+    currentY = await addGeneralReportContent(doc, completeData, currentY);
   }
   
   // Convertir a Buffer
@@ -319,35 +321,38 @@ export const generatePDFReport = async (data: ReportData, dateRange: string, rep
 
 // Nueva función para generar Excel como Buffer
 export const generateExcelReport = async (data: ReportData, dateRange: string, reportId?: string): Promise<Buffer> => {
+  // Los datos ya vienen completos del endpoint, no necesitamos volver a buscarlos
+  const completeData = data;
+
   const workbook = XLSX.utils.book_new();
   
   // Generar hojas específicas según el tipo de reporte
-  if (reportId && data) {
+  if (reportId && completeData) {
     switch (reportId) {
       case 'sales-summary':
-        addSalesSummaryExcelSheets(workbook, data);
+        addSalesSummaryExcelSheets(workbook, completeData);
         break;
       case 'customer-analysis':
-        addCustomerAnalysisExcelSheets(workbook, data);
+        addCustomerAnalysisExcelSheets(workbook, completeData);
         break;
       case 'product-performance':
-        addProductPerformanceExcelSheets(workbook, data);
+        addProductPerformanceExcelSheets(workbook, completeData);
         break;
       case 'financial-report':
-        addFinancialReportExcelSheets(workbook, data);
+        addFinancialReportExcelSheets(workbook, completeData);
         break;
       case 'orders-analysis':
-        addOrdersAnalysisExcelSheets(workbook, data);
+        addOrdersAnalysisExcelSheets(workbook, completeData);
         break;
       case 'growth-trends':
-        addGrowthTrendsExcelSheets(workbook, data);
+        addGrowthTrendsExcelSheets(workbook, completeData);
         break;
       default:
-        addGeneralExcelSheets(workbook, data);
+        addGeneralExcelSheets(workbook, completeData);
         break;
     }
   } else {
-    addGeneralExcelSheets(workbook, data);
+    addGeneralExcelSheets(workbook, completeData);
   }
   
   // Convertir a Buffer
@@ -357,6 +362,22 @@ export const generateExcelReport = async (data: ReportData, dateRange: string, r
 
 // Nueva función para generar CSV como Buffer
 export const generateCSVReport = async (data: ReportData, dateRange: string, reportId?: string): Promise<Buffer> => {
+  // Si tenemos reportId, obtener los datos completos del mismo endpoint que usa la vista previa
+  let completeData = data;
+  if (reportId) {
+    try {
+      // Usar el mismo endpoint que usa la vista previa para obtener TODOS los datos
+      const response = await fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/admin/reports/${reportId}?dateRange=${dateRange}`);
+      if (response.ok) {
+        const apiResponse = await response.json();
+        completeData = apiResponse.data;
+      }
+    } catch (error) {
+      console.error('Error fetching complete report data:', error);
+      // Si falla, usar los datos originales
+    }
+  }
+
   let csvContent = '';
   
   // Encabezado
@@ -366,32 +387,31 @@ export const generateCSVReport = async (data: ReportData, dateRange: string, rep
   csvContent += `Generado: ${new Date().toLocaleDateString('es-ES')}\n\n`;
   
   // Generar contenido específico según el tipo de reporte
-  if (reportId && data) {
+  if (reportId && completeData) {
     switch (reportId) {
       case 'sales-summary':
-        csvContent += generateSalesSummaryCSV(data);
+        csvContent += generateSalesSummaryCSV(completeData);
         break;
       case 'customer-analysis':
-        csvContent += generateCustomerAnalysisCSV(data);
+        csvContent += generateCustomerAnalysisCSV(completeData);
         break;
       case 'product-performance':
-        csvContent += generateProductPerformanceCSV(data);
+        csvContent += generateProductPerformanceCSV(completeData);
         break;
       case 'financial-report':
-        csvContent += generateFinancialReportCSV(data);
+        csvContent += generateFinancialReportCSV(completeData);
         break;
       case 'orders-analysis':
-        csvContent += generateOrdersAnalysisCSV(data);
+        csvContent += generateOrdersAnalysisCSV(completeData);
         break;
       case 'growth-trends':
-        csvContent += generateGrowthTrendsCSV(data);
+        csvContent += generateGrowthTrendsCSV(completeData);
         break;
       default:
-        csvContent += generateGeneralCSV(data);
-        break;
+        csvContent += generateGeneralCSV(completeData);        break;
     }
   } else {
-    csvContent += generateGeneralCSV(data);
+    csvContent += generateGeneralCSV(completeData);
   }
   
   return Buffer.from(csvContent, 'utf-8');
@@ -576,8 +596,8 @@ async function addCustomerAnalysisContent(doc: any, data: any, startY: number): 
     const summaryData = [
       ['Total de Clientes', data.summary.totalCustomers?.toString() || '0'],
       ['Nuevos Clientes', data.summary.newCustomers?.toString() || '0'],
-      ['Tasa de Repetición', `${data.summary.repeatCustomerRate || 0}%`],
-      ['Valor Promedio por Cliente', `$${data.summary.averageCustomerValue?.toLocaleString('es-ES', { minimumFractionDigits: 2 }) || '0.00'}`]
+      ['Tasa de Repetición', `${data.summary.repeatCustomerRate?.toFixed(2) || 0}%`],
+      ['Valor Promedio de Vida', `$${data.summary.averageLifetimeValue?.toLocaleString('es-ES', { minimumFractionDigits: 2 }) || '0.00'}`]
     ];
     
     autoTable(doc, {
@@ -590,9 +610,39 @@ async function addCustomerAnalysisContent(doc: any, data: any, startY: number): 
     
     currentY = (doc as any).lastAutoTable.finalY + 15;
   }
+
+  // Top clientes
+  if (data.topCustomers && data.topCustomers.length > 0) {
+    if (currentY > 250) {
+      doc.addPage();
+      currentY = 20;
+    }
+    
+    doc.setFontSize(16);
+    doc.text('Principales Clientes', 14, currentY);
+    currentY += 5;
+    
+    const topCustomersData = data.topCustomers.slice(0, 10).map((customer: any, index: number) => [
+      (index + 1).toString(),
+      customer.name || 'N/A',
+      customer.email || 'N/A',
+      `$${customer.totalSpent?.toLocaleString('es-ES', { minimumFractionDigits: 2 }) || '0.00'}`,
+      customer.orderCount?.toString() || '0'
+    ]);
+    
+    autoTable(doc, {
+      startY: currentY,
+      head: [['#', 'Cliente', 'Email', 'Total Gastado', 'Órdenes']],
+      body: topCustomersData,
+      theme: 'striped',
+      styles: { fontSize: 9 }
+    });
+    
+    currentY = (doc as any).lastAutoTable.finalY + 15;
+  }
   
   // Segmentación de clientes
-  if (data.segmentation && data.segmentation.length > 0) {
+  if (data.segmentation) {
     if (currentY > 250) {
       doc.addPage();
       currentY = 20;
@@ -602,26 +652,25 @@ async function addCustomerAnalysisContent(doc: any, data: any, startY: number): 
     doc.text('Segmentación de Clientes', 14, currentY);
     currentY += 5;
     
-    const segmentationData = data.segmentation.map((segment: any) => [
-      segment.segment || 'N/A',
-      segment.count?.toString() || '0',
-      `${segment.percentage || 0}%`,
-      `$${segment.averageSpent?.toLocaleString('es-ES', { minimumFractionDigits: 2 }) || '0.00'}`
-    ]);
+    const segmentationData = [
+      ['Alto Valor (+$1000)', data.segmentation.highValue?.toString() || '0'],
+      ['Valor Medio ($500-$1000)', data.segmentation.mediumValue?.toString() || '0'],
+      ['Valor Bajo (-$500)', data.segmentation.lowValue?.toString() || '0']
+    ];
     
     autoTable(doc, {
       startY: currentY,
-      head: [['Segmento', 'Clientes', 'Porcentaje', 'Gasto Promedio']],
+      head: [['Segmento', 'Cantidad de Clientes']],
       body: segmentationData,
-      theme: 'striped',
-      styles: { fontSize: 9 }
+      theme: 'grid',
+      styles: { fontSize: 10 }
     });
     
     currentY = (doc as any).lastAutoTable.finalY + 15;
   }
-  
+
   // Distribución geográfica
-  if (data.geographic && data.geographic.length > 0) {
+  if (data.customersByRegion && data.customersByRegion.length > 0) {
     if (currentY > 250) {
       doc.addPage();
       currentY = 20;
@@ -631,48 +680,17 @@ async function addCustomerAnalysisContent(doc: any, data: any, startY: number): 
     doc.text('Distribución Geográfica', 14, currentY);
     currentY += 5;
     
-    const geographicData = data.geographic.map((geo: any) => [
-      geo.region || 'N/A',
-      geo.customers?.toString() || '0',
-      `${geo.percentage || 0}%`,
-      `$${geo.revenue?.toLocaleString('es-ES', { minimumFractionDigits: 2 }) || '0.00'}`
+    const regionData = data.customersByRegion.map((region: any) => [
+      region.region || 'Sin especificar',
+      region.customerCount?.toString() || '0'
     ]);
     
     autoTable(doc, {
       startY: currentY,
-      head: [['Región', 'Clientes', 'Porcentaje', 'Ingresos']],
-      body: geographicData,
-      theme: 'striped',
-      styles: { fontSize: 9 }
-    });
-    
-    currentY = (doc as any).lastAutoTable.finalY + 15;
-  }
-  
-  // Top clientes
-  if (data.topCustomers && data.topCustomers.length > 0) {
-    if (currentY > 250) {
-      doc.addPage();
-      currentY = 20;
-    }
-    
-    doc.setFontSize(16);
-    doc.text('Mejores Clientes', 14, currentY);
-    currentY += 5;
-    
-    const topCustomersData = data.topCustomers.slice(0, 10).map((customer: any) => [
-      customer.name || 'N/A',
-      customer.email || 'N/A',
-      `$${customer.totalSpent?.toLocaleString('es-ES', { minimumFractionDigits: 2 }) || '0.00'}`,
-      customer.orderCount?.toString() || '0'
-    ]);
-    
-    autoTable(doc, {
-      startY: currentY,
-      head: [['Cliente', 'Email', 'Total Gastado', 'Órdenes']],
-      body: topCustomersData,
-      theme: 'striped',
-      styles: { fontSize: 9 }
+      head: [['Región', 'Cantidad de Clientes']],
+      body: regionData,
+      theme: 'grid',
+      styles: { fontSize: 10 }
     });
     
     currentY = (doc as any).lastAutoTable.finalY + 15;
@@ -709,7 +727,7 @@ async function addProductPerformanceContent(doc: any, data: any, startY: number)
   }
   
   // Top productos
-  if (data.topProducts && data.topProducts.length > 0) {
+  if (data.topPerformers && data.topPerformers.length > 0) {
     if (currentY > 250) {
       doc.addPage();
       currentY = 20;
@@ -719,17 +737,17 @@ async function addProductPerformanceContent(doc: any, data: any, startY: number)
     doc.text('Productos Más Vendidos', 14, currentY);
     currentY += 5;
     
-    const topProductsData = data.topProducts.slice(0, 10).map((product: any) => [
+    const topProductsData = data.topPerformers.slice(0, 10).map((product: any, index: number) => [
+      (index + 1).toString(),
       product.name || 'N/A',
       product.category?.name || 'Sin categoría',
       `$${product.price?.toLocaleString('es-ES', { minimumFractionDigits: 2 }) || '0.00'}`,
-      product.totalSold?.toString() || '0',
-      `$${product.revenue?.toLocaleString('es-ES', { minimumFractionDigits: 2 }) || '0.00'}`
+      product.totalSold?.toString() || '0'
     ]);
     
     autoTable(doc, {
       startY: currentY,
-      head: [['Producto', 'Categoría', 'Precio', 'Vendidos', 'Ingresos']],
+      head: [['#', 'Producto', 'Categoría', 'Precio', 'Vendidos']],
       body: topProductsData,
       theme: 'striped',
       styles: { fontSize: 8 }
@@ -746,20 +764,19 @@ async function addProductPerformanceContent(doc: any, data: any, startY: number)
     }
     
     doc.setFontSize(16);
-    doc.text('Análisis por Categoría', 14, currentY);
+    doc.text('Rendimiento por Categoría', 14, currentY);
     currentY += 5;
     
     const categoryData = data.categoryAnalysis.map((category: any) => [
       category.name || 'N/A',
-      category.products?.toString() || '0',
+      category.productCount?.toString() || '0',
       `$${category.revenue?.toLocaleString('es-ES', { minimumFractionDigits: 2 }) || '0.00'}`,
-      category.sales?.toString() || '0',
-      `${category.percentage || 0}%`
+      category.quantity?.toString() || '0'
     ]);
     
     autoTable(doc, {
       startY: currentY,
-      head: [['Categoría', 'Productos', 'Ingresos', 'Ventas', 'Participación']],
+      head: [['Categoría', 'Productos', 'Ingresos', 'Unidades Vendidas']],
       body: categoryData,
       theme: 'striped',
       styles: { fontSize: 9 }
@@ -776,14 +793,14 @@ async function addProductPerformanceContent(doc: any, data: any, startY: number)
     }
     
     doc.setFontSize(16);
-    doc.text('Insights de Inventario', 14, currentY);
+    doc.text('Estado del Inventario', 14, currentY);
     currentY += 10;
     
     const inventoryData = [
       ['Productos con Stock Bajo', data.inventoryInsights.lowStock?.toString() || '0'],
       ['Productos Sin Stock', data.inventoryInsights.outOfStock?.toString() || '0'],
-      ['Valor Total de Inventario', `$${data.inventoryInsights.totalInventoryValue?.toLocaleString('es-ES', { minimumFractionDigits: 2 }) || '0.00'}`],
-      ['Rotación de Inventario', `${data.inventoryInsights.turnoverRate || 0}x`]
+      ['Total Productos Activos', data.inventoryInsights.totalActiveProducts?.toString() || '0'],
+      ['Stock Promedio', data.inventoryInsights.averageStock?.toFixed(1) || '0']
     ];
     
     autoTable(doc, {
@@ -1296,48 +1313,19 @@ function addCustomerAnalysisExcelSheets(workbook: any, data: any) {
       ['Métrica', 'Valor'],
       ['Total de Clientes', data.summary.totalCustomers || 0],
       ['Nuevos Clientes', data.summary.newCustomers || 0],
-      ['Tasa de Repetición', `${data.summary.repeatCustomerRate || 0}%`],
-      ['Valor Promedio por Cliente', data.summary.averageCustomerValue || 0]
+      ['Tasa de Repetición', `${data.summary.repeatCustomerRate?.toFixed(2) || 0}%`],
+      ['Valor Promedio de Vida', data.summary.averageLifetimeValue || 0]
     ];
     const summarySheet = XLSX.utils.aoa_to_sheet(summaryData);
     XLSX.utils.book_append_sheet(workbook, summarySheet, 'Resumen');
   }
   
-  // Hoja de segmentación
-  if (data.segmentation && data.segmentation.length > 0) {
-    const segmentationData = [
-      ['Segmento', 'Clientes', 'Porcentaje', 'Gasto Promedio'],
-      ...data.segmentation.map((segment: any) => [
-        segment.segment || 'N/A',
-        segment.count || 0,
-        `${segment.percentage || 0}%`,
-        segment.averageSpent || 0
-      ])
-    ];
-    const segmentationSheet = XLSX.utils.aoa_to_sheet(segmentationData);
-    XLSX.utils.book_append_sheet(workbook, segmentationSheet, 'Segmentación');
-  }
-  
-  // Hoja de distribución geográfica
-  if (data.geographic && data.geographic.length > 0) {
-    const geographicData = [
-      ['Región', 'Clientes', 'Porcentaje', 'Ingresos'],
-      ...data.geographic.map((geo: any) => [
-        geo.region || 'N/A',
-        geo.customers || 0,
-        `${geo.percentage || 0}%`,
-        geo.revenue || 0
-      ])
-    ];
-    const geographicSheet = XLSX.utils.aoa_to_sheet(geographicData);
-    XLSX.utils.book_append_sheet(workbook, geographicSheet, 'Distribución Geográfica');
-  }
-  
   // Hoja de top clientes
   if (data.topCustomers && data.topCustomers.length > 0) {
     const topCustomersData = [
-      ['Cliente', 'Email', 'Total Gastado', 'Órdenes'],
-      ...data.topCustomers.map((customer: any) => [
+      ['#', 'Cliente', 'Email', 'Total Gastado', 'Órdenes'],
+      ...data.topCustomers.map((customer: any, index: number) => [
+        index + 1,
         customer.name || 'N/A',
         customer.email || 'N/A',
         customer.totalSpent || 0,
@@ -1345,7 +1333,32 @@ function addCustomerAnalysisExcelSheets(workbook: any, data: any) {
       ])
     ];
     const topCustomersSheet = XLSX.utils.aoa_to_sheet(topCustomersData);
-    XLSX.utils.book_append_sheet(workbook, topCustomersSheet, 'Top Clientes');
+    XLSX.utils.book_append_sheet(workbook, topCustomersSheet, 'Principales Clientes');
+  }
+  
+  // Hoja de segmentación
+  if (data.segmentation) {
+    const segmentationData = [
+      ['Segmento', 'Cantidad de Clientes'],
+      ['Alto Valor (+$1000)', data.segmentation.highValue || 0],
+      ['Valor Medio ($500-$1000)', data.segmentation.mediumValue || 0],
+      ['Valor Bajo (-$500)', data.segmentation.lowValue || 0]
+    ];
+    const segmentationSheet = XLSX.utils.aoa_to_sheet(segmentationData);
+    XLSX.utils.book_append_sheet(workbook, segmentationSheet, 'Segmentación');
+  }
+  
+  // Hoja de distribución geográfica
+  if (data.customersByRegion && data.customersByRegion.length > 0) {
+    const geographicData = [
+      ['Región', 'Cantidad de Clientes'],
+      ...data.customersByRegion.map((region: any) => [
+        region.region || 'Sin especificar',
+        region.customerCount || 0
+      ])
+    ];
+    const geographicSheet = XLSX.utils.aoa_to_sheet(geographicData);
+    XLSX.utils.book_append_sheet(workbook, geographicSheet, 'Distribución Geográfica');
   }
 }
 
@@ -1695,36 +1708,35 @@ function generateCustomerAnalysisCSV(data: any): string {
     content += 'Métrica,Valor\n';
     content += `Total de Clientes,${data.summary.totalCustomers || 0}\n`;
     content += `Nuevos Clientes,${data.summary.newCustomers || 0}\n`;
-    content += `Tasa de Repetición,${data.summary.repeatCustomerRate || 0}%\n`;
-    content += `Valor Promedio por Cliente,$${(data.summary.averageCustomerValue || 0).toLocaleString('es-ES')}\n\n`;
+    content += `Tasa de Repetición,${data.summary.repeatCustomerRate?.toFixed(2) || 0}%\n`;
+    content += `Valor Promedio de Vida,$${(data.summary.averageLifetimeValue || 0).toLocaleString('es-ES')}\n\n`;
+  }
+  
+  // Principales clientes
+  if (data.topCustomers && data.topCustomers.length > 0) {
+    content += 'PRINCIPALES CLIENTES\n';
+    content += '#,Cliente,Email,Total Gastado,Órdenes\n';
+    data.topCustomers.forEach((customer: any, index: number) => {
+      content += `${index + 1},"${customer.name || 'N/A'}","${customer.email || 'N/A'}",${customer.totalSpent || 0},${customer.orderCount || 0}\n`;
+    });
+    content += '\n';
   }
   
   // Segmentación de clientes
-  if (data.segmentation && data.segmentation.length > 0) {
+  if (data.segmentation) {
     content += 'SEGMENTACIÓN DE CLIENTES\n';
-    content += 'Segmento,Clientes,Porcentaje,Gasto Promedio\n';
-    data.segmentation.forEach((segment: any) => {
-      content += `"${segment.segment || 'N/A'}",${segment.count || 0},${segment.percentage || 0}%,${segment.averageSpent || 0}\n`;
-    });
-    content += '\n';
+    content += 'Segmento,Cantidad de Clientes\n';
+    content += `Alto Valor (+$1000),${data.segmentation.highValue || 0}\n`;
+    content += `Valor Medio ($500-$1000),${data.segmentation.mediumValue || 0}\n`;
+    content += `Valor Bajo (-$500),${data.segmentation.lowValue || 0}\n\n`;
   }
   
   // Distribución geográfica
-  if (data.geographic && data.geographic.length > 0) {
+  if (data.customersByRegion && data.customersByRegion.length > 0) {
     content += 'DISTRIBUCIÓN GEOGRÁFICA\n';
-    content += 'Región,Clientes,Porcentaje,Ingresos\n';
-    data.geographic.forEach((geo: any) => {
-      content += `"${geo.region || 'N/A'}",${geo.customers || 0},${geo.percentage || 0}%,${geo.revenue || 0}\n`;
-    });
-    content += '\n';
-  }
-  
-  // Top clientes
-  if (data.topCustomers && data.topCustomers.length > 0) {
-    content += 'MEJORES CLIENTES\n';
-    content += 'Cliente,Email,Total Gastado,Órdenes\n';
-    data.topCustomers.forEach((customer: any) => {
-      content += `"${customer.name || 'N/A'}","${customer.email || 'N/A'}",${customer.totalSpent || 0},${customer.orderCount || 0}\n`;
+    content += 'Región,Cantidad de Clientes\n';
+    data.customersByRegion.forEach((region: any) => {
+      content += `"${region.region || 'Sin especificar'}",${region.customerCount || 0}\n`;
     });
     content += '\n';
   }

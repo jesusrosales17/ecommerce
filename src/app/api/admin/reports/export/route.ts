@@ -20,13 +20,18 @@ export async function GET(request: NextRequest) {
         { error: "Formato no válido. Use: pdf, excel, o csv" },
         { status: 400 }
       );
-    }
-
-    // Obtener datos para la exportación
-    const reportDataResponse = await fetch(`${request.nextUrl.origin}/api/admin/reports?dateRange=${dateRange}`);
+    }    // Obtener datos para la exportación
+    // Obtener cookies de la petición original para mantener la sesión
+    const cookieHeader = request.headers.get('cookie');
+    
+    const reportDataResponse = await fetch(`${request.nextUrl.origin}/api/admin/reports?dateRange=${dateRange}`, {
+      headers: {
+        cookie: cookieHeader || ''
+      }
+    });
     
     if (!reportDataResponse.ok) {
-      throw new Error('Error al obtener datos del reporte');
+      throw new Error(`Error al obtener datos del reporte: ${await reportDataResponse.text()}`);
     }
 
     const reportData = await reportDataResponse.json();
@@ -96,33 +101,39 @@ export async function POST(request: NextRequest) {
         { error: "Formato no válido. Use: pdf, excel, o csv" },
         { status: 400 }
       );
-    }
-
-    let reportData;
-
-    if (customData) {
-      // Usar datos personalizados proporcionados
-      reportData = customData;
-    } else if (reportId) {
-      // Generar reporte específico
-      const generateResponse = await fetch(`${request.nextUrl.origin}/api/admin/reports/generate`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reportId, dateRange })
+    }    let reportData;    // Si hay reportId, siempre usar la misma API que usa la vista previa para consistencia
+    if (reportId) {
+      // Obtener cookies de la petición original para mantener la sesión
+      const cookieHeader = request.headers.get('cookie');
+      
+      // Usar el mismo endpoint que las vistas previa para mantener consistencia de datos
+      const reportResponse = await fetch(`${request.nextUrl.origin}/api/admin/reports/${reportId}?dateRange=${dateRange}`, {
+        headers: {
+          cookie: cookieHeader || ''
+        }
       });
       
-      if (!generateResponse.ok) {
-        throw new Error('Error al generar reporte específico');
+      if (!reportResponse.ok) {
+        throw new Error(`Error al obtener datos del reporte específico: ${await reportResponse.text()}`);
       }
       
-      const generatedReport = await generateResponse.json();
-      reportData = generatedReport.data;
-    } else {
+      const reportResult = await reportResponse.json();
+      reportData = reportResult.data;
+    } else if (customData) {
+      // Usar datos personalizados proporcionados si no hay reportId específico
+      reportData = customData;    } else {
+      // Obtener cookies de la petición original para mantener la sesión
+      const cookieHeader = request.headers.get('cookie');
+      
       // Usar datos generales del dashboard
-      const reportDataResponse = await fetch(`${request.nextUrl.origin}/api/admin/reports?dateRange=${dateRange}`);
+      const reportDataResponse = await fetch(`${request.nextUrl.origin}/api/admin/reports?dateRange=${dateRange}`, {
+        headers: {
+          cookie: cookieHeader || ''
+        }
+      });
       
       if (!reportDataResponse.ok) {
-        throw new Error('Error al obtener datos del reporte');
+        throw new Error(`Error al obtener datos del reporte: ${await reportDataResponse.text()}`);
       }
       
       reportData = await reportDataResponse.json();
@@ -168,11 +179,13 @@ export async function POST(request: NextRequest) {
       status: 200,
       headers
     });
-
   } catch (error) {
     console.error("Error exporting custom report:", error);
     return NextResponse.json(
-      { error: "Error al exportar el reporte personalizado" },
+      { 
+        error: "Error al exportar el reporte personalizado", 
+        details: error instanceof Error ? error.message : "Error desconocido" 
+      },
       { status: 500 }
     );
   }

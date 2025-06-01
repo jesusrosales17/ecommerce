@@ -103,7 +103,6 @@ export default function ReportPreviewPage() {
         return <FileText className="h-6 w-6" />;
     }
   };
-
   const handleDownload = async (format: "pdf" | "excel" | "csv") => {
     try {
       const response = await fetch("/api/admin/reports/export", {
@@ -113,7 +112,7 @@ export default function ReportPreviewPage() {
           reportId,
           dateRange,
           format,
-          data: reportData,
+          // No enviar data para que use la API directamente y mantenga consistencia
         }),
       });
 
