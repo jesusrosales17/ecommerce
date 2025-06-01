@@ -14,15 +14,15 @@ import {
 import { ReportType } from "../interfaces/reportTypes";
 
 interface ReportTypesGridProps {
-  onGenerateReport: (reportId: string) => void;
+  onDownloadReport: (reportId: string, format: 'pdf' | 'excel' | 'csv') => void;
   onPreviewReport: (reportId: string) => void;
-  isGenerating: string | null;
+  isDownloading: string | null;
 }
 
 export const ReportTypesGrid = ({ 
-  onGenerateReport, 
+  onDownloadReport, 
   onPreviewReport, 
-  isGenerating 
+  isDownloading 
 }: ReportTypesGridProps) => {
   const reportTypes: ReportType[] = [
     {
@@ -113,35 +113,69 @@ export const ReportTypesGrid = ({
                   <p className="text-sm text-gray-600 mb-4">
                     {report.description}
                   </p>
-                  
-                  <div className="flex space-x-2">
-                    <button
-                      onClick={() => onGenerateReport(report.id)}
-                      disabled={isGenerating === report.id}
-                      className={`flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors inline-flex items-center justify-center text-sm font-medium ${
-                        isGenerating === report.id ? "opacity-50 cursor-not-allowed" : ""
-                      }`}
-                    >
-                      {isGenerating === report.id ? (
-                        <>
-                          <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
-                          Generando...
-                        </>
-                      ) : (
-                        <>
-                          <Download className="w-4 h-4 mr-2" />
-                          Generar
-                        </>
-                      )}
-                    </button>
-                    
+                    <div className="flex flex-col space-y-2">
+                    {/* Botón de vista previa */}
                     <button
                       onClick={() => onPreviewReport(report.id)}
-                      className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors inline-flex items-center justify-center text-sm font-medium"
+                      className="w-full bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors inline-flex items-center justify-center text-sm font-medium"
                     >
                       <Eye className="w-4 h-4 mr-2" />
-                      Vista
+                      Vista Previa
                     </button>
+                    
+                    {/* Botones de descarga */}
+                    <div className="flex space-x-1">
+                      <button
+                        onClick={() => onDownloadReport(report.id, 'pdf')}
+                        disabled={isDownloading === `${report.id}-pdf`}
+                        className={`flex-1 bg-red-600 text-white px-3 py-2 rounded-lg hover:bg-red-700 transition-colors inline-flex items-center justify-center text-xs font-medium ${
+                          isDownloading === `${report.id}-pdf` ? "opacity-50 cursor-not-allowed" : ""
+                        }`}
+                      >
+                        {isDownloading === `${report.id}-pdf` ? (
+                          <div className="animate-spin rounded-full h-3 w-3 border-2 border-white border-t-transparent"></div>
+                        ) : (
+                          <>
+                            <Download className="w-3 h-3 mr-1" />
+                            PDF
+                          </>
+                        )}
+                      </button>
+                      
+                      <button
+                        onClick={() => onDownloadReport(report.id, 'excel')}
+                        disabled={isDownloading === `${report.id}-excel`}
+                        className={`flex-1 bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-700 transition-colors inline-flex items-center justify-center text-xs font-medium ${
+                          isDownloading === `${report.id}-excel` ? "opacity-50 cursor-not-allowed" : ""
+                        }`}
+                      >
+                        {isDownloading === `${report.id}-excel` ? (
+                          <div className="animate-spin rounded-full h-3 w-3 border-2 border-white border-t-transparent"></div>
+                        ) : (
+                          <>
+                            <Download className="w-3 h-3 mr-1" />
+                            Excel
+                          </>
+                        )}
+                      </button>
+                      
+                      <button
+                        onClick={() => onDownloadReport(report.id, 'csv')}
+                        disabled={isDownloading === `${report.id}-csv`}
+                        className={`flex-1 bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 transition-colors inline-flex items-center justify-center text-xs font-medium ${
+                          isDownloading === `${report.id}-csv` ? "opacity-50 cursor-not-allowed" : ""
+                        }`}
+                      >
+                        {isDownloading === `${report.id}-csv` ? (
+                          <div className="animate-spin rounded-full h-3 w-3 border-2 border-white border-t-transparent"></div>
+                        ) : (
+                          <>
+                            <Download className="w-3 h-3 mr-1" />
+                            CSV
+                          </>
+                        )}
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>

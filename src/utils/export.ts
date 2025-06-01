@@ -281,65 +281,35 @@ export const generatePDFReport = async (data: ReportData, dateRange: string, rep
   
   let currentY = 55;
   
-  // Resumen rápido si existe
-  if (data.quickStats) {
-    doc.setFontSize(16);
-    doc.text('Resumen Ejecutivo', 14, currentY);
-    currentY += 10;
-    
-    const quickStatsData = [
-      ['Total de Ingresos', `$${data.quickStats.totalRevenue.toLocaleString('es-ES', { minimumFractionDigits: 2 })}`, data.quickStats.revenueChange],
-      ['Total de Órdenes', data.quickStats.totalOrders.toString(), data.quickStats.ordersChange],
-      ['Total de Usuarios', data.quickStats.totalUsers.toString(), data.quickStats.usersChange],
-      ['Total de Productos', data.quickStats.totalProducts.toString(), data.quickStats.productsChange]
-    ];
-    
-    autoTable(doc, {
-      startY: currentY,
-      head: [['Métrica', 'Valor', 'Cambio']],
-      body: quickStatsData,
-      theme: 'grid',
-      styles: { fontSize: 10 }
-    });
-    
-    currentY = (doc as any).lastAutoTable.finalY + 15;
-  }
-  
-  // Top productos si existen
-  if (data.topProducts && data.topProducts.length > 0) {
-    doc.setFontSize(16);
-    doc.text('Productos Más Vendidos', 14, currentY);
-    currentY += 5;
-    
-    const topProductsData = data.topProducts.slice(0, 10).map(product => [
-      product.name,
-      product.category?.name || 'Sin categoría',
-      `$${product.price.toLocaleString('es-ES', { minimumFractionDigits: 2 })}`,
-      product.totalSold.toString()
-    ]);
-    
-    autoTable(doc, {
-      startY: currentY,
-      head: [['Producto', 'Categoría', 'Precio', 'Vendidos']],
-      body: topProductsData,
-      theme: 'striped',
-      styles: { fontSize: 9 }
-    });
-    
-    currentY = (doc as any).lastAutoTable.finalY + 15;
-  }
-  
-  // Datos específicos del reporte
-  if (data.summary && reportId) {
-    doc.addPage();
-    currentY = 20;
-    
-    doc.setFontSize(16);
-    doc.text('Análisis Detallado', 14, currentY);
-    currentY += 10;
-    
-    // Agregar contenido específico según el tipo de reporte
-    addReportSpecificContent(doc, data, reportId, currentY);
+  // Generar contenido específico según el tipo de reporte
+  if (reportId && data) {
+    switch (reportId) {
+      case 'sales-summary':
+        currentY = await addSalesSummaryContent(doc, data, currentY);
+        break;
+      case 'customer-analysis':
+        currentY = await addCustomerAnalysisContent(doc, data, currentY);
+        break;
+      case 'product-performance':
+        currentY = await addProductPerformanceContent(doc, data, currentY);
+        break;
+      case 'financial-report':
+        currentY = await addFinancialReportContent(doc, data, currentY);
+        break;
+      case 'orders-analysis':
+        currentY = await addOrdersAnalysisContent(doc, data, currentY);
+        break;
+      case 'growth-trends':
+        currentY = await addGrowthTrendsContent(doc, data, currentY);
+        break;
+      default:
+        // Fallback para reportes generales
+        currentY = await addGeneralReportContent(doc, data, currentY);
+        break;
+    }
+  } else {
+    // Fallback para reportes sin tipo específico
+    currentY = await addGeneralReportContent(doc, data, currentY);
   }
   
   // Convertir a Buffer
@@ -351,68 +321,33 @@ export const generatePDFReport = async (data: ReportData, dateRange: string, rep
 export const generateExcelReport = async (data: ReportData, dateRange: string, reportId?: string): Promise<Buffer> => {
   const workbook = XLSX.utils.book_new();
   
-  // Hoja de resumen
-  if (data.quickStats) {
-    const overviewData = [
-      ['Métrica', 'Valor', 'Cambio'],
-      ['Total de Ingresos', data.quickStats.totalRevenue, data.quickStats.revenueChange],
-      ['Total de Órdenes', data.quickStats.totalOrders, data.quickStats.ordersChange],
-      ['Total de Usuarios', data.quickStats.totalUsers, data.quickStats.usersChange],
-      ['Total de Productos', data.quickStats.totalProducts, data.quickStats.productsChange]
-    ];
-    
-    const overviewSheet = XLSX.utils.aoa_to_sheet(overviewData);
-    XLSX.utils.book_append_sheet(workbook, overviewSheet, 'Resumen');
-  }
-  
-  // Hoja de productos más vendidos
-  if (data.topProducts && data.topProducts.length > 0) {
-    const topProductsData = [
-      ['Producto', 'Categoría', 'Precio', 'Total Vendidos'],
-      ...data.topProducts.map(product => [
-        product.name,
-        product.category?.name || 'Sin categoría',
-        product.price,
-        product.totalSold
-      ])
-    ];
-    
-    const topProductsSheet = XLSX.utils.aoa_to_sheet(topProductsData);
-    XLSX.utils.book_append_sheet(workbook, topProductsSheet, 'Top Productos');
-  }
-  
-  // Hoja de estadísticas mensuales
-  if (data.monthlyStats && data.monthlyStats.length > 0) {
-    const monthlyData = [
-      ['Mes', 'Órdenes', 'Ingresos'],
-      ...data.monthlyStats.map(stat => [
-        stat.month,
-        stat.orders,
-        stat.revenue
-      ])
-    ];
-    
-    const monthlySheet = XLSX.utils.aoa_to_sheet(monthlyData);
-    XLSX.utils.book_append_sheet(workbook, monthlySheet, 'Estadísticas Mensuales');
-  }
-  
-  // Hoja de estado de órdenes
-  if (data.orderStatusData && data.orderStatusData.length > 0) {
-    const statusData = [
-      ['Estado', 'Cantidad'],
-      ...data.orderStatusData.map(status => [
-        status.status,
-        status.count
-      ])
-    ];
-    
-    const statusSheet = XLSX.utils.aoa_to_sheet(statusData);
-    XLSX.utils.book_append_sheet(workbook, statusSheet, 'Estado Órdenes');
-  }
-  
-  // Agregar hojas específicas según el tipo de reporte
-  if (reportId && data.summary) {
-    addExcelReportSpecificSheets(workbook, data, reportId);
+  // Generar hojas específicas según el tipo de reporte
+  if (reportId && data) {
+    switch (reportId) {
+      case 'sales-summary':
+        addSalesSummaryExcelSheets(workbook, data);
+        break;
+      case 'customer-analysis':
+        addCustomerAnalysisExcelSheets(workbook, data);
+        break;
+      case 'product-performance':
+        addProductPerformanceExcelSheets(workbook, data);
+        break;
+      case 'financial-report':
+        addFinancialReportExcelSheets(workbook, data);
+        break;
+      case 'orders-analysis':
+        addOrdersAnalysisExcelSheets(workbook, data);
+        break;
+      case 'growth-trends':
+        addGrowthTrendsExcelSheets(workbook, data);
+        break;
+      default:
+        addGeneralExcelSheets(workbook, data);
+        break;
+    }
+  } else {
+    addGeneralExcelSheets(workbook, data);
   }
   
   // Convertir a Buffer
@@ -430,49 +365,33 @@ export const generateCSVReport = async (data: ReportData, dateRange: string, rep
   csvContent += `Período: ${formatDateRangeText(dateRange)}\n`;
   csvContent += `Generado: ${new Date().toLocaleDateString('es-ES')}\n\n`;
   
-  // Resumen ejecutivo
-  if (data.quickStats) {
-    csvContent += 'RESUMEN EJECUTIVO\n';
-    csvContent += 'Métrica,Valor,Cambio\n';
-    csvContent += `Total de Ingresos,$${data.quickStats.totalRevenue.toLocaleString('es-ES')},${data.quickStats.revenueChange}\n`;
-    csvContent += `Total de Órdenes,${data.quickStats.totalOrders},${data.quickStats.ordersChange}\n`;
-    csvContent += `Total de Usuarios,${data.quickStats.totalUsers},${data.quickStats.usersChange}\n`;
-    csvContent += `Total de Productos,${data.quickStats.totalProducts},${data.quickStats.productsChange}\n\n`;
-  }
-  
-  // Top productos
-  if (data.topProducts && data.topProducts.length > 0) {
-    csvContent += 'PRODUCTOS MÁS VENDIDOS\n';
-    csvContent += 'Producto,Categoría,Precio,Total Vendidos\n';
-    data.topProducts.forEach(product => {
-      csvContent += `"${product.name}","${product.category?.name || 'Sin categoría'}",${product.price},${product.totalSold}\n`;
-    });
-    csvContent += '\n';
-  }
-  
-  // Estadísticas mensuales
-  if (data.monthlyStats && data.monthlyStats.length > 0) {
-    csvContent += 'ESTADÍSTICAS MENSUALES\n';
-    csvContent += 'Mes,Órdenes,Ingresos\n';
-    data.monthlyStats.forEach(stat => {
-      csvContent += `${stat.month},${stat.orders},${stat.revenue}\n`;
-    });
-    csvContent += '\n';
-  }
-  
-  // Estado de órdenes
-  if (data.orderStatusData && data.orderStatusData.length > 0) {
-    csvContent += 'ESTADO DE ÓRDENES\n';
-    csvContent += 'Estado,Cantidad\n';
-    data.orderStatusData.forEach(status => {
-      csvContent += `${status.status},${status.count}\n`;
-    });
-    csvContent += '\n';
-  }
-  
-  // Agregar contenido específico del reporte
-  if (reportId && data.summary) {
-    csvContent += addCSVReportSpecificContent(data, reportId);
+  // Generar contenido específico según el tipo de reporte
+  if (reportId && data) {
+    switch (reportId) {
+      case 'sales-summary':
+        csvContent += generateSalesSummaryCSV(data);
+        break;
+      case 'customer-analysis':
+        csvContent += generateCustomerAnalysisCSV(data);
+        break;
+      case 'product-performance':
+        csvContent += generateProductPerformanceCSV(data);
+        break;
+      case 'financial-report':
+        csvContent += generateFinancialReportCSV(data);
+        break;
+      case 'orders-analysis':
+        csvContent += generateOrdersAnalysisCSV(data);
+        break;
+      case 'growth-trends':
+        csvContent += generateGrowthTrendsCSV(data);
+        break;
+      default:
+        csvContent += generateGeneralCSV(data);
+        break;
+    }
+  } else {
+    csvContent += generateGeneralCSV(data);
   }
   
   return Buffer.from(csvContent, 'utf-8');
@@ -501,85 +420,1545 @@ function formatDateRangeText(range: string): string {
   return ranges[range] || range;
 }
 
-function addReportSpecificContent(doc: jsPDF, data: ReportData, reportId: string, startY: number): void {
-  // Agregar contenido específico según el tipo de reporte
-  switch (reportId) {
-    case 'sales-summary':
-      if (data.salesTrends) {
-        // Agregar datos de tendencias de ventas
-        doc.text('Tendencias de Ventas', 14, startY);
-      }
-      break;
-    case 'customer-analysis':
-      if (data.topCustomers) {
-        // Agregar datos de top clientes
-        doc.text('Principales Clientes', 14, startY);
-      }
-      break;
-    // Agregar más casos según sea necesario
+async function addSalesSummaryContent(doc: any, data: any, startY: number): Promise<number> {
+  let currentY = startY;
+  
+  // Resumen ejecutivo
+  if (data.summary) {
+    doc.setFontSize(16);
+    doc.text('Resumen Ejecutivo', 14, currentY);
+    currentY += 10;
+    
+    const summaryData = [
+      ['Total de Ingresos', `$${data.summary.totalRevenue?.toLocaleString('es-ES', { minimumFractionDigits: 2 }) || '0.00'}`],
+      ['Total de Órdenes', data.summary.totalOrders?.toString() || '0'],
+      ['Valor Promedio por Orden', `$${data.summary.averageOrderValue?.toLocaleString('es-ES', { minimumFractionDigits: 2 }) || '0.00'}`],
+      ['Tasa de Conversión', `${data.summary.conversionRate || 0}%`]
+    ];
+    
+    autoTable(doc, {
+      startY: currentY,
+      head: [['Métrica', 'Valor']],
+      body: summaryData,
+      theme: 'grid',
+      styles: { fontSize: 10 }
+    });
+    
+    currentY = (doc as any).lastAutoTable.finalY + 15;
+  }
+  
+  // Top productos
+  if (data.topProducts && data.topProducts.length > 0) {
+    if (currentY > 250) {
+      doc.addPage();
+      currentY = 20;
+    }
+    
+    doc.setFontSize(16);
+    doc.text('Productos Más Vendidos', 14, currentY);
+    currentY += 5;
+    
+    const topProductsData = data.topProducts.slice(0, 10).map((product: any) => [
+      product.name || 'N/A',
+      product.category?.name || 'Sin categoría',
+      `$${product.price?.toLocaleString('es-ES', { minimumFractionDigits: 2 }) || '0.00'}`,
+      product.totalSold?.toString() || '0'
+    ]);
+    
+    autoTable(doc, {
+      startY: currentY,
+      head: [['Producto', 'Categoría', 'Precio', 'Vendidos']],
+      body: topProductsData,
+      theme: 'striped',
+      styles: { fontSize: 9 }
+    });
+    
+    currentY = (doc as any).lastAutoTable.finalY + 15;
+  }
+  
+  // Top clientes
+  if (data.topCustomers && data.topCustomers.length > 0) {
+    if (currentY > 250) {
+      doc.addPage();
+      currentY = 20;
+    }
+    
+    doc.setFontSize(16);
+    doc.text('Mejores Clientes', 14, currentY);
+    currentY += 5;
+    
+    const topCustomersData = data.topCustomers.slice(0, 10).map((customer: any) => [
+      customer.name || 'N/A',
+      customer.email || 'N/A',
+      `$${customer.totalSpent?.toLocaleString('es-ES', { minimumFractionDigits: 2 }) || '0.00'}`,
+      customer.orderCount?.toString() || '0'
+    ]);
+    
+    autoTable(doc, {
+      startY: currentY,
+      head: [['Cliente', 'Email', 'Total Gastado', 'Órdenes']],
+      body: topCustomersData,
+      theme: 'striped',
+      styles: { fontSize: 9 }
+    });
+    
+    currentY = (doc as any).lastAutoTable.finalY + 15;
+  }
+  
+  // Ventas por categoría
+  if (data.salesTrends?.byCategory && data.salesTrends.byCategory.length > 0) {
+    if (currentY > 250) {
+      doc.addPage();
+      currentY = 20;
+    }
+    
+    doc.setFontSize(16);
+    doc.text('Ventas por Categoría', 14, currentY);
+    currentY += 5;
+    
+    const categoryData = data.salesTrends.byCategory.map((category: any) => [
+      category.name || 'N/A',
+      `$${category.revenue?.toLocaleString('es-ES', { minimumFractionDigits: 2 }) || '0.00'}`,
+      category.sales?.toString() || '0'
+    ]);
+    
+    autoTable(doc, {
+      startY: currentY,
+      head: [['Categoría', 'Ingresos', 'Unidades Vendidas']],
+      body: categoryData,
+      theme: 'striped',
+      styles: { fontSize: 9 }
+    });
+    
+    currentY = (doc as any).lastAutoTable.finalY + 15;
+  }
+  
+  // Estado de órdenes
+  if (data.orderStatus && data.orderStatus.length > 0) {
+    if (currentY > 250) {
+      doc.addPage();
+      currentY = 20;
+    }
+    
+    doc.setFontSize(16);
+    doc.text('Estado de Órdenes', 14, currentY);
+    currentY += 5;
+    
+    const orderStatusData = data.orderStatus.map((status: any) => [
+      status.status || 'N/A',
+      status.count?.toString() || '0',
+      `$${status.revenue?.toLocaleString('es-ES', { minimumFractionDigits: 2 }) || '0.00'}`
+    ]);
+    
+    autoTable(doc, {
+      startY: currentY,
+      head: [['Estado', 'Cantidad', 'Ingresos']],
+      body: orderStatusData,
+      theme: 'striped',
+      styles: { fontSize: 9 }
+    });
+    
+    currentY = (doc as any).lastAutoTable.finalY + 15;
+  }
+  
+  return currentY;
+}
+
+async function addCustomerAnalysisContent(doc: any, data: any, startY: number): Promise<number> {
+  let currentY = startY;
+  
+  // Resumen de clientes
+  if (data.summary) {
+    doc.setFontSize(16);
+    doc.text('Resumen de Clientes', 14, currentY);
+    currentY += 10;
+    
+    const summaryData = [
+      ['Total de Clientes', data.summary.totalCustomers?.toString() || '0'],
+      ['Nuevos Clientes', data.summary.newCustomers?.toString() || '0'],
+      ['Tasa de Repetición', `${data.summary.repeatCustomerRate || 0}%`],
+      ['Valor Promedio por Cliente', `$${data.summary.averageCustomerValue?.toLocaleString('es-ES', { minimumFractionDigits: 2 }) || '0.00'}`]
+    ];
+    
+    autoTable(doc, {
+      startY: currentY,
+      head: [['Métrica', 'Valor']],
+      body: summaryData,
+      theme: 'grid',
+      styles: { fontSize: 10 }
+    });
+    
+    currentY = (doc as any).lastAutoTable.finalY + 15;
+  }
+  
+  // Segmentación de clientes
+  if (data.segmentation && data.segmentation.length > 0) {
+    if (currentY > 250) {
+      doc.addPage();
+      currentY = 20;
+    }
+    
+    doc.setFontSize(16);
+    doc.text('Segmentación de Clientes', 14, currentY);
+    currentY += 5;
+    
+    const segmentationData = data.segmentation.map((segment: any) => [
+      segment.segment || 'N/A',
+      segment.count?.toString() || '0',
+      `${segment.percentage || 0}%`,
+      `$${segment.averageSpent?.toLocaleString('es-ES', { minimumFractionDigits: 2 }) || '0.00'}`
+    ]);
+    
+    autoTable(doc, {
+      startY: currentY,
+      head: [['Segmento', 'Clientes', 'Porcentaje', 'Gasto Promedio']],
+      body: segmentationData,
+      theme: 'striped',
+      styles: { fontSize: 9 }
+    });
+    
+    currentY = (doc as any).lastAutoTable.finalY + 15;
+  }
+  
+  // Distribución geográfica
+  if (data.geographic && data.geographic.length > 0) {
+    if (currentY > 250) {
+      doc.addPage();
+      currentY = 20;
+    }
+    
+    doc.setFontSize(16);
+    doc.text('Distribución Geográfica', 14, currentY);
+    currentY += 5;
+    
+    const geographicData = data.geographic.map((geo: any) => [
+      geo.region || 'N/A',
+      geo.customers?.toString() || '0',
+      `${geo.percentage || 0}%`,
+      `$${geo.revenue?.toLocaleString('es-ES', { minimumFractionDigits: 2 }) || '0.00'}`
+    ]);
+    
+    autoTable(doc, {
+      startY: currentY,
+      head: [['Región', 'Clientes', 'Porcentaje', 'Ingresos']],
+      body: geographicData,
+      theme: 'striped',
+      styles: { fontSize: 9 }
+    });
+    
+    currentY = (doc as any).lastAutoTable.finalY + 15;
+  }
+  
+  // Top clientes
+  if (data.topCustomers && data.topCustomers.length > 0) {
+    if (currentY > 250) {
+      doc.addPage();
+      currentY = 20;
+    }
+    
+    doc.setFontSize(16);
+    doc.text('Mejores Clientes', 14, currentY);
+    currentY += 5;
+    
+    const topCustomersData = data.topCustomers.slice(0, 10).map((customer: any) => [
+      customer.name || 'N/A',
+      customer.email || 'N/A',
+      `$${customer.totalSpent?.toLocaleString('es-ES', { minimumFractionDigits: 2 }) || '0.00'}`,
+      customer.orderCount?.toString() || '0'
+    ]);
+    
+    autoTable(doc, {
+      startY: currentY,
+      head: [['Cliente', 'Email', 'Total Gastado', 'Órdenes']],
+      body: topCustomersData,
+      theme: 'striped',
+      styles: { fontSize: 9 }
+    });
+    
+    currentY = (doc as any).lastAutoTable.finalY + 15;
+  }
+  
+  return currentY;
+}
+
+async function addProductPerformanceContent(doc: any, data: any, startY: number): Promise<number> {
+  let currentY = startY;
+  
+  // Resumen de productos
+  if (data.summary) {
+    doc.setFontSize(16);
+    doc.text('Resumen de Productos', 14, currentY);
+    currentY += 10;
+    
+    const summaryData = [
+      ['Total de Productos', data.summary.totalProducts?.toString() || '0'],
+      ['Productos Activos', data.summary.activeProducts?.toString() || '0'],
+      ['Ingresos Totales', `$${data.summary.totalRevenue?.toLocaleString('es-ES', { minimumFractionDigits: 2 }) || '0.00'}`],
+      ['Unidades Vendidas', data.summary.totalUnitsSold?.toString() || '0']
+    ];
+    
+    autoTable(doc, {
+      startY: currentY,
+      head: [['Métrica', 'Valor']],
+      body: summaryData,
+      theme: 'grid',
+      styles: { fontSize: 10 }
+    });
+    
+    currentY = (doc as any).lastAutoTable.finalY + 15;
+  }
+  
+  // Top productos
+  if (data.topProducts && data.topProducts.length > 0) {
+    if (currentY > 250) {
+      doc.addPage();
+      currentY = 20;
+    }
+    
+    doc.setFontSize(16);
+    doc.text('Productos Más Vendidos', 14, currentY);
+    currentY += 5;
+    
+    const topProductsData = data.topProducts.slice(0, 10).map((product: any) => [
+      product.name || 'N/A',
+      product.category?.name || 'Sin categoría',
+      `$${product.price?.toLocaleString('es-ES', { minimumFractionDigits: 2 }) || '0.00'}`,
+      product.totalSold?.toString() || '0',
+      `$${product.revenue?.toLocaleString('es-ES', { minimumFractionDigits: 2 }) || '0.00'}`
+    ]);
+    
+    autoTable(doc, {
+      startY: currentY,
+      head: [['Producto', 'Categoría', 'Precio', 'Vendidos', 'Ingresos']],
+      body: topProductsData,
+      theme: 'striped',
+      styles: { fontSize: 8 }
+    });
+    
+    currentY = (doc as any).lastAutoTable.finalY + 15;
+  }
+  
+  // Análisis por categoría
+  if (data.categoryAnalysis && data.categoryAnalysis.length > 0) {
+    if (currentY > 250) {
+      doc.addPage();
+      currentY = 20;
+    }
+    
+    doc.setFontSize(16);
+    doc.text('Análisis por Categoría', 14, currentY);
+    currentY += 5;
+    
+    const categoryData = data.categoryAnalysis.map((category: any) => [
+      category.name || 'N/A',
+      category.products?.toString() || '0',
+      `$${category.revenue?.toLocaleString('es-ES', { minimumFractionDigits: 2 }) || '0.00'}`,
+      category.sales?.toString() || '0',
+      `${category.percentage || 0}%`
+    ]);
+    
+    autoTable(doc, {
+      startY: currentY,
+      head: [['Categoría', 'Productos', 'Ingresos', 'Ventas', 'Participación']],
+      body: categoryData,
+      theme: 'striped',
+      styles: { fontSize: 9 }
+    });
+    
+    currentY = (doc as any).lastAutoTable.finalY + 15;
+  }
+  
+  // Insights de inventario
+  if (data.inventoryInsights) {
+    if (currentY > 250) {
+      doc.addPage();
+      currentY = 20;
+    }
+    
+    doc.setFontSize(16);
+    doc.text('Insights de Inventario', 14, currentY);
+    currentY += 10;
+    
+    const inventoryData = [
+      ['Productos con Stock Bajo', data.inventoryInsights.lowStock?.toString() || '0'],
+      ['Productos Sin Stock', data.inventoryInsights.outOfStock?.toString() || '0'],
+      ['Valor Total de Inventario', `$${data.inventoryInsights.totalInventoryValue?.toLocaleString('es-ES', { minimumFractionDigits: 2 }) || '0.00'}`],
+      ['Rotación de Inventario', `${data.inventoryInsights.turnoverRate || 0}x`]
+    ];
+    
+    autoTable(doc, {
+      startY: currentY,
+      head: [['Métrica', 'Valor']],
+      body: inventoryData,
+      theme: 'grid',
+      styles: { fontSize: 10 }
+    });
+    
+    currentY = (doc as any).lastAutoTable.finalY + 15;
+  }
+  
+  return currentY;
+}
+
+async function addFinancialReportContent(doc: any, data: any, startY: number): Promise<number> {
+  let currentY = startY;
+  
+  // Resumen financiero
+  if (data.summary) {
+    doc.setFontSize(16);
+    doc.text('Resumen Financiero', 14, currentY);
+    currentY += 10;
+    
+    const summaryData = [
+      ['Ingresos Totales', `$${data.summary.totalRevenue?.toLocaleString('es-ES', { minimumFractionDigits: 2 }) || '0.00'}`],
+      ['Gastos Totales', `$${data.summary.totalExpenses?.toLocaleString('es-ES', { minimumFractionDigits: 2 }) || '0.00'}`],
+      ['Ganancia Neta', `$${data.summary.netProfit?.toLocaleString('es-ES', { minimumFractionDigits: 2 }) || '0.00'}`],
+      ['Margen de Ganancia', `${data.summary.profitMargin || 0}%`]
+    ];
+    
+    autoTable(doc, {
+      startY: currentY,
+      head: [['Métrica', 'Valor']],
+      body: summaryData,
+      theme: 'grid',
+      styles: { fontSize: 10 }
+    });
+    
+    currentY = (doc as any).lastAutoTable.finalY + 15;
+  }
+  
+  // Análisis de ingresos
+  if (data.revenueAnalysis) {
+    if (currentY > 250) {
+      doc.addPage();
+      currentY = 20;
+    }
+    
+    doc.setFontSize(16);
+    doc.text('Análisis de Ingresos', 14, currentY);
+    currentY += 10;
+    
+    const revenueData = [
+      ['Ingresos por Ventas', `$${data.revenueAnalysis.salesRevenue?.toLocaleString('es-ES', { minimumFractionDigits: 2 }) || '0.00'}`],
+      ['Ingresos por Envío', `$${data.revenueAnalysis.shippingRevenue?.toLocaleString('es-ES', { minimumFractionDigits: 2 }) || '0.00'}`],
+      ['Impuestos Recaudados', `$${data.revenueAnalysis.taxesCollected?.toLocaleString('es-ES', { minimumFractionDigits: 2 }) || '0.00'}`],
+      ['Descuentos Aplicados', `$${data.revenueAnalysis.discountsApplied?.toLocaleString('es-ES', { minimumFractionDigits: 2 }) || '0.00'}`]
+    ];
+    
+    autoTable(doc, {
+      startY: currentY,
+      head: [['Concepto', 'Monto']],
+      body: revenueData,
+      theme: 'grid',
+      styles: { fontSize: 10 }
+    });
+    
+    currentY = (doc as any).lastAutoTable.finalY + 15;
+  }
+  
+  // Análisis de gastos
+  if (data.expenseAnalysis && data.expenseAnalysis.length > 0) {
+    if (currentY > 250) {
+      doc.addPage();
+      currentY = 20;
+    }
+    
+    doc.setFontSize(16);
+    doc.text('Análisis de Gastos', 14, currentY);
+    currentY += 5;
+    
+    const expenseData = data.expenseAnalysis.map((expense: any) => [
+      expense.category || 'N/A',
+      `$${expense.amount?.toLocaleString('es-ES', { minimumFractionDigits: 2 }) || '0.00'}`,
+      `${expense.percentage || 0}%`,
+      expense.trend === 'up' ? '↗' : expense.trend === 'down' ? '↘' : '→'
+    ]);
+    
+    autoTable(doc, {
+      startY: currentY,
+      head: [['Categoría', 'Monto', 'Porcentaje', 'Tendencia']],
+      body: expenseData,
+      theme: 'striped',
+      styles: { fontSize: 9 }
+    });
+    
+    currentY = (doc as any).lastAutoTable.finalY + 15;
+  }
+  
+  // Flujo de caja
+  if (data.cashFlow) {
+    if (currentY > 250) {
+      doc.addPage();
+      currentY = 20;
+    }
+    
+    doc.setFontSize(16);
+    doc.text('Flujo de Caja', 14, currentY);
+    currentY += 10;
+    
+    const cashFlowData = [
+      ['Efectivo Inicial', `$${data.cashFlow.startingCash?.toLocaleString('es-ES', { minimumFractionDigits: 2 }) || '0.00'}`],
+      ['Entradas de Efectivo', `$${data.cashFlow.cashInflows?.toLocaleString('es-ES', { minimumFractionDigits: 2 }) || '0.00'}`],
+      ['Salidas de Efectivo', `$${data.cashFlow.cashOutflows?.toLocaleString('es-ES', { minimumFractionDigits: 2 }) || '0.00'}`],
+      ['Efectivo Final', `$${data.cashFlow.endingCash?.toLocaleString('es-ES', { minimumFractionDigits: 2 }) || '0.00'}`]
+    ];
+    
+    autoTable(doc, {
+      startY: currentY,
+      head: [['Concepto', 'Monto']],
+      body: cashFlowData,
+      theme: 'grid',
+      styles: { fontSize: 10 }
+    });
+    
+    currentY = (doc as any).lastAutoTable.finalY + 15;
+  }
+  
+  return currentY;
+}
+
+async function addOrdersAnalysisContent(doc: any, data: any, startY: number): Promise<number> {
+  let currentY = startY;
+  
+  // Resumen de órdenes
+  if (data.summary) {
+    doc.setFontSize(16);
+    doc.text('Resumen de Órdenes', 14, currentY);
+    currentY += 10;
+    
+    const summaryData = [
+      ['Total de Órdenes', data.summary.totalOrders?.toString() || '0'],
+      ['Órdenes Completadas', data.summary.completedOrders?.toString() || '0'],
+      ['Órdenes Pendientes', data.summary.pendingOrders?.toString() || '0'],
+      ['Tasa de Completación', `${data.summary.completionRate || 0}%`]
+    ];
+    
+    autoTable(doc, {
+      startY: currentY,
+      head: [['Métrica', 'Valor']],
+      body: summaryData,
+      theme: 'grid',
+      styles: { fontSize: 10 }
+    });
+    
+    currentY = (doc as any).lastAutoTable.finalY + 15;
+  }
+  
+  // Estado de órdenes
+  if (data.orderStatus && data.orderStatus.length > 0) {
+    if (currentY > 250) {
+      doc.addPage();
+      currentY = 20;
+    }
+    
+    doc.setFontSize(16);
+    doc.text('Distribución por Estado', 14, currentY);
+    currentY += 5;
+    
+    const statusData = data.orderStatus.map((status: any) => [
+      status.status || 'N/A',
+      status.count?.toString() || '0',
+      `${status.percentage || 0}%`,
+      `$${status.revenue?.toLocaleString('es-ES', { minimumFractionDigits: 2 }) || '0.00'}`
+    ]);
+    
+    autoTable(doc, {
+      startY: currentY,
+      head: [['Estado', 'Cantidad', 'Porcentaje', 'Ingresos']],
+      body: statusData,
+      theme: 'striped',
+      styles: { fontSize: 9 }
+    });
+    
+    currentY = (doc as any).lastAutoTable.finalY + 15;
+  }
+  
+  // Tendencias de tiempo
+  if (data.timeAnalysis) {
+    if (currentY > 250) {
+      doc.addPage();
+      currentY = 20;
+    }
+    
+    doc.setFontSize(16);
+    doc.text('Análisis Temporal', 14, currentY);
+    currentY += 10;
+    
+    const timeData = [
+      ['Tiempo Promedio de Procesamiento', `${data.timeAnalysis.avgProcessingTime || 0} horas`],
+      ['Tiempo Promedio de Envío', `${data.timeAnalysis.avgShippingTime || 0} días`],
+      ['Tiempo Total Promedio', `${data.timeAnalysis.avgTotalTime || 0} días`],
+      ['SLA Cumplido', `${data.timeAnalysis.slaCompliance || 0}%`]
+    ];
+    
+    autoTable(doc, {
+      startY: currentY,
+      head: [['Métrica', 'Valor']],
+      body: timeData,
+      theme: 'grid',
+      styles: { fontSize: 10 }
+    });
+    
+    currentY = (doc as any).lastAutoTable.finalY + 15;
+  }
+  
+  // Análisis por método de pago
+  if (data.paymentMethods && data.paymentMethods.length > 0) {
+    if (currentY > 250) {
+      doc.addPage();
+      currentY = 20;
+    }
+    
+    doc.setFontSize(16);
+    doc.text('Métodos de Pago', 14, currentY);
+    currentY += 5;
+    
+    const paymentData = data.paymentMethods.map((method: any) => [
+      method.method || 'N/A',
+      method.orders?.toString() || '0',
+      `${method.percentage || 0}%`,
+      `$${method.revenue?.toLocaleString('es-ES', { minimumFractionDigits: 2 }) || '0.00'}`
+    ]);
+    
+    autoTable(doc, {
+      startY: currentY,
+      head: [['Método', 'Órdenes', 'Porcentaje', 'Ingresos']],
+      body: paymentData,
+      theme: 'striped',
+      styles: { fontSize: 9 }
+    });
+    
+    currentY = (doc as any).lastAutoTable.finalY + 15;
+  }
+  
+  return currentY;
+}
+
+async function addGrowthTrendsContent(doc: any, data: any, startY: number): Promise<number> {
+  let currentY = startY;
+  
+  // Resumen de crecimiento
+  if (data.summary) {
+    doc.setFontSize(16);
+    doc.text('Métricas de Crecimiento', 14, currentY);
+    currentY += 10;
+    
+    const summaryData = [
+      ['Crecimiento de Ingresos', `${data.summary.revenueGrowth || 0}%`],
+      ['Crecimiento de Usuarios', `${data.summary.userGrowth || 0}%`],
+      ['Crecimiento de Órdenes', `${data.summary.orderGrowth || 0}%`],
+      ['Tasa de Retención', `${data.summary.retentionRate || 0}%`]
+    ];
+    
+    autoTable(doc, {
+      startY: currentY,
+      head: [['Métrica', 'Valor']],
+      body: summaryData,
+      theme: 'grid',
+      styles: { fontSize: 10 }
+    });
+    
+    currentY = (doc as any).lastAutoTable.finalY + 15;
+  }
+  
+  // Tendencias mensuales
+  if (data.monthlyTrends && data.monthlyTrends.length > 0) {
+    if (currentY > 250) {
+      doc.addPage();
+      currentY = 20;
+    }
+    
+    doc.setFontSize(16);
+    doc.text('Tendencias Mensuales', 14, currentY);
+    currentY += 5;
+    
+    const trendsData = data.monthlyTrends.map((trend: any) => [
+      trend.month || 'N/A',
+      `$${trend.revenue?.toLocaleString('es-ES', { minimumFractionDigits: 2 }) || '0.00'}`,
+      trend.orders?.toString() || '0',
+      trend.users?.toString() || '0',
+      `${trend.growth || 0}%`
+    ]);
+    
+    autoTable(doc, {
+      startY: currentY,
+      head: [['Mes', 'Ingresos', 'Órdenes', 'Usuarios', 'Crecimiento']],
+      body: trendsData,
+      theme: 'striped',
+      styles: { fontSize: 8 }
+    });
+    
+    currentY = (doc as any).lastAutoTable.finalY + 15;
+  }
+  
+  // Predicciones
+  if (data.predictions) {
+    if (currentY > 250) {
+      doc.addPage();
+      currentY = 20;
+    }
+    
+    doc.setFontSize(16);
+    doc.text('Predicciones', 14, currentY);
+    currentY += 10;
+    
+    const predictionsData = [
+      ['Ingresos Predichos (30 días)', `$${data.predictions.nextMonthRevenue?.toLocaleString('es-ES', { minimumFractionDigits: 2 }) || '0.00'}`],
+      ['Nuevos Usuarios Predichos', data.predictions.nextMonthUsers?.toString() || '0'],
+      ['Órdenes Predichas', data.predictions.nextMonthOrders?.toString() || '0'],
+      ['Confianza del Modelo', `${data.predictions.confidence || 0}%`]
+    ];
+    
+    autoTable(doc, {
+      startY: currentY,
+      head: [['Predicción', 'Valor']],
+      body: predictionsData,
+      theme: 'grid',
+      styles: { fontSize: 10 }
+    });
+    
+    currentY = (doc as any).lastAutoTable.finalY + 15;
+  }
+  
+  // Análisis de cohortes
+  if (data.cohortAnalysis && data.cohortAnalysis.length > 0) {
+    if (currentY > 250) {
+      doc.addPage();
+      currentY = 20;
+    }
+    
+    doc.setFontSize(16);
+    doc.text('Análisis de Cohortes', 14, currentY);
+    currentY += 5;
+    
+    const cohortData = data.cohortAnalysis.map((cohort: any) => [
+      cohort.period || 'N/A',
+      cohort.newUsers?.toString() || '0',
+      `${cohort.retentionWeek1 || 0}%`,
+      `${cohort.retentionWeek4 || 0}%`,
+      `$${cohort.avgLifetimeValue?.toLocaleString('es-ES', { minimumFractionDigits: 2 }) || '0.00'}`
+    ]);
+    
+    autoTable(doc, {
+      startY: currentY,
+      head: [['Período', 'Nuevos Usuarios', 'Retención S1', 'Retención S4', 'LTV Promedio']],
+      body: cohortData,
+      theme: 'striped',
+      styles: { fontSize: 8 }
+    });
+    
+    currentY = (doc as any).lastAutoTable.finalY + 15;
+  }
+  
+  return currentY;
+}
+
+async function addGeneralReportContent(doc: any, data: any, startY: number): Promise<number> {
+  let currentY = startY;
+  
+  // Resumen rápido si existe
+  if (data.quickStats || (data.summary && Object.keys(data.summary).length > 0)) {
+    doc.setFontSize(16);
+    doc.text('Resumen Ejecutivo', 14, currentY);
+    currentY += 10;
+    
+    const statsToShow = data.quickStats || data.summary;
+    const quickStatsData = [
+      ['Total de Ingresos', `$${(statsToShow.totalRevenue || 0).toLocaleString('es-ES', { minimumFractionDigits: 2 })}`],
+      ['Total de Órdenes', (statsToShow.totalOrders || 0).toString()],
+      ['Total de Usuarios', (statsToShow.totalUsers || statsToShow.totalCustomers || 0).toString()],
+      ['Total de Productos', (statsToShow.totalProducts || 0).toString()]
+    ];
+    
+    autoTable(doc, {
+      startY: currentY,
+      head: [['Métrica', 'Valor']],
+      body: quickStatsData,
+      theme: 'grid',
+      styles: { fontSize: 10 }
+    });
+    
+    currentY = (doc as any).lastAutoTable.finalY + 15;
+  }
+  
+  // Top productos si existen
+  if (data.topProducts && data.topProducts.length > 0) {
+    if (currentY > 250) {
+      doc.addPage();
+      currentY = 20;
+    }
+    
+    doc.setFontSize(16);
+    doc.text('Productos Más Vendidos', 14, currentY);
+    currentY += 5;
+    
+    const topProductsData = data.topProducts.slice(0, 10).map((product: any) => [
+      product.name || 'N/A',
+      product.category?.name || 'Sin categoría',
+      `$${(product.price || 0).toLocaleString('es-ES', { minimumFractionDigits: 2 })}`,
+      (product.totalSold || 0).toString()
+    ]);
+    
+    autoTable(doc, {
+      startY: currentY,
+      head: [['Producto', 'Categoría', 'Precio', 'Vendidos']],
+      body: topProductsData,
+      theme: 'striped',
+      styles: { fontSize: 9 }
+    });
+    
+    currentY = (doc as any).lastAutoTable.finalY + 15;
+  }
+  
+  return currentY;
+}
+
+// Funciones auxiliares para generar hojas Excel específicas por tipo de reporte
+
+function addSalesSummaryExcelSheets(workbook: any, data: any) {
+  // Hoja de resumen
+  if (data.summary) {
+    const summaryData = [
+      ['Métrica', 'Valor'],
+      ['Total de Ingresos', data.summary.totalRevenue || 0],
+      ['Total de Órdenes', data.summary.totalOrders || 0],
+      ['Valor Promedio por Orden', data.summary.averageOrderValue || 0],
+      ['Tasa de Conversión', `${data.summary.conversionRate || 0}%`]
+    ];
+    const summarySheet = XLSX.utils.aoa_to_sheet(summaryData);
+    XLSX.utils.book_append_sheet(workbook, summarySheet, 'Resumen');
+  }
+  
+  // Hoja de top productos
+  if (data.topProducts && data.topProducts.length > 0) {
+    const topProductsData = [
+      ['Producto', 'Categoría', 'Precio', 'Vendidos', 'Ingresos'],
+      ...data.topProducts.map((product: any) => [
+        product.name || 'N/A',
+        product.category?.name || 'Sin categoría',
+        product.price || 0,
+        product.totalSold || 0,
+        product.revenue || 0
+      ])
+    ];
+    const topProductsSheet = XLSX.utils.aoa_to_sheet(topProductsData);
+    XLSX.utils.book_append_sheet(workbook, topProductsSheet, 'Top Productos');
+  }
+  
+  // Hoja de top clientes
+  if (data.topCustomers && data.topCustomers.length > 0) {
+    const topCustomersData = [
+      ['Cliente', 'Email', 'Total Gastado', 'Órdenes'],
+      ...data.topCustomers.map((customer: any) => [
+        customer.name || 'N/A',
+        customer.email || 'N/A',
+        customer.totalSpent || 0,
+        customer.orderCount || 0
+      ])
+    ];
+    const topCustomersSheet = XLSX.utils.aoa_to_sheet(topCustomersData);
+    XLSX.utils.book_append_sheet(workbook, topCustomersSheet, 'Top Clientes');
+  }
+  
+  // Hoja de ventas por categoría
+  if (data.salesTrends?.byCategory && data.salesTrends.byCategory.length > 0) {
+    const categoryData = [
+      ['Categoría', 'Ingresos', 'Unidades Vendidas'],
+      ...data.salesTrends.byCategory.map((category: any) => [
+        category.name || 'N/A',
+        category.revenue || 0,
+        category.sales || 0
+      ])
+    ];
+    const categorySheet = XLSX.utils.aoa_to_sheet(categoryData);
+    XLSX.utils.book_append_sheet(workbook, categorySheet, 'Ventas por Categoría');
+  }
+  
+  // Hoja de estado de órdenes
+  if (data.orderStatus && data.orderStatus.length > 0) {
+    const statusData = [
+      ['Estado', 'Cantidad', 'Ingresos'],
+      ...data.orderStatus.map((status: any) => [
+        status.status || 'N/A',
+        status.count || 0,
+        status.revenue || 0
+      ])
+    ];
+    const statusSheet = XLSX.utils.aoa_to_sheet(statusData);
+    XLSX.utils.book_append_sheet(workbook, statusSheet, 'Estado Órdenes');
   }
 }
 
-function addExcelReportSpecificSheets(workbook: XLSX.WorkBook, data: ReportData, reportId: string): void {
-  switch (reportId) {
-    case 'sales-summary':
-      if (data.salesTrends && data.salesTrends.daily) {
-        const dailyData = [
-          ['Fecha', 'Ventas', 'Órdenes'],
-          ...data.salesTrends.daily.map((item: any) => [
-            item.date,
-            item.sales,
-            item.orders
-          ])
-        ];
-        const dailySheet = XLSX.utils.aoa_to_sheet(dailyData);
-        XLSX.utils.book_append_sheet(workbook, dailySheet, 'Ventas Diarias');
-      }
-      break;
-    case 'customer-analysis':
-      if (data.topCustomers) {
-        const customersData = [
-          ['Cliente', 'Email', 'Total Gastado', 'Órdenes'],
-          ...data.topCustomers.map((customer: any) => [
-            customer.name,
-            customer.email,
-            customer.totalSpent,
-            customer.orderCount
-          ])
-        ];
-        const customersSheet = XLSX.utils.aoa_to_sheet(customersData);
-        XLSX.utils.book_append_sheet(workbook, customersSheet, 'Top Clientes');
-      }
-      break;
-    // Agregar más casos según sea necesario
+function addCustomerAnalysisExcelSheets(workbook: any, data: any) {
+  // Hoja de resumen de clientes
+  if (data.summary) {
+    const summaryData = [
+      ['Métrica', 'Valor'],
+      ['Total de Clientes', data.summary.totalCustomers || 0],
+      ['Nuevos Clientes', data.summary.newCustomers || 0],
+      ['Tasa de Repetición', `${data.summary.repeatCustomerRate || 0}%`],
+      ['Valor Promedio por Cliente', data.summary.averageCustomerValue || 0]
+    ];
+    const summarySheet = XLSX.utils.aoa_to_sheet(summaryData);
+    XLSX.utils.book_append_sheet(workbook, summarySheet, 'Resumen');
+  }
+  
+  // Hoja de segmentación
+  if (data.segmentation && data.segmentation.length > 0) {
+    const segmentationData = [
+      ['Segmento', 'Clientes', 'Porcentaje', 'Gasto Promedio'],
+      ...data.segmentation.map((segment: any) => [
+        segment.segment || 'N/A',
+        segment.count || 0,
+        `${segment.percentage || 0}%`,
+        segment.averageSpent || 0
+      ])
+    ];
+    const segmentationSheet = XLSX.utils.aoa_to_sheet(segmentationData);
+    XLSX.utils.book_append_sheet(workbook, segmentationSheet, 'Segmentación');
+  }
+  
+  // Hoja de distribución geográfica
+  if (data.geographic && data.geographic.length > 0) {
+    const geographicData = [
+      ['Región', 'Clientes', 'Porcentaje', 'Ingresos'],
+      ...data.geographic.map((geo: any) => [
+        geo.region || 'N/A',
+        geo.customers || 0,
+        `${geo.percentage || 0}%`,
+        geo.revenue || 0
+      ])
+    ];
+    const geographicSheet = XLSX.utils.aoa_to_sheet(geographicData);
+    XLSX.utils.book_append_sheet(workbook, geographicSheet, 'Distribución Geográfica');
+  }
+  
+  // Hoja de top clientes
+  if (data.topCustomers && data.topCustomers.length > 0) {
+    const topCustomersData = [
+      ['Cliente', 'Email', 'Total Gastado', 'Órdenes'],
+      ...data.topCustomers.map((customer: any) => [
+        customer.name || 'N/A',
+        customer.email || 'N/A',
+        customer.totalSpent || 0,
+        customer.orderCount || 0
+      ])
+    ];
+    const topCustomersSheet = XLSX.utils.aoa_to_sheet(topCustomersData);
+    XLSX.utils.book_append_sheet(workbook, topCustomersSheet, 'Top Clientes');
   }
 }
 
-function addCSVReportSpecificContent(data: ReportData, reportId: string): string {
+function addProductPerformanceExcelSheets(workbook: any, data: any) {
+  // Hoja de resumen de productos
+  if (data.summary) {
+    const summaryData = [
+      ['Métrica', 'Valor'],
+      ['Total de Productos', data.summary.totalProducts || 0],
+      ['Productos Activos', data.summary.activeProducts || 0],
+      ['Ingresos Totales', data.summary.totalRevenue || 0],
+      ['Unidades Vendidas', data.summary.totalUnitsSold || 0]
+    ];
+    const summarySheet = XLSX.utils.aoa_to_sheet(summaryData);
+    XLSX.utils.book_append_sheet(workbook, summarySheet, 'Resumen');
+  }
+  
+  // Hoja de top productos
+  if (data.topProducts && data.topProducts.length > 0) {
+    const topProductsData = [
+      ['Producto', 'Categoría', 'Precio', 'Vendidos', 'Ingresos'],
+      ...data.topProducts.map((product: any) => [
+        product.name || 'N/A',
+        product.category?.name || 'Sin categoría',
+        product.price || 0,
+        product.totalSold || 0,
+        product.revenue || 0
+      ])
+    ];
+    const topProductsSheet = XLSX.utils.aoa_to_sheet(topProductsData);
+    XLSX.utils.book_append_sheet(workbook, topProductsSheet, 'Top Productos');
+  }
+  
+  // Hoja de análisis por categoría
+  if (data.categoryAnalysis && data.categoryAnalysis.length > 0) {
+    const categoryData = [
+      ['Categoría', 'Productos', 'Ingresos', 'Ventas', 'Participación'],
+      ...data.categoryAnalysis.map((category: any) => [
+        category.name || 'N/A',
+        category.products || 0,
+        category.revenue || 0,
+        category.sales || 0,
+        `${category.percentage || 0}%`
+      ])
+    ];
+    const categorySheet = XLSX.utils.aoa_to_sheet(categoryData);
+    XLSX.utils.book_append_sheet(workbook, categorySheet, 'Análisis por Categoría');
+  }
+  
+  // Hoja de insights de inventario
+  if (data.inventoryInsights) {
+    const inventoryData = [
+      ['Métrica', 'Valor'],
+      ['Productos con Stock Bajo', data.inventoryInsights.lowStock || 0],
+      ['Productos Sin Stock', data.inventoryInsights.outOfStock || 0],
+      ['Valor Total de Inventario', data.inventoryInsights.totalInventoryValue || 0],
+      ['Rotación de Inventario', `${data.inventoryInsights.turnoverRate || 0}x`]
+    ];
+    const inventorySheet = XLSX.utils.aoa_to_sheet(inventoryData);
+    XLSX.utils.book_append_sheet(workbook, inventorySheet, 'Insights Inventario');
+  }
+}
+
+function addFinancialReportExcelSheets(workbook: any, data: any) {
+  // Hoja de resumen financiero
+  if (data.summary) {
+    const summaryData = [
+      ['Métrica', 'Valor'],
+      ['Ingresos Totales', data.summary.totalRevenue || 0],
+      ['Gastos Totales', data.summary.totalExpenses || 0],
+      ['Ganancia Neta', data.summary.netProfit || 0],
+      ['Margen de Ganancia', `${data.summary.profitMargin || 0}%`]
+    ];
+    const summarySheet = XLSX.utils.aoa_to_sheet(summaryData);
+    XLSX.utils.book_append_sheet(workbook, summarySheet, 'Resumen Financiero');
+  }
+  
+  // Hoja de análisis de ingresos
+  if (data.revenueAnalysis) {
+    const revenueData = [
+      ['Concepto', 'Monto'],
+      ['Ingresos por Ventas', data.revenueAnalysis.salesRevenue || 0],
+      ['Ingresos por Envío', data.revenueAnalysis.shippingRevenue || 0],
+      ['Impuestos Recaudados', data.revenueAnalysis.taxesCollected || 0],
+      ['Descuentos Aplicados', data.revenueAnalysis.discountsApplied || 0]
+    ];
+    const revenueSheet = XLSX.utils.aoa_to_sheet(revenueData);
+    XLSX.utils.book_append_sheet(workbook, revenueSheet, 'Análisis de Ingresos');
+  }
+  
+  // Hoja de análisis de gastos
+  if (data.expenseAnalysis && data.expenseAnalysis.length > 0) {
+    const expenseData = [
+      ['Categoría', 'Monto', 'Porcentaje', 'Tendencia'],
+      ...data.expenseAnalysis.map((expense: any) => [
+        expense.category || 'N/A',
+        expense.amount || 0,
+        `${expense.percentage || 0}%`,
+        expense.trend === 'up' ? 'Subida' : expense.trend === 'down' ? 'Bajada' : 'Estable'
+      ])
+    ];
+    const expenseSheet = XLSX.utils.aoa_to_sheet(expenseData);
+    XLSX.utils.book_append_sheet(workbook, expenseSheet, 'Análisis de Gastos');
+  }
+  
+  // Hoja de flujo de caja
+  if (data.cashFlow) {
+    const cashFlowData = [
+      ['Concepto', 'Monto'],
+      ['Efectivo Inicial', data.cashFlow.startingCash || 0],
+      ['Entradas de Efectivo', data.cashFlow.cashInflows || 0],
+      ['Salidas de Efectivo', data.cashFlow.cashOutflows || 0],
+      ['Efectivo Final', data.cashFlow.endingCash || 0]
+    ];
+    const cashFlowSheet = XLSX.utils.aoa_to_sheet(cashFlowData);
+    XLSX.utils.book_append_sheet(workbook, cashFlowSheet, 'Flujo de Caja');
+  }
+}
+
+function addOrdersAnalysisExcelSheets(workbook: any, data: any) {
+  // Hoja de resumen de órdenes
+  if (data.summary) {
+    const summaryData = [
+      ['Métrica', 'Valor'],
+      ['Total de Órdenes', data.summary.totalOrders || 0],
+      ['Órdenes Completadas', data.summary.completedOrders || 0],
+      ['Órdenes Pendientes', data.summary.pendingOrders || 0],
+      ['Tasa de Completación', `${data.summary.completionRate || 0}%`]
+    ];
+    const summarySheet = XLSX.utils.aoa_to_sheet(summaryData);
+    XLSX.utils.book_append_sheet(workbook, summarySheet, 'Resumen');
+  }
+  
+  // Hoja de estado de órdenes
+  if (data.orderStatus && data.orderStatus.length > 0) {
+    const statusData = [
+      ['Estado', 'Cantidad', 'Porcentaje', 'Ingresos'],
+      ...data.orderStatus.map((status: any) => [
+        status.status || 'N/A',
+        status.count || 0,
+        `${status.percentage || 0}%`,
+        status.revenue || 0
+      ])
+    ];
+    const statusSheet = XLSX.utils.aoa_to_sheet(statusData);
+    XLSX.utils.book_append_sheet(workbook, statusSheet, 'Estado Órdenes');
+  }
+  
+  // Hoja de análisis temporal
+  if (data.timeAnalysis) {
+    const timeData = [
+      ['Métrica', 'Valor'],
+      ['Tiempo Promedio de Procesamiento', `${data.timeAnalysis.avgProcessingTime || 0} horas`],
+      ['Tiempo Promedio de Envío', `${data.timeAnalysis.avgShippingTime || 0} días`],
+      ['Tiempo Total Promedio', `${data.timeAnalysis.avgTotalTime || 0} días`],
+      ['SLA Cumplido', `${data.timeAnalysis.slaCompliance || 0}%`]
+    ];
+    const timeSheet = XLSX.utils.aoa_to_sheet(timeData);
+    XLSX.utils.book_append_sheet(workbook, timeSheet, 'Análisis Temporal');
+  }
+  
+  // Hoja de métodos de pago
+  if (data.paymentMethods && data.paymentMethods.length > 0) {
+    const paymentData = [
+      ['Método', 'Órdenes', 'Porcentaje', 'Ingresos'],
+      ...data.paymentMethods.map((method: any) => [
+        method.method || 'N/A',
+        method.orders || 0,
+        `${method.percentage || 0}%`,
+        method.revenue || 0
+      ])
+    ];
+    const paymentSheet = XLSX.utils.aoa_to_sheet(paymentData);
+    XLSX.utils.book_append_sheet(workbook, paymentSheet, 'Métodos de Pago');
+  }
+}
+
+function addGrowthTrendsExcelSheets(workbook: any, data: any) {
+  // Hoja de métricas de crecimiento
+  if (data.summary) {
+    const summaryData = [
+      ['Métrica', 'Valor'],
+      ['Crecimiento de Ingresos', `${data.summary.revenueGrowth || 0}%`],
+      ['Crecimiento de Usuarios', `${data.summary.userGrowth || 0}%`],
+      ['Crecimiento de Órdenes', `${data.summary.orderGrowth || 0}%`],
+      ['Tasa de Retención', `${data.summary.retentionRate || 0}%`]
+    ];
+    const summarySheet = XLSX.utils.aoa_to_sheet(summaryData);
+    XLSX.utils.book_append_sheet(workbook, summarySheet, 'Métricas Crecimiento');
+  }
+  
+  // Hoja de tendencias mensuales
+  if (data.monthlyTrends && data.monthlyTrends.length > 0) {
+    const trendsData = [
+      ['Mes', 'Ingresos', 'Órdenes', 'Usuarios', 'Crecimiento'],
+      ...data.monthlyTrends.map((trend: any) => [
+        trend.month || 'N/A',
+        trend.revenue || 0,
+        trend.orders || 0,
+        trend.users || 0,
+        `${trend.growth || 0}%`
+      ])
+    ];
+    const trendsSheet = XLSX.utils.aoa_to_sheet(trendsData);
+    XLSX.utils.book_append_sheet(workbook, trendsSheet, 'Tendencias Mensuales');
+  }
+  
+  // Hoja de predicciones
+  if (data.predictions) {
+    const predictionsData = [
+      ['Predicción', 'Valor'],
+      ['Ingresos Predichos (30 días)', data.predictions.nextMonthRevenue || 0],
+      ['Nuevos Usuarios Predichos', data.predictions.nextMonthUsers || 0],
+      ['Órdenes Predichas', data.predictions.nextMonthOrders || 0],
+      ['Confianza del Modelo', `${data.predictions.confidence || 0}%`]
+    ];
+    const predictionsSheet = XLSX.utils.aoa_to_sheet(predictionsData);
+    XLSX.utils.book_append_sheet(workbook, predictionsSheet, 'Predicciones');
+  }
+  
+  // Hoja de análisis de cohortes
+  if (data.cohortAnalysis && data.cohortAnalysis.length > 0) {
+    const cohortData = [
+      ['Período', 'Nuevos Usuarios', 'Retención S1', 'Retención S4', 'LTV Promedio'],
+      ...data.cohortAnalysis.map((cohort: any) => [
+        cohort.period || 'N/A',
+        cohort.newUsers || 0,
+        `${cohort.retentionWeek1 || 0}%`,
+        `${cohort.retentionWeek4 || 0}%`,
+        cohort.avgLifetimeValue || 0
+      ])
+    ];
+    const cohortSheet = XLSX.utils.aoa_to_sheet(cohortData);
+    XLSX.utils.book_append_sheet(workbook, cohortSheet, 'Análisis Cohortes');
+  }
+}
+
+function addGeneralExcelSheets(workbook: any, data: any) {
+  // Hoja de resumen general
+  const statsToShow = data.quickStats || data.summary || {};
+  if (Object.keys(statsToShow).length > 0) {
+    const overviewData = [
+      ['Métrica', 'Valor'],
+      ['Total de Ingresos', statsToShow.totalRevenue || 0],
+      ['Total de Órdenes', statsToShow.totalOrders || 0],
+      ['Total de Usuarios', statsToShow.totalUsers || statsToShow.totalCustomers || 0],
+      ['Total de Productos', statsToShow.totalProducts || 0]
+    ];
+    const overviewSheet = XLSX.utils.aoa_to_sheet(overviewData);
+    XLSX.utils.book_append_sheet(workbook, overviewSheet, 'Resumen');
+  }
+  
+  // Hoja de productos más vendidos
+  if (data.topProducts && data.topProducts.length > 0) {
+    const topProductsData = [
+      ['Producto', 'Categoría', 'Precio', 'Total Vendidos'],
+      ...data.topProducts.map((product: any) => [
+        product.name || 'N/A',
+        product.category?.name || 'Sin categoría',
+        product.price || 0,
+        product.totalSold || 0
+      ])
+    ];
+    const topProductsSheet = XLSX.utils.aoa_to_sheet(topProductsData);
+    XLSX.utils.book_append_sheet(workbook, topProductsSheet, 'Top Productos');
+  }
+  
+  // Hoja de estadísticas mensuales si existe
+  if (data.monthlyStats && data.monthlyStats.length > 0) {
+    const monthlyData = [
+      ['Mes', 'Órdenes', 'Ingresos'],
+      ...data.monthlyStats.map((stat: any) => [
+        stat.month || 'N/A',
+        stat.orders || 0,
+        stat.revenue || 0
+      ])
+    ];
+    const monthlySheet = XLSX.utils.aoa_to_sheet(monthlyData);
+    XLSX.utils.book_append_sheet(workbook, monthlySheet, 'Estadísticas Mensuales');
+  }
+}
+
+// Funciones auxiliares para generar contenido CSV específico por tipo de reporte
+
+function generateSalesSummaryCSV(data: any): string {
   let content = '';
   
-  switch (reportId) {
-    case 'sales-summary':
-      if (data.salesTrends && data.salesTrends.daily) {
-        content += 'VENTAS DIARIAS\n';
-        content += 'Fecha,Ventas,Órdenes\n';
-        data.salesTrends.daily.forEach((item: any) => {
-          content += `${item.date},${item.sales},${item.orders}\n`;
-        });
-        content += '\n';
-      }
-      break;
-    case 'customer-analysis':
-      if (data.topCustomers) {
-        content += 'PRINCIPALES CLIENTES\n';
-        content += 'Cliente,Email,Total Gastado,Órdenes\n';
-        data.topCustomers.forEach((customer: any) => {
-          content += `"${customer.name}","${customer.email}",${customer.totalSpent},${customer.orderCount}\n`;
-        });
-        content += '\n';
-      }
-      break;
-    // Agregar más casos según sea necesario
+  // Resumen ejecutivo
+  if (data.summary) {
+    content += 'RESUMEN EJECUTIVO\n';
+    content += 'Métrica,Valor\n';
+    content += `Total de Ingresos,$${(data.summary.totalRevenue || 0).toLocaleString('es-ES')}\n`;
+    content += `Total de Órdenes,${data.summary.totalOrders || 0}\n`;
+    content += `Valor Promedio por Orden,$${(data.summary.averageOrderValue || 0).toLocaleString('es-ES')}\n`;
+    content += `Tasa de Conversión,${data.summary.conversionRate || 0}%\n\n`;
+  }
+  
+  // Top productos
+  if (data.topProducts && data.topProducts.length > 0) {
+    content += 'PRODUCTOS MÁS VENDIDOS\n';
+    content += 'Producto,Categoría,Precio,Vendidos,Ingresos\n';
+    data.topProducts.forEach((product: any) => {
+      content += `"${product.name || 'N/A'}","${product.category?.name || 'Sin categoría'}",${product.price || 0},${product.totalSold || 0},${product.revenue || 0}\n`;
+    });
+    content += '\n';
+  }
+  
+  // Top clientes
+  if (data.topCustomers && data.topCustomers.length > 0) {
+    content += 'MEJORES CLIENTES\n';
+    content += 'Cliente,Email,Total Gastado,Órdenes\n';
+    data.topCustomers.forEach((customer: any) => {
+      content += `"${customer.name || 'N/A'}","${customer.email || 'N/A'}",${customer.totalSpent || 0},${customer.orderCount || 0}\n`;
+    });
+    content += '\n';
+  }
+  
+  // Ventas por categoría
+  if (data.salesTrends?.byCategory && data.salesTrends.byCategory.length > 0) {
+    content += 'VENTAS POR CATEGORÍA\n';
+    content += 'Categoría,Ingresos,Unidades Vendidas\n';
+    data.salesTrends.byCategory.forEach((category: any) => {
+      content += `"${category.name || 'N/A'}",${category.revenue || 0},${category.sales || 0}\n`;
+    });
+    content += '\n';
+  }
+  
+  // Estado de órdenes
+  if (data.orderStatus && data.orderStatus.length > 0) {
+    content += 'ESTADO DE ÓRDENES\n';
+    content += 'Estado,Cantidad,Ingresos\n';
+    data.orderStatus.forEach((status: any) => {
+      content += `${status.status || 'N/A'},${status.count || 0},${status.revenue || 0}\n`;
+    });
+    content += '\n';
+  }
+  
+  return content;
+}
+
+function generateCustomerAnalysisCSV(data: any): string {
+  let content = '';
+  
+  // Resumen de clientes
+  if (data.summary) {
+    content += 'RESUMEN DE CLIENTES\n';
+    content += 'Métrica,Valor\n';
+    content += `Total de Clientes,${data.summary.totalCustomers || 0}\n`;
+    content += `Nuevos Clientes,${data.summary.newCustomers || 0}\n`;
+    content += `Tasa de Repetición,${data.summary.repeatCustomerRate || 0}%\n`;
+    content += `Valor Promedio por Cliente,$${(data.summary.averageCustomerValue || 0).toLocaleString('es-ES')}\n\n`;
+  }
+  
+  // Segmentación de clientes
+  if (data.segmentation && data.segmentation.length > 0) {
+    content += 'SEGMENTACIÓN DE CLIENTES\n';
+    content += 'Segmento,Clientes,Porcentaje,Gasto Promedio\n';
+    data.segmentation.forEach((segment: any) => {
+      content += `"${segment.segment || 'N/A'}",${segment.count || 0},${segment.percentage || 0}%,${segment.averageSpent || 0}\n`;
+    });
+    content += '\n';
+  }
+  
+  // Distribución geográfica
+  if (data.geographic && data.geographic.length > 0) {
+    content += 'DISTRIBUCIÓN GEOGRÁFICA\n';
+    content += 'Región,Clientes,Porcentaje,Ingresos\n';
+    data.geographic.forEach((geo: any) => {
+      content += `"${geo.region || 'N/A'}",${geo.customers || 0},${geo.percentage || 0}%,${geo.revenue || 0}\n`;
+    });
+    content += '\n';
+  }
+  
+  // Top clientes
+  if (data.topCustomers && data.topCustomers.length > 0) {
+    content += 'MEJORES CLIENTES\n';
+    content += 'Cliente,Email,Total Gastado,Órdenes\n';
+    data.topCustomers.forEach((customer: any) => {
+      content += `"${customer.name || 'N/A'}","${customer.email || 'N/A'}",${customer.totalSpent || 0},${customer.orderCount || 0}\n`;
+    });
+    content += '\n';
+  }
+  
+  return content;
+}
+
+function generateProductPerformanceCSV(data: any): string {
+  let content = '';
+  
+  // Resumen de productos
+  if (data.summary) {
+    content += 'RESUMEN DE PRODUCTOS\n';
+    content += 'Métrica,Valor\n';
+    content += `Total de Productos,${data.summary.totalProducts || 0}\n`;
+    content += `Productos Activos,${data.summary.activeProducts || 0}\n`;
+    content += `Ingresos Totales,$${(data.summary.totalRevenue || 0).toLocaleString('es-ES')}\n`;
+    content += `Unidades Vendidas,${data.summary.totalUnitsSold || 0}\n\n`;
+  }
+  
+  // Top productos
+  if (data.topProducts && data.topProducts.length > 0) {
+    content += 'PRODUCTOS MÁS VENDIDOS\n';
+    content += 'Producto,Categoría,Precio,Vendidos,Ingresos\n';
+    data.topProducts.forEach((product: any) => {
+      content += `"${product.name || 'N/A'}","${product.category?.name || 'Sin categoría'}",${product.price || 0},${product.totalSold || 0},${product.revenue || 0}\n`;
+    });
+    content += '\n';
+  }
+  
+  // Análisis por categoría
+  if (data.categoryAnalysis && data.categoryAnalysis.length > 0) {
+    content += 'ANÁLISIS POR CATEGORÍA\n';
+    content += 'Categoría,Productos,Ingresos,Ventas,Participación\n';
+    data.categoryAnalysis.forEach((category: any) => {
+      content += `"${category.name || 'N/A'}",${category.products || 0},${category.revenue || 0},${category.sales || 0},${category.percentage || 0}%\n`;
+    });
+    content += '\n';
+  }
+  
+  // Insights de inventario
+  if (data.inventoryInsights) {
+    content += 'INSIGHTS DE INVENTARIO\n';
+    content += 'Métrica,Valor\n';
+    content += `Productos con Stock Bajo,${data.inventoryInsights.lowStock || 0}\n`;
+    content += `Productos Sin Stock,${data.inventoryInsights.outOfStock || 0}\n`;
+    content += `Valor Total de Inventario,$${(data.inventoryInsights.totalInventoryValue || 0).toLocaleString('es-ES')}\n`;
+    content += `Rotación de Inventario,${data.inventoryInsights.turnoverRate || 0}x\n\n`;
+  }
+  
+  return content;
+}
+
+function generateFinancialReportCSV(data: any): string {
+  let content = '';
+  
+  // Resumen financiero
+  if (data.summary) {
+    content += 'RESUMEN FINANCIERO\n';
+    content += 'Métrica,Valor\n';
+    content += `Ingresos Totales,$${(data.summary.totalRevenue || 0).toLocaleString('es-ES')}\n`;
+    content += `Gastos Totales,$${(data.summary.totalExpenses || 0).toLocaleString('es-ES')}\n`;
+    content += `Ganancia Neta,$${(data.summary.netProfit || 0).toLocaleString('es-ES')}\n`;
+    content += `Margen de Ganancia,${data.summary.profitMargin || 0}%\n\n`;
+  }
+  
+  // Análisis de ingresos
+  if (data.revenueAnalysis) {
+    content += 'ANÁLISIS DE INGRESOS\n';
+    content += 'Concepto,Monto\n';
+    content += `Ingresos por Ventas,$${(data.revenueAnalysis.salesRevenue || 0).toLocaleString('es-ES')}\n`;
+    content += `Ingresos por Envío,$${(data.revenueAnalysis.shippingRevenue || 0).toLocaleString('es-ES')}\n`;
+    content += `Impuestos Recaudados,$${(data.revenueAnalysis.taxesCollected || 0).toLocaleString('es-ES')}\n`;
+    content += `Descuentos Aplicados,$${(data.revenueAnalysis.discountsApplied || 0).toLocaleString('es-ES')}\n\n`;
+  }
+  
+  // Análisis de gastos
+  if (data.expenseAnalysis && data.expenseAnalysis.length > 0) {
+    content += 'ANÁLISIS DE GASTOS\n';
+    content += 'Categoría,Monto,Porcentaje,Tendencia\n';
+    data.expenseAnalysis.forEach((expense: any) => {
+      const trendText = expense.trend === 'up' ? 'Subida' : expense.trend === 'down' ? 'Bajada' : 'Estable';
+      content += `"${expense.category || 'N/A'}",${expense.amount || 0},${expense.percentage || 0}%,${trendText}\n`;
+    });
+    content += '\n';
+  }
+  
+  // Flujo de caja
+  if (data.cashFlow) {
+    content += 'FLUJO DE CAJA\n';
+    content += 'Concepto,Monto\n';
+    content += `Efectivo Inicial,$${(data.cashFlow.startingCash || 0).toLocaleString('es-ES')}\n`;
+    content += `Entradas de Efectivo,$${(data.cashFlow.cashInflows || 0).toLocaleString('es-ES')}\n`;
+    content += `Salidas de Efectivo,$${(data.cashFlow.cashOutflows || 0).toLocaleString('es-ES')}\n`;
+    content += `Efectivo Final,$${(data.cashFlow.endingCash || 0).toLocaleString('es-ES')}\n\n`;
+  }
+  
+  return content;
+}
+
+function generateOrdersAnalysisCSV(data: any): string {
+  let content = '';
+  
+  // Resumen de órdenes
+  if (data.summary) {
+    content += 'RESUMEN DE ÓRDENES\n';
+    content += 'Métrica,Valor\n';
+    content += `Total de Órdenes,${data.summary.totalOrders || 0}\n`;
+    content += `Órdenes Completadas,${data.summary.completedOrders || 0}\n`;
+    content += `Órdenes Pendientes,${data.summary.pendingOrders || 0}\n`;
+    content += `Tasa de Completación,${data.summary.completionRate || 0}%\n\n`;
+  }
+  
+  // Estado de órdenes
+  if (data.orderStatus && data.orderStatus.length > 0) {
+    content += 'DISTRIBUCIÓN POR ESTADO\n';
+    content += 'Estado,Cantidad,Porcentaje,Ingresos\n';
+    data.orderStatus.forEach((status: any) => {
+      content += `${status.status || 'N/A'},${status.count || 0},${status.percentage || 0}%,${status.revenue || 0}\n`;
+    });
+    content += '\n';
+  }
+  
+  // Análisis temporal
+  if (data.timeAnalysis) {
+    content += 'ANÁLISIS TEMPORAL\n';
+    content += 'Métrica,Valor\n';
+    content += `Tiempo Promedio de Procesamiento,${data.timeAnalysis.avgProcessingTime || 0} horas\n`;
+    content += `Tiempo Promedio de Envío,${data.timeAnalysis.avgShippingTime || 0} días\n`;
+    content += `Tiempo Total Promedio,${data.timeAnalysis.avgTotalTime || 0} días\n`;
+    content += `SLA Cumplido,${data.timeAnalysis.slaCompliance || 0}%\n\n`;
+  }
+  
+  // Métodos de pago
+  if (data.paymentMethods && data.paymentMethods.length > 0) {
+    content += 'MÉTODOS DE PAGO\n';
+    content += 'Método,Órdenes,Porcentaje,Ingresos\n';
+    data.paymentMethods.forEach((method: any) => {
+      content += `"${method.method || 'N/A'}",${method.orders || 0},${method.percentage || 0}%,${method.revenue || 0}\n`;
+    });
+    content += '\n';
+  }
+  
+  return content;
+}
+
+function generateGrowthTrendsCSV(data: any): string {
+  let content = '';
+  
+  // Métricas de crecimiento
+  if (data.summary) {
+    content += 'MÉTRICAS DE CRECIMIENTO\n';
+    content += 'Métrica,Valor\n';
+    content += `Crecimiento de Ingresos,${data.summary.revenueGrowth || 0}%\n`;
+    content += `Crecimiento de Usuarios,${data.summary.userGrowth || 0}%\n`;
+    content += `Crecimiento de Órdenes,${data.summary.orderGrowth || 0}%\n`;
+    content += `Tasa de Retención,${data.summary.retentionRate || 0}%\n\n`;
+  }
+  
+  // Tendencias mensuales
+  if (data.monthlyTrends && data.monthlyTrends.length > 0) {
+    content += 'TENDENCIAS MENSUALES\n';
+    content += 'Mes,Ingresos,Órdenes,Usuarios,Crecimiento\n';
+    data.monthlyTrends.forEach((trend: any) => {
+      content += `"${trend.month || 'N/A'}",${trend.revenue || 0},${trend.orders || 0},${trend.users || 0},${trend.growth || 0}%\n`;
+    });
+    content += '\n';
+  }
+  
+  // Predicciones
+  if (data.predictions) {
+    content += 'PREDICCIONES\n';
+    content += 'Predicción,Valor\n';
+    content += `Ingresos Predichos (30 días),$${(data.predictions.nextMonthRevenue || 0).toLocaleString('es-ES')}\n`;
+    content += `Nuevos Usuarios Predichos,${data.predictions.nextMonthUsers || 0}\n`;
+    content += `Órdenes Predichas,${data.predictions.nextMonthOrders || 0}\n`;
+    content += `Confianza del Modelo,${data.predictions.confidence || 0}%\n\n`;
+  }
+  
+  // Análisis de cohortes
+  if (data.cohortAnalysis && data.cohortAnalysis.length > 0) {
+    content += 'ANÁLISIS DE COHORTES\n';
+    content += 'Período,Nuevos Usuarios,Retención S1,Retención S4,LTV Promedio\n';
+    data.cohortAnalysis.forEach((cohort: any) => {
+      content += `"${cohort.period || 'N/A'}",${cohort.newUsers || 0},${cohort.retentionWeek1 || 0}%,${cohort.retentionWeek4 || 0}%,${cohort.avgLifetimeValue || 0}\n`;
+    });
+    content += '\n';
+  }
+  
+  return content;
+}
+
+function generateGeneralCSV(data: any): string {
+  let content = '';
+  
+  // Resumen ejecutivo
+  const statsToShow = data.quickStats || data.summary || {};
+  if (Object.keys(statsToShow).length > 0) {
+    content += 'RESUMEN EJECUTIVO\n';
+    content += 'Métrica,Valor\n';
+    content += `Total de Ingresos,$${(statsToShow.totalRevenue || 0).toLocaleString('es-ES')}\n`;
+    content += `Total de Órdenes,${statsToShow.totalOrders || 0}\n`;
+    content += `Total de Usuarios,${statsToShow.totalUsers || statsToShow.totalCustomers || 0}\n`;
+    content += `Total de Productos,${statsToShow.totalProducts || 0}\n\n`;
+  }
+  
+  // Top productos
+  if (data.topProducts && data.topProducts.length > 0) {
+    content += 'PRODUCTOS MÁS VENDIDOS\n';
+    content += 'Producto,Categoría,Precio,Total Vendidos\n';
+    data.topProducts.forEach((product: any) => {
+      content += `"${product.name || 'N/A'}","${product.category?.name || 'Sin categoría'}",${product.price || 0},${product.totalSold || 0}\n`;
+    });
+    content += '\n';
+  }
+  
+  // Estadísticas mensuales
+  if (data.monthlyStats && data.monthlyStats.length > 0) {
+    content += 'ESTADÍSTICAS MENSUALES\n';
+    content += 'Mes,Órdenes,Ingresos\n';
+    data.monthlyStats.forEach((stat: any) => {
+      content += `${stat.month || 'N/A'},${stat.orders || 0},${stat.revenue || 0}\n`;
+    });
+    content += '\n';
+  }
+  
+  // Estado de órdenes
+  if (data.orderStatusData && data.orderStatusData.length > 0) {
+    content += 'ESTADO DE ÓRDENES\n';
+    content += 'Estado,Cantidad\n';
+    data.orderStatusData.forEach((status: any) => {
+      content += `${status.status || 'N/A'},${status.count || 0}\n`;
+    });
+    content += '\n';
   }
   
   return content;

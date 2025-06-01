@@ -71,7 +71,70 @@ export default function ReportsPage() {
     }
   };
 
-  // Función para manejar la descarga desde el dialog
+  // Función para descargar directamente un reporte sin mostrar el diálogo
+  const handleDownloadReport = async (reportId: string, format: 'pdf' | 'excel' | 'csv') => {
+    setIsDownloading(`${reportId}-${format}`);
+    
+    try {
+      // Obtener información específica del reporte según su tipo
+      const reportInfo = getReportInfo(reportId);
+      
+      // Primero, obtener los datos del reporte
+      const generateResponse = await fetch('/api/admin/reports/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          reportId, 
+          reportType: reportInfo.category,
+          dateRange: selectedDateRange,
+          filters: reportInfo.defaultFilters
+        })
+      });
+      
+      if (!generateResponse.ok) {
+        throw new Error(`Error ${generateResponse.status}: ${generateResponse.statusText}`);
+      }
+      
+      const reportResult = await generateResponse.json();
+      
+      // Luego, exportar los datos en el formato solicitado
+      const exportResponse = await fetch('/api/admin/reports/export', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          format,
+          dateRange: selectedDateRange,
+          reportId: reportInfo.id,
+          customData: reportResult.data
+        })
+      });
+
+      if (!exportResponse.ok) throw new Error('Error al descargar');
+
+      const blob = await exportResponse.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      
+      // Usar la extensión correcta para Excel
+      const extension = format === 'excel' ? 'xlsx' : format;
+      a.download = `${reportInfo.id}-${selectedDateRange}-${new Date().toISOString().split('T')[0]}.${extension}`;
+      
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      
+      toast.success(`Descarga iniciada: El reporte ${reportInfo.title} en formato ${format.toUpperCase()} se está descargando.`);
+      
+    } catch (error) {
+      console.error('Error downloading report:', error);
+      toast.error(error instanceof Error ? error.message : "Ha ocurrido un error inesperado al descargar el reporte.");
+    } finally {
+      setIsDownloading(null);
+    }
+  };
   const handleDownloadFromDialog = async (format: 'pdf' | 'excel' | 'csv') => {
     if (!currentReportData || !currentReportInfo) return;
     
@@ -96,7 +159,9 @@ export default function ReportsPage() {
       const a = document.createElement('a');
       a.style.display = 'none';
       a.href = url;
-      a.download = `${currentReportInfo.id}-${selectedDateRange}-${new Date().toISOString().split('T')[0]}.${format}`;
+      // Usar la extensión correcta para Excel
+      const extension = format === 'excel' ? 'xlsx' : format;
+      a.download = `${currentReportInfo.id}-${selectedDateRange}-${new Date().toISOString().split('T')[0]}.${extension}`;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
@@ -263,11 +328,10 @@ export default function ReportsPage() {
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
         {/* Left Column */}
         <div className="xl:col-span-2 space-y-8">
-          {/* Report Types Grid */}
-          <ReportTypesGrid
-            onGenerateReport={handleGenerateReport}
+          {/* Report Types Grid */}          <ReportTypesGrid
+            onDownloadReport={handleDownloadReport}
             onPreviewReport={handlePreviewReport}
-            isGenerating={isGenerating}
+            isDownloading={isDownloading}
           />
           
           {/* Top Products */}

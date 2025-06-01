@@ -489,7 +489,7 @@ async function generateProductPerformanceReport(startDate: Date, endDate: Date) 
       productCount: Number(cat.productCount)
     })),
     inventoryInsights: {
-      lowStock: profitabilityData.filter(p => p.stock < 10).length,
+      lowStock: profitabilityData.filter(p => p.stock! < 10 ).length,
       outOfStock: profitabilityData.filter(p => p.stock === 0).length,
       totalActiveProducts: inventoryStatus.reduce((sum, status) => sum + status._count.id, 0),
       averageStock: inventoryStatus.length > 0 
