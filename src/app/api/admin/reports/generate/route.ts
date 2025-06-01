@@ -439,13 +439,14 @@ async function generateProductPerformanceReport(startDate: Date, endDate: Date, 
 
   return {
     topPerformers: await enrichProductData(bestSellingProducts),
+    topProducts: await enrichProductData(bestSellingProducts),
     underPerformers: await enrichProductData(worstPerformingProducts),
     categoryAnalysis: categoryPerformance.map(cat => ({
-      categoryId: cat.categoryId,
-      categoryName: cat.categoryName,
-      totalRevenue: Number(cat.totalRevenue),
-      totalQuantity: Number(cat.totalQuantity),
-      productCount: Number(cat.productCount)
+      name: cat.categoryName,
+      products: Number(cat.productCount),
+      revenue: Number(cat.totalRevenue),
+      sales: Number(cat.totalQuantity),
+      percentage: 0 // Si tienes el porcentaje real, cámbialo aquí
     })),
     inventoryHealth: {
       totalActiveProducts: inventoryStatus.reduce((sum, item) => sum + item._count.id, 0),

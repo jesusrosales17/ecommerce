@@ -714,9 +714,8 @@ async function addProductPerformanceContent(doc: any, data: any, startY: number)
     
     currentY = (doc as any).lastAutoTable.finalY + 15;
   }
-  
-  // Top productos
-  if (data.topPerformers && data.topPerformers.length > 0) {
+    // Top productos
+  if (data.topProducts && data.topProducts.length > 0) {
     if (currentY > 250) {
       doc.addPage();
       currentY = 20;
@@ -726,7 +725,7 @@ async function addProductPerformanceContent(doc: any, data: any, startY: number)
     doc.text('Productos Más Vendidos', 14, currentY);
     currentY += 5;
     
-    const topProductsData = data.topPerformers.slice(0, 10).map((product: any, index: number) => [
+    const topProductsData = data.topProducts.slice(0, 10).map((product: any, index: number) => [
       (index + 1).toString(),
       product.name || 'N/A',
       product.category?.name || 'Sin categoría',
@@ -755,10 +754,9 @@ async function addProductPerformanceContent(doc: any, data: any, startY: number)
     doc.setFontSize(16);
     doc.text('Rendimiento por Categoría', 14, currentY);
     currentY += 5;
-    
-    const categoryData = data.categoryAnalysis.map((category: any) => [
+      const categoryData = data.categoryAnalysis.map((category: any) => [
       category.name || 'N/A',
-      category.productCount?.toString() || '0',
+      category.productCount.toString() || '0',
       `$${category.revenue?.toLocaleString('es-ES', { minimumFractionDigits: 2 }) || '0.00'}`,
       category.quantity?.toString() || '0'
     ]);
@@ -1267,13 +1265,12 @@ function addProductPerformanceExcelSheets(workbook: any, data: any) {
   // Hoja de análisis por categoría
   if (data.categoryAnalysis && data.categoryAnalysis.length > 0) {
     const categoryData = [
-      ['Categoría', 'Productos', 'Ingresos', 'Ventas', 'Participación'],
+      ['Categoría', 'Productos', 'Ingresos', 'Ventas'],
       ...data.categoryAnalysis.map((category: any) => [
         category.name || 'N/A',
-        category.products || 0,
+        category.productCount || 0,
         category.revenue || 0,
-        category.sales || 0,
-        `${category.percentage || 0}%`
+        category.quantity || 0,
       ])
     ];
     const categorySheet = XLSX.utils.aoa_to_sheet(categoryData);

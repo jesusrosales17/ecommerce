@@ -146,6 +146,9 @@ export async function POST(request: NextRequest) {
     const timestamp = new Date().toISOString().split('T')[0];
     const reportName = reportId || 'general';
 
+
+    console.log(reportData)
+
     switch (format) {
       case 'pdf':
         fileBuffer = await generatePDFReport(reportData, dateRange, reportId);

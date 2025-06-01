@@ -152,7 +152,7 @@ export const ReportTypesGrid = ({
                         )}
                       </button>
                       
-                      <button
+                      {/* <button
                         onClick={() => onDownloadReport(report.id, 'csv')}
                         disabled={isDownloading === `${report.id}-csv`}
                         className={`flex-1 bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 transition-colors inline-flex items-center justify-center text-xs font-medium ${
@@ -167,7 +167,7 @@ export const ReportTypesGrid = ({
                             CSV
                           </>
                         )}
-                      </button>
+                      </button> */}
                     </div>
                   </div>
                 </div>
