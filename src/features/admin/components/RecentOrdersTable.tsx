@@ -2,6 +2,11 @@
 
 import React from "react";
 import { Eye, Clock, CheckCircle, XCircle, Package } from "lucide-react";
+import { formatPrice } from "@/utils/price";
+import { formatDate, formatDateShort } from "@/utils/date";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
+import { useOrderStore } from "@/features/orders/store/useOrderStore";
 
 interface RecentOrder {
   id: string;
@@ -18,64 +23,82 @@ interface RecentOrdersTableProps {
 }
 
 export default function RecentOrdersTable({ orders }: RecentOrdersTableProps) {
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("es-ES", {
-      style: "currency",
-      currency: "USD"
-    }).format(amount);
+  const router = useRouter();
+  const { setOrderToShow, setIsOpenInfoDrawer } = useOrderStore();  const handleViewOrder = async (order: RecentOrder) => {
+    try {      // Navegar a la página de órdenes
+      router.push('/admin/orders');
+      
+      // Establecer la orden temporal y abrir el drawer (con casting para tipo temporal)
+      const temporaryOrder = {
+        id: order.id,
+        total: order.total.toString(),
+        status: order.status,
+        createdAt: order.createdAt,
+        updatedAt: order.createdAt,
+        userId: '',
+        addressId: '',
+        paymentId: '',
+        paymentStatus: 'PENDING' as const,
+        User: {
+          name: order.customerName,
+          email: order.customerEmail
+        },
+        Address: null,
+        items: []
+      } as any; // Casting temporal - se actualizará con datos completos
+      
+      setOrderToShow(temporaryOrder);
+      setIsOpenInfoDrawer(true);
+      
+      // Cargar los detalles completos en segundo plano
+      const response = await fetch(`/api/admin/orders/${order.id}`);
+      if (response.ok) {
+        const fullOrder = await response.json();
+        setOrderToShow(fullOrder);
+      } else {
+        console.error('Error loading order details');
+      }
+    } catch (error) {
+      console.error('Error handling view order:', error);
+    }
   };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("es-ES", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit"
-    });
-  };
-
-  const formatDateShort = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("es-ES", {
-      day: "2-digit",
-      month: "short"
-    });
-  };
-
   const getStatusBadge = (status: string) => {
     const statusConfig = {
       PENDING: {
         color: "bg-yellow-100 text-yellow-800 border-yellow-200",
         icon: Clock,
-        label: "Pendiente"
+        label: "Pendiente",
       },
       PROCESSING: {
         color: "bg-blue-100 text-blue-800 border-blue-200",
         icon: Package,
-        label: "Procesando"
+        label: "Procesando",
       },
       SHIPPED: {
         color: "bg-indigo-100 text-indigo-800 border-indigo-200",
         icon: Package,
-        label: "Enviado"
+        label: "Enviado",
       },
       DELIVERED: {
         color: "bg-green-100 text-green-800 border-green-200",
         icon: CheckCircle,
-        label: "Entregado"
+        label: "Entregado",
       },
       CANCELLED: {
         color: "bg-red-100 text-red-800 border-red-200",
         icon: XCircle,
-        label: "Cancelado"
-      }
+        label: "Cancelado",
+      },
     };
 
-    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.PENDING;
+    const config =
+      statusConfig[status as keyof typeof statusConfig] || statusConfig.PENDING;
     const Icon = config.icon;
 
     return (
-      <span className={`inline-flex items-center px-2 py-1 sm:px-2.5 sm:py-0.5 rounded-full text-xs font-medium border ${config.color}`}>
+      <span
+        className={`inline-flex items-center px-2 py-1 sm:px-2.5 sm:py-0.5 rounded-full text-xs font-medium border ${config.color}`}
+      >
         <Icon className="w-3 h-3 mr-1" />
         <span className="hidden sm:inline">{config.label}</span>
         <span className="sm:hidden">{config.label.slice(0, 3)}</span>
@@ -121,10 +144,10 @@ export default function RecentOrdersTable({ orders }: RecentOrdersTableProps) {
                     {getStatusBadge(order.status)}
                   </div>
                   <span className="text-sm font-semibold text-gray-900">
-                    {formatCurrency(order.total)}
+                    {formatPrice(order.total)}
                   </span>
                 </div>
-                
+
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-gray-900 truncate">
@@ -136,16 +159,18 @@ export default function RecentOrdersTable({ orders }: RecentOrdersTableProps) {
                   </div>
                   <div className="text-right ml-4">
                     <p className="text-xs text-gray-500">
-                      {order.itemsCount} {order.itemsCount === 1 ? 'item' : 'items'}
+                      {order.itemsCount}{" "}
+                      {order.itemsCount === 1 ? "item" : "items"}
                     </p>
                     <p className="text-xs text-gray-500">
                       {formatDateShort(order.createdAt)}
                     </p>
                   </div>
-                </div>
-                
-                <div className="flex justify-end">
-                  <button className="text-blue-600 hover:text-blue-700 text-sm font-medium inline-flex items-center">
+                </div>                <div className="flex justify-end">
+                  <button 
+                    onClick={() => handleViewOrder(order)}
+                    className="text-blue-600 hover:text-blue-700 text-sm font-medium inline-flex items-center"
+                  >
                     <Eye className="w-4 h-4 mr-1" />
                     Ver
                   </button>
@@ -207,19 +232,23 @@ export default function RecentOrdersTable({ orders }: RecentOrdersTableProps) {
                     {getStatusBadge(order.status)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {order.itemsCount} {order.itemsCount === 1 ? 'item' : 'items'}
+                    {order.itemsCount}{" "}
+                    {order.itemsCount === 1 ? "item" : "items"}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
-                    {formatCurrency(order.total)}
+                    {formatPrice(order.total)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {formatDate(order.createdAt)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <button className="text-blue-600 hover:text-blue-700 inline-flex items-center">
+                  </td>                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <Button
+                      variant={"ghost"}
+                      onClick={() => handleViewOrder(order)}
+                      className="text-blue-600 hover:text-blue-700 inline-flex items-center"
+                    >
                       <Eye className="w-4 h-4 mr-1" />
                       Ver
-                    </button>
+                    </Button>
                   </td>
                 </tr>
               ))}

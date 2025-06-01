@@ -44,7 +44,12 @@ interface Props {
 }
 
 export function OrderTable({ orders: initialOrders }: Props) {
-  const { setIsOpenInfoDrawer, setOrderToShow, setOrders, orders: storeOrders } = useOrderStore();
+  const {
+    setIsOpenInfoDrawer,
+    setOrderToShow,
+    setOrders,
+    orders: storeOrders,
+  } = useOrderStore();
 
   const { changeOrderStatus } = useOrderActions();
 
@@ -85,7 +90,8 @@ export function OrderTable({ orders: initialOrders }: Props) {
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
         classname="mb-4"
-      /><div className="rounded-md border">
+      />
+      <div className="rounded-md border">
         <Table>
           <TableHeader>
             <TableRow>
