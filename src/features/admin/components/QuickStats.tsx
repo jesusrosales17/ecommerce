@@ -2,6 +2,7 @@
 
 import React from "react";
 import { TrendingUp, TrendingDown, DollarSign, Users, ShoppingCart } from "lucide-react";
+import { formattedPrice } from "@/utils/price";
 
 interface QuickStatsProps {
   totalRevenue: number;
@@ -16,14 +17,7 @@ export default function QuickStats({
   totalOrders, 
   userGrowthPercentage 
 }: QuickStatsProps) {
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("es-ES", {
-      style: "currency",
-      currency: "USD",
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0
-    }).format(amount);
-  };
+
 
   const formatGrowth = (percentage: number) => {
     const abs = Math.abs(percentage);
@@ -46,7 +40,7 @@ export default function QuickStats({
             <div className="flex items-center justify-center w-12 h-12 bg-white/20 rounded-lg mb-2">
               <DollarSign className="w-6 h-6" />
             </div>
-            <div className="text-2xl font-bold">{formatCurrency(totalRevenue)}</div>
+            <div className="text-2xl font-bold">{formattedPrice(totalRevenue)}</div>
             <div className="text-sm text-blue-100">Ingresos Totales</div>
           </div>
 
