@@ -1,11 +1,11 @@
 "use client";
 
 import React from "react";
-import { Clock, User, ShoppingCart, Package, AlertCircle } from "lucide-react";
+import { Clock, User, ShoppingCart, AlertCircle } from "lucide-react";
 
 interface ActivityItem {
   id: string;
-  type: "order" | "user" | "product" | "alert";
+  type: "order" | "user" | "alert";
   message: string;
   timestamp: string;
   user?: string;
@@ -16,53 +16,12 @@ interface RecentActivityProps {
 }
 
 export default function RecentActivity({ activities = [] }: RecentActivityProps) {
-  // Mock data for demonstration
-  const defaultActivities: ActivityItem[] = [
-    {
-      id: "1",
-      type: "order",
-      message: "Nueva orden #ORD-001 recibida",
-      timestamp: "Hace 5 minutos",
-      user: "Juan Pérez"
-    },
-    {
-      id: "2",
-      type: "user",
-      message: "Nuevo usuario registrado",
-      timestamp: "Hace 15 minutos",
-      user: "María García"
-    },
-    {
-      id: "3",
-      type: "product",
-      message: "Producto 'iPhone 14' actualizado",
-      timestamp: "Hace 30 minutos"
-    },
-    {
-      id: "4",
-      type: "alert",
-      message: "Stock bajo en 'Samsung Galaxy S23'",
-      timestamp: "Hace 1 hora"
-    },
-    {
-      id: "5",
-      type: "order",
-      message: "Orden #ORD-002 enviada",
-      timestamp: "Hace 2 horas",
-      user: "Carlos López"
-    }
-  ];
-
-  const displayActivities = activities.length > 0 ? activities : defaultActivities;
-
   const getActivityIcon = (type: string) => {
     switch (type) {
       case "order":
         return <ShoppingCart className="w-4 h-4 text-blue-500" />;
       case "user":
         return <User className="w-4 h-4 text-green-500" />;
-      case "product":
-        return <Package className="w-4 h-4 text-purple-500" />;
       case "alert":
         return <AlertCircle className="w-4 h-4 text-orange-500" />;
       default:
@@ -76,8 +35,6 @@ export default function RecentActivity({ activities = [] }: RecentActivityProps)
         return "bg-blue-50 border-blue-200";
       case "user":
         return "bg-green-50 border-green-200";
-      case "product":
-        return "bg-purple-50 border-purple-200";
       case "alert":
         return "bg-orange-50 border-orange-200";
       default:
@@ -92,12 +49,10 @@ export default function RecentActivity({ activities = [] }: RecentActivityProps)
           <Clock className="w-5 h-5 mr-2 text-gray-600" />
           Actividad Reciente
         </h3>
-      </div>
-
-      <div className="p-6">
-        {displayActivities.length > 0 ? (
+      </div>      <div className="p-6">
+        {activities.length > 0 ? (
           <div className="space-y-3">
-            {displayActivities.map((activity) => (
+            {activities.map((activity) => (
               <div 
                 key={activity.id} 
                 className={`flex items-start space-x-3 p-3 rounded-lg border ${getActivityColor(activity.type)}`}
@@ -135,12 +90,12 @@ export default function RecentActivity({ activities = [] }: RecentActivityProps)
           </div>
         )}
       </div>
-
+{/* 
       <div className="px-6 py-3 bg-gray-50 border-t border-gray-200 rounded-b-lg">
         <button className="text-sm font-medium text-blue-600 hover:text-blue-700">
           Ver toda la actividad
         </button>
-      </div>
+      </div> */}
     </div>
   );
 }

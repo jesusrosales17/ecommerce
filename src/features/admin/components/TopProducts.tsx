@@ -17,12 +17,13 @@ interface TopProductsProps {
   products: TopProduct[];
 }
 
-export default function TopProducts({ products }: TopProductsProps) {  const formatCurrency = (amount: number) => {
+export default function TopProducts({ products }: TopProductsProps) {
+  const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("es-MX", {
       style: "currency",
       currency: "MXN",
       minimumFractionDigits: 0,
-      maximumFractionDigits: 0
+      maximumFractionDigits: 0,
     }).format(amount);
   };
 
@@ -49,7 +50,8 @@ export default function TopProducts({ products }: TopProductsProps) {  const for
             </Link>
           </Button>
         </div>
-      </div>      <div className="p-0">
+      </div>{" "}
+      <div className="p-0">
         {products.length > 0 ? (
           <div className="overflow-x-auto">
             <table className="w-full">
@@ -66,7 +68,8 @@ export default function TopProducts({ products }: TopProductsProps) {  const for
                   </th>
                   <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Vendidos
-                  </th>                  <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  </th>
+                  <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Ingresos
                   </th>
                   <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -104,7 +107,8 @@ export default function TopProducts({ products }: TopProductsProps) {  const for
                         <Package className="w-4 h-4 mr-1" />
                         <span className="font-medium">{product.totalSold}</span>
                       </div>
-                    </td>                    <td className="px-4 py-4 whitespace-nowrap text-right">
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap text-right">
                       <div className="flex items-center justify-end text-sm font-semibold text-green-600">
                         <DollarSign className="w-4 h-4 mr-1" />
                         <span>
@@ -121,7 +125,10 @@ export default function TopProducts({ products }: TopProductsProps) {  const for
                         size="sm"
                         className="text-blue-600 hover:text-blue-700"
                       >
-                        <Link href={`/admin/products/${product.id}`} className="flex items-center">
+                        <Link
+                          href={`/admin/products/${product.id}`}
+                          className="flex items-center"
+                        >
                           <Eye className="w-4 h-4 mr-1" />
                           Ver
                         </Link>

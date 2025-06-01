@@ -36,11 +36,17 @@ interface DashboardStats {
     month: string;
     orders: number;
     revenue: number;
-  }>;
-  orderStatusData: Array<{
+  }>;  orderStatusData: Array<{
     status: string;
     count: number;
     color: string;
+  }>;
+  recentActivity: Array<{
+    id: string;
+    type: "order" | "user" | "alert";
+    message: string;
+    timestamp: string;
+    user?: string;
   }>;
 }
 

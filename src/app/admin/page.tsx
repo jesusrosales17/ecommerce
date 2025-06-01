@@ -9,6 +9,7 @@ import TopProducts from "@/features/admin/components/TopProducts";
 import OrderStatusChart from "@/features/admin/components/OrderStatusChart";
 import QuickStats from "@/features/admin/components/QuickStats";
 import RecentActivity from "@/features/admin/components/RecentActivity";
+import QuickActions from "@/features/admin/components/QuickActions";
 import { RefreshCw, Settings, Bell } from "lucide-react";
 
 export default function AdminDashboard() {
@@ -132,40 +133,13 @@ export default function AdminDashboard() {
           <div className="2xl:col-span-1">
             <TopProducts products={stats.topProducts} />
           </div>
-        </div>
-
-        {/* Activity and Quick Actions */}
+        </div>        {/* Activity and Quick Actions */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
           {/* Recent Activity */}
-          <RecentActivity />
+          <RecentActivity activities={stats.recentActivity} />
           
           {/* Quick Actions */}
-          <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              Acciones Rápidas
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-              <button className="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4 text-left hover:bg-blue-100 transition-colors">
-                <div className="text-blue-600 font-medium text-sm sm:text-base">Agregar Producto</div>
-                <div className="text-xs sm:text-sm text-blue-500 mt-1">Crear nuevo producto</div>
-              </button>
-              
-              <button className="bg-green-50 border border-green-200 rounded-lg p-3 sm:p-4 text-left hover:bg-green-100 transition-colors">
-                <div className="text-green-600 font-medium text-sm sm:text-base">Ver Órdenes</div>
-                <div className="text-xs sm:text-sm text-green-500 mt-1">Gestionar pedidos</div>
-              </button>
-              
-              <button className="bg-purple-50 border border-purple-200 rounded-lg p-3 sm:p-4 text-left hover:bg-purple-100 transition-colors">
-                <div className="text-purple-600 font-medium text-sm sm:text-base">Clientes</div>
-                <div className="text-xs sm:text-sm text-purple-500 mt-1">Ver clientes</div>
-              </button>
-              
-              <button className="bg-orange-50 border border-orange-200 rounded-lg p-3 sm:p-4 text-left hover:bg-orange-100 transition-colors">
-                <div className="text-orange-600 font-medium text-sm sm:text-base">Reportes</div>
-                <div className="text-xs sm:text-sm text-orange-500 mt-1">Generar reportes</div>
-              </button>
-            </div>
-          </div>
+          <QuickActions />
         </div>
       </div>
     </div>

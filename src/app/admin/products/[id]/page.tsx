@@ -60,7 +60,7 @@ const ProductViewPage = async ({ params }: Props) => {
         >
           {product.status === "ACTIVE" ? "Activo" : "Inactivo"}
         </Badge>
-      </div>{" "}
+      </div>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Images & Category & Dates */}
         <div className="space-y-6">

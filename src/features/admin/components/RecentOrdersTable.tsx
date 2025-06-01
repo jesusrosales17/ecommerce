@@ -170,7 +170,7 @@ export default function RecentOrdersTable({ orders }: RecentOrdersTableProps) {
                       {formatDateShort(order.createdAt)}
                     </p>
                   </div>
-                </div>{" "}
+                </div>
                 <div className="flex justify-end">
                   <button
                     onClick={() => handleViewOrder(order)}
