@@ -12,6 +12,7 @@ import {
   Eye
 } from "lucide-react";
 import { ReportType } from "../interfaces/reportTypes";
+import { Button } from "@/components/ui/button";
 
 interface ReportTypesGridProps {
   onDownloadReport: (reportId: string, format: 'pdf' | 'excel' | 'csv') => void;
@@ -75,16 +76,7 @@ export const ReportTypesGrid = ({
       borderColor: "border-indigo-200",
       category: "sales"
     },
-    {
-      id: "growth-trends",
-      title: "Tendencias de Crecimiento",
-      description: "Métricas de crecimiento y proyecciones",
-      icon: TrendingUp,
-      color: "text-emerald-600",
-      bgColor: "bg-emerald-50",
-      borderColor: "border-emerald-200",
-      category: "financial"
-    }
+
   ];
 
   return (
@@ -99,10 +91,10 @@ export const ReportTypesGrid = ({
           return (
             <div
               key={report.id}
-              className={`bg-white rounded-lg border ${report.borderColor} p-6 hover:shadow-lg transition-all duration-200 transform hover:-translate-y-1`}
+              className={`bg-white rounded-lg border ${report.borderColor} p-6 hover:shadow-lg relative transition-all duration-200 transform hover:-translate-y-1`}
             >
-              <div className="flex items-start space-x-4">
-                <div className={`${report.bgColor} p-3 rounded-lg flex-shrink-0`}>
+              <div className=" space-x-4">
+                <div className={`${report.bgColor} p-3 rounded-lg flex-shrink-0 w-11 h-10 mr-auto absolute right-3 top-3`}>
                   <IconComponent className={`w-6 h-6 ${report.color}`} />
                 </div>
                 
@@ -124,7 +116,7 @@ export const ReportTypesGrid = ({
                     </button>
                     
                     {/* Botones de descarga */}
-                    <div className="flex space-x-1">
+                    <div className="flex gap-4 mt-3">
                       <button
                         onClick={() => onDownloadReport(report.id, 'pdf')}
                         disabled={isDownloading === `${report.id}-pdf`}
@@ -151,6 +143,7 @@ export const ReportTypesGrid = ({
                       >
                         {isDownloading === `${report.id}-excel` ? (
                           <div className="animate-spin rounded-full h-3 w-3 border-2 border-white border-t-transparent"></div>
+
                         ) : (
                           <>
                             <Download className="w-3 h-3 mr-1" />

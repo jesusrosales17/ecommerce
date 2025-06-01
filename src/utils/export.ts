@@ -180,7 +180,23 @@ export const exportToPDF = (data: ExportData) => {
   doc.save(`dashboard-report-${new Date().toISOString().split('T')[0]}.pdf`);
 };
 
-export const exportToExcel = (data: ExportData) => {
+export const exportToExcel = async (data: ExportData, dateRange: string, reportId?: string) => {
+  // Si tenemos reportId, obtener los datos completos del mismo endpoint que usa la vista previa
+  let completeData = data;
+  if (reportId) {
+    try {
+      // Usar el mismo endpoint que usa la vista previa para obtener TODOS los datos
+      const response = await fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/admin/reports/${reportId}?dateRange=${dateRange}`);
+      if (response.ok) {
+        const apiResponse = await response.json();
+        completeData = apiResponse.data;
+      }
+    } catch (error) {
+      console.error('Error fetching complete report data for Excel:', error);
+      // Si falla, usar los datos originales
+    }
+  }
+
   const workbook = XLSX.utils.book_new();
   
   // Hoja de resumen
@@ -297,12 +313,8 @@ export const generatePDFReport = async (data: ReportData, dateRange: string, rep
         break;
       case 'financial-report':
         currentY = await addFinancialReportContent(doc, completeData, currentY);
-        break;
-      case 'orders-analysis':
+        break;      case 'orders-analysis':
         currentY = await addOrdersAnalysisContent(doc, completeData, currentY);
-        break;
-      case 'growth-trends':
-        currentY = await addGrowthTrendsContent(doc, completeData, currentY);
         break;
       default:
         // Fallback para reportes generales
@@ -321,9 +333,8 @@ export const generatePDFReport = async (data: ReportData, dateRange: string, rep
 
 // Nueva función para generar Excel como Buffer
 export const generateExcelReport = async (data: ReportData, dateRange: string, reportId?: string): Promise<Buffer> => {
-  // Los datos ya vienen completos del endpoint, no necesitamos volver a buscarlos
+  // Usar los datos proporcionados sin hacer solicitudes adicionales
   const completeData = data;
-
   const workbook = XLSX.utils.book_new();
   
   // Generar hojas específicas según el tipo de reporte
@@ -340,12 +351,8 @@ export const generateExcelReport = async (data: ReportData, dateRange: string, r
         break;
       case 'financial-report':
         addFinancialReportExcelSheets(workbook, completeData);
-        break;
-      case 'orders-analysis':
+        break;      case 'orders-analysis':
         addOrdersAnalysisExcelSheets(workbook, completeData);
-        break;
-      case 'growth-trends':
-        addGrowthTrendsExcelSheets(workbook, completeData);
         break;
       default:
         addGeneralExcelSheets(workbook, completeData);
@@ -362,21 +369,8 @@ export const generateExcelReport = async (data: ReportData, dateRange: string, r
 
 // Nueva función para generar CSV como Buffer
 export const generateCSVReport = async (data: ReportData, dateRange: string, reportId?: string): Promise<Buffer> => {
-  // Si tenemos reportId, obtener los datos completos del mismo endpoint que usa la vista previa
-  let completeData = data;
-  if (reportId) {
-    try {
-      // Usar el mismo endpoint que usa la vista previa para obtener TODOS los datos
-      const response = await fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/admin/reports/${reportId}?dateRange=${dateRange}`);
-      if (response.ok) {
-        const apiResponse = await response.json();
-        completeData = apiResponse.data;
-      }
-    } catch (error) {
-      console.error('Error fetching complete report data:', error);
-      // Si falla, usar los datos originales
-    }
-  }
+  // Usar los datos proporcionados sin hacer solicitudes adicionales
+  const completeData = data;
 
   let csvContent = '';
   
@@ -400,12 +394,8 @@ export const generateCSVReport = async (data: ReportData, dateRange: string, rep
         break;
       case 'financial-report':
         csvContent += generateFinancialReportCSV(completeData);
-        break;
-      case 'orders-analysis':
+        break;      case 'orders-analysis':
         csvContent += generateOrdersAnalysisCSV(completeData);
-        break;
-      case 'growth-trends':
-        csvContent += generateGrowthTrendsCSV(completeData);
         break;
       default:
         csvContent += generateGeneralCSV(completeData);        break;
@@ -425,7 +415,6 @@ function getReportTitle(reportId: string): string {
     'product-performance': 'Reporte de Rendimiento de Productos',
     'financial-report': 'Reporte Financiero',
     'orders-analysis': 'Reporte de Análisis de Órdenes',
-    'growth-trends': 'Reporte de Tendencias de Crecimiento'
   };
   return titles[reportId] || 'Reporte Personalizado';
 }
@@ -1051,124 +1040,7 @@ async function addOrdersAnalysisContent(doc: any, data: any, startY: number): Pr
   return currentY;
 }
 
-async function addGrowthTrendsContent(doc: any, data: any, startY: number): Promise<number> {
-  let currentY = startY;
-  
-  // Resumen de crecimiento
-  if (data.summary) {
-    doc.setFontSize(16);
-    doc.text('Métricas de Crecimiento', 14, currentY);
-    currentY += 10;
-    
-    const summaryData = [
-      ['Crecimiento de Ingresos', `${data.summary.revenueGrowth || 0}%`],
-      ['Crecimiento de Usuarios', `${data.summary.userGrowth || 0}%`],
-      ['Crecimiento de Órdenes', `${data.summary.orderGrowth || 0}%`],
-      ['Tasa de Retención', `${data.summary.retentionRate || 0}%`]
-    ];
-    
-    autoTable(doc, {
-      startY: currentY,
-      head: [['Métrica', 'Valor']],
-      body: summaryData,
-      theme: 'grid',
-      styles: { fontSize: 10 }
-    });
-    
-    currentY = (doc as any).lastAutoTable.finalY + 15;
-  }
-  
-  // Tendencias mensuales
-  if (data.monthlyTrends && data.monthlyTrends.length > 0) {
-    if (currentY > 250) {
-      doc.addPage();
-      currentY = 20;
-    }
-    
-    doc.setFontSize(16);
-    doc.text('Tendencias Mensuales', 14, currentY);
-    currentY += 5;
-    
-    const trendsData = data.monthlyTrends.map((trend: any) => [
-      trend.month || 'N/A',
-      `$${trend.revenue?.toLocaleString('es-ES', { minimumFractionDigits: 2 }) || '0.00'}`,
-      trend.orders?.toString() || '0',
-      trend.users?.toString() || '0',
-      `${trend.growth || 0}%`
-    ]);
-    
-    autoTable(doc, {
-      startY: currentY,
-      head: [['Mes', 'Ingresos', 'Órdenes', 'Usuarios', 'Crecimiento']],
-      body: trendsData,
-      theme: 'striped',
-      styles: { fontSize: 8 }
-    });
-    
-    currentY = (doc as any).lastAutoTable.finalY + 15;
-  }
-  
-  // Predicciones
-  if (data.predictions) {
-    if (currentY > 250) {
-      doc.addPage();
-      currentY = 20;
-    }
-    
-    doc.setFontSize(16);
-    doc.text('Predicciones', 14, currentY);
-    currentY += 10;
-    
-    const predictionsData = [
-      ['Ingresos Predichos (30 días)', `$${data.predictions.nextMonthRevenue?.toLocaleString('es-ES', { minimumFractionDigits: 2 }) || '0.00'}`],
-      ['Nuevos Usuarios Predichos', data.predictions.nextMonthUsers?.toString() || '0'],
-      ['Órdenes Predichas', data.predictions.nextMonthOrders?.toString() || '0'],
-      ['Confianza del Modelo', `${data.predictions.confidence || 0}%`]
-    ];
-    
-    autoTable(doc, {
-      startY: currentY,
-      head: [['Predicción', 'Valor']],
-      body: predictionsData,
-      theme: 'grid',
-      styles: { fontSize: 10 }
-    });
-    
-    currentY = (doc as any).lastAutoTable.finalY + 15;
-  }
-  
-  // Análisis de cohortes
-  if (data.cohortAnalysis && data.cohortAnalysis.length > 0) {
-    if (currentY > 250) {
-      doc.addPage();
-      currentY = 20;
-    }
-    
-    doc.setFontSize(16);
-    doc.text('Análisis de Cohortes', 14, currentY);
-    currentY += 5;
-    
-    const cohortData = data.cohortAnalysis.map((cohort: any) => [
-      cohort.period || 'N/A',
-      cohort.newUsers?.toString() || '0',
-      `${cohort.retentionWeek1 || 0}%`,
-      `${cohort.retentionWeek4 || 0}%`,
-      `$${cohort.avgLifetimeValue?.toLocaleString('es-ES', { minimumFractionDigits: 2 }) || '0.00'}`
-    ]);
-    
-    autoTable(doc, {
-      startY: currentY,
-      head: [['Período', 'Nuevos Usuarios', 'Retención S1', 'Retención S4', 'LTV Promedio']],
-      body: cohortData,
-      theme: 'striped',
-      styles: { fontSize: 8 }
-    });
-    
-    currentY = (doc as any).lastAutoTable.finalY + 15;
-  }
-  
-  return currentY;
-}
+
 
 async function addGeneralReportContent(doc: any, data: any, startY: number): Promise<number> {
   let currentY = startY;
@@ -1536,65 +1408,7 @@ function addOrdersAnalysisExcelSheets(workbook: any, data: any) {
   }
 }
 
-function addGrowthTrendsExcelSheets(workbook: any, data: any) {
-  // Hoja de métricas de crecimiento
-  if (data.summary) {
-    const summaryData = [
-      ['Métrica', 'Valor'],
-      ['Crecimiento de Ingresos', `${data.summary.revenueGrowth || 0}%`],
-      ['Crecimiento de Usuarios', `${data.summary.userGrowth || 0}%`],
-      ['Crecimiento de Órdenes', `${data.summary.orderGrowth || 0}%`],
-      ['Tasa de Retención', `${data.summary.retentionRate || 0}%`]
-    ];
-    const summarySheet = XLSX.utils.aoa_to_sheet(summaryData);
-    XLSX.utils.book_append_sheet(workbook, summarySheet, 'Métricas Crecimiento');
-  }
-  
-  // Hoja de tendencias mensuales
-  if (data.monthlyTrends && data.monthlyTrends.length > 0) {
-    const trendsData = [
-      ['Mes', 'Ingresos', 'Órdenes', 'Usuarios', 'Crecimiento'],
-      ...data.monthlyTrends.map((trend: any) => [
-        trend.month || 'N/A',
-        trend.revenue || 0,
-        trend.orders || 0,
-        trend.users || 0,
-        `${trend.growth || 0}%`
-      ])
-    ];
-    const trendsSheet = XLSX.utils.aoa_to_sheet(trendsData);
-    XLSX.utils.book_append_sheet(workbook, trendsSheet, 'Tendencias Mensuales');
-  }
-  
-  // Hoja de predicciones
-  if (data.predictions) {
-    const predictionsData = [
-      ['Predicción', 'Valor'],
-      ['Ingresos Predichos (30 días)', data.predictions.nextMonthRevenue || 0],
-      ['Nuevos Usuarios Predichos', data.predictions.nextMonthUsers || 0],
-      ['Órdenes Predichas', data.predictions.nextMonthOrders || 0],
-      ['Confianza del Modelo', `${data.predictions.confidence || 0}%`]
-    ];
-    const predictionsSheet = XLSX.utils.aoa_to_sheet(predictionsData);
-    XLSX.utils.book_append_sheet(workbook, predictionsSheet, 'Predicciones');
-  }
-  
-  // Hoja de análisis de cohortes
-  if (data.cohortAnalysis && data.cohortAnalysis.length > 0) {
-    const cohortData = [
-      ['Período', 'Nuevos Usuarios', 'Retención S1', 'Retención S4', 'LTV Promedio'],
-      ...data.cohortAnalysis.map((cohort: any) => [
-        cohort.period || 'N/A',
-        cohort.newUsers || 0,
-        `${cohort.retentionWeek1 || 0}%`,
-        `${cohort.retentionWeek4 || 0}%`,
-        cohort.avgLifetimeValue || 0
-      ])
-    ];
-    const cohortSheet = XLSX.utils.aoa_to_sheet(cohortData);
-    XLSX.utils.book_append_sheet(workbook, cohortSheet, 'Análisis Cohortes');
-  }
-}
+
 
 function addGeneralExcelSheets(workbook: any, data: any) {
   // Hoja de resumen general
@@ -1650,9 +1464,10 @@ function generateSalesSummaryCSV(data: any): string {
   if (data.summary) {
     content += 'RESUMEN EJECUTIVO\n';
     content += 'Métrica,Valor\n';
-    content += `Total de Ingresos,$${(data.summary.totalRevenue || 0).toLocaleString('es-ES')}\n`;
+    // Usar los mismos campos que en Excel
+    content += `Total de Ingresos,${data.summary.totalRevenue || 0}\n`;
     content += `Total de Órdenes,${data.summary.totalOrders || 0}\n`;
-    content += `Valor Promedio por Orden,$${(data.summary.averageOrderValue || 0).toLocaleString('es-ES')}\n`;
+    content += `Valor Promedio por Orden,${data.summary.averageOrderValue || 0}\n`;
     content += `Tasa de Conversión,${data.summary.conversionRate || 0}%\n\n`;
   }
   
@@ -1705,11 +1520,10 @@ function generateCustomerAnalysisCSV(data: any): string {
   // Resumen de clientes
   if (data.summary) {
     content += 'RESUMEN DE CLIENTES\n';
-    content += 'Métrica,Valor\n';
-    content += `Total de Clientes,${data.summary.totalCustomers || 0}\n`;
+    content += 'Métrica,Valor\n';    content += `Total de Clientes,${data.summary.totalCustomers || 0}\n`;
     content += `Nuevos Clientes,${data.summary.newCustomers || 0}\n`;
     content += `Tasa de Repetición,${data.summary.repeatCustomerRate?.toFixed(2) || 0}%\n`;
-    content += `Valor Promedio de Vida,$${(data.summary.averageLifetimeValue || 0).toLocaleString('es-ES')}\n\n`;
+    content += `Valor Promedio de Vida,${data.summary.averageLifetimeValue || 0}\n\n`;
   }
   
   // Principales clientes
@@ -1746,14 +1560,13 @@ function generateCustomerAnalysisCSV(data: any): string {
 
 function generateProductPerformanceCSV(data: any): string {
   let content = '';
-  
-  // Resumen de productos
+    // Resumen de productos
   if (data.summary) {
     content += 'RESUMEN DE PRODUCTOS\n';
     content += 'Métrica,Valor\n';
     content += `Total de Productos,${data.summary.totalProducts || 0}\n`;
     content += `Productos Activos,${data.summary.activeProducts || 0}\n`;
-    content += `Ingresos Totales,$${(data.summary.totalRevenue || 0).toLocaleString('es-ES')}\n`;
+    content += `Ingresos Totales,${data.summary.totalRevenue || 0}\n`;
     content += `Unidades Vendidas,${data.summary.totalUnitsSold || 0}\n\n`;
   }
   
@@ -1776,14 +1589,13 @@ function generateProductPerformanceCSV(data: any): string {
     });
     content += '\n';
   }
-  
-  // Insights de inventario
+    // Insights de inventario
   if (data.inventoryInsights) {
     content += 'INSIGHTS DE INVENTARIO\n';
     content += 'Métrica,Valor\n';
     content += `Productos con Stock Bajo,${data.inventoryInsights.lowStock || 0}\n`;
     content += `Productos Sin Stock,${data.inventoryInsights.outOfStock || 0}\n`;
-    content += `Valor Total de Inventario,$${(data.inventoryInsights.totalInventoryValue || 0).toLocaleString('es-ES')}\n`;
+    content += `Valor Total de Inventario,${data.inventoryInsights.totalInventoryValue || 0}\n`;
     content += `Rotación de Inventario,${data.inventoryInsights.turnoverRate || 0}x\n\n`;
   }
   
@@ -1797,20 +1609,19 @@ function generateFinancialReportCSV(data: any): string {
   if (data.summary) {
     content += 'RESUMEN FINANCIERO\n';
     content += 'Métrica,Valor\n';
-    content += `Ingresos Totales,$${(data.summary.totalRevenue || 0).toLocaleString('es-ES')}\n`;
-    content += `Gastos Totales,$${(data.summary.totalExpenses || 0).toLocaleString('es-ES')}\n`;
-    content += `Ganancia Neta,$${(data.summary.netProfit || 0).toLocaleString('es-ES')}\n`;
+    content += `Ingresos Totales,${data.summary.totalRevenue || 0}\n`;
+    content += `Gastos Totales,${data.summary.totalExpenses || 0}\n`;
+    content += `Ganancia Neta,${data.summary.netProfit || 0}\n`;
     content += `Margen de Ganancia,${data.summary.profitMargin || 0}%\n\n`;
   }
-  
-  // Análisis de ingresos
+    // Análisis de ingresos
   if (data.revenueAnalysis) {
     content += 'ANÁLISIS DE INGRESOS\n';
     content += 'Concepto,Monto\n';
-    content += `Ingresos por Ventas,$${(data.revenueAnalysis.salesRevenue || 0).toLocaleString('es-ES')}\n`;
-    content += `Ingresos por Envío,$${(data.revenueAnalysis.shippingRevenue || 0).toLocaleString('es-ES')}\n`;
-    content += `Impuestos Recaudados,$${(data.revenueAnalysis.taxesCollected || 0).toLocaleString('es-ES')}\n`;
-    content += `Descuentos Aplicados,$${(data.revenueAnalysis.discountsApplied || 0).toLocaleString('es-ES')}\n\n`;
+    content += `Ingresos por Ventas,${data.revenueAnalysis.salesRevenue || 0}\n`;
+    content += `Ingresos por Envío,${data.revenueAnalysis.shippingRevenue || 0}\n`;
+    content += `Impuestos Recaudados,${data.revenueAnalysis.taxesCollected || 0}\n`;
+    content += `Descuentos Aplicados,${data.revenueAnalysis.discountsApplied || 0}\n\n`;
   }
   
   // Análisis de gastos
@@ -1823,15 +1634,14 @@ function generateFinancialReportCSV(data: any): string {
     });
     content += '\n';
   }
-  
-  // Flujo de caja
+    // Flujo de caja
   if (data.cashFlow) {
     content += 'FLUJO DE CAJA\n';
     content += 'Concepto,Monto\n';
-    content += `Efectivo Inicial,$${(data.cashFlow.startingCash || 0).toLocaleString('es-ES')}\n`;
-    content += `Entradas de Efectivo,$${(data.cashFlow.cashInflows || 0).toLocaleString('es-ES')}\n`;
-    content += `Salidas de Efectivo,$${(data.cashFlow.cashOutflows || 0).toLocaleString('es-ES')}\n`;
-    content += `Efectivo Final,$${(data.cashFlow.endingCash || 0).toLocaleString('es-ES')}\n\n`;
+    content += `Efectivo Inicial,${data.cashFlow.startingCash || 0}\n`;
+    content += `Entradas de Efectivo,${data.cashFlow.cashInflows || 0}\n`;
+    content += `Salidas de Efectivo,${data.cashFlow.cashOutflows || 0}\n`;
+    content += `Efectivo Final,${data.cashFlow.endingCash || 0}\n\n`;
   }
   
   return content;
@@ -1883,51 +1693,7 @@ function generateOrdersAnalysisCSV(data: any): string {
   return content;
 }
 
-function generateGrowthTrendsCSV(data: any): string {
-  let content = '';
-  
-  // Métricas de crecimiento
-  if (data.summary) {
-    content += 'MÉTRICAS DE CRECIMIENTO\n';
-    content += 'Métrica,Valor\n';
-    content += `Crecimiento de Ingresos,${data.summary.revenueGrowth || 0}%\n`;
-    content += `Crecimiento de Usuarios,${data.summary.userGrowth || 0}%\n`;
-    content += `Crecimiento de Órdenes,${data.summary.orderGrowth || 0}%\n`;
-    content += `Tasa de Retención,${data.summary.retentionRate || 0}%\n\n`;
-  }
-  
-  // Tendencias mensuales
-  if (data.monthlyTrends && data.monthlyTrends.length > 0) {
-    content += 'TENDENCIAS MENSUALES\n';
-    content += 'Mes,Ingresos,Órdenes,Usuarios,Crecimiento\n';
-    data.monthlyTrends.forEach((trend: any) => {
-      content += `"${trend.month || 'N/A'}",${trend.revenue || 0},${trend.orders || 0},${trend.users || 0},${trend.growth || 0}%\n`;
-    });
-    content += '\n';
-  }
-  
-  // Predicciones
-  if (data.predictions) {
-    content += 'PREDICCIONES\n';
-    content += 'Predicción,Valor\n';
-    content += `Ingresos Predichos (30 días),$${(data.predictions.nextMonthRevenue || 0).toLocaleString('es-ES')}\n`;
-    content += `Nuevos Usuarios Predichos,${data.predictions.nextMonthUsers || 0}\n`;
-    content += `Órdenes Predichas,${data.predictions.nextMonthOrders || 0}\n`;
-    content += `Confianza del Modelo,${data.predictions.confidence || 0}%\n\n`;
-  }
-  
-  // Análisis de cohortes
-  if (data.cohortAnalysis && data.cohortAnalysis.length > 0) {
-    content += 'ANÁLISIS DE COHORTES\n';
-    content += 'Período,Nuevos Usuarios,Retención S1,Retención S4,LTV Promedio\n';
-    data.cohortAnalysis.forEach((cohort: any) => {
-      content += `"${cohort.period || 'N/A'}",${cohort.newUsers || 0},${cohort.retentionWeek1 || 0}%,${cohort.retentionWeek4 || 0}%,${cohort.avgLifetimeValue || 0}\n`;
-    });
-    content += '\n';
-  }
-  
-  return content;
-}
+
 
 function generateGeneralCSV(data: any): string {
   let content = '';

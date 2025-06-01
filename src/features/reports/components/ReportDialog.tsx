@@ -265,11 +265,8 @@ export function ReportDialog({
       case 'product-performance':
         return renderProductSpecificContent();
       case 'financial-report':
-        return renderFinancialSpecificContent();
-      case 'orders-analysis':
+        return renderFinancialSpecificContent();      case 'orders-analysis':
         return renderOrdersSpecificContent();
-      case 'growth-trends':
-        return renderGrowthSpecificContent();
       default:
         return null;
     }
@@ -576,80 +573,7 @@ export function ReportDialog({
     </>
   );
 
-  // Contenido específico para tendencias de crecimiento
-  const renderGrowthSpecificContent = () => (
-    <>
-      {reportData.summary && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Indicadores de Crecimiento</CardTitle>
-            <CardDescription>
-              Tasas de crecimiento comparativo
-            </CardDescription>
-          </CardHeader>
-          <CardContent>            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-green-600">
-                  {(reportData.summary?.revenueGrowth || 0) > 0 ? '+' : ''}{(reportData.summary?.revenueGrowth || 0).toFixed(1)}%
-                </div>
-                <p className="text-sm text-muted-foreground mt-1">Ingresos</p>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-blue-600">
-                  {(reportData.summary?.orderGrowth || 0) > 0 ? '+' : ''}{(reportData.summary?.orderGrowth || 0).toFixed(1)}%
-                </div>
-                <p className="text-sm text-muted-foreground mt-1">Órdenes</p>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-purple-600">
-                  {formatNumber(reportData.summary?.customerGrowth || 0)}
-                </div>
-                <p className="text-sm text-muted-foreground mt-1">Nuevos Clientes</p>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-orange-600">
-                  {(reportData.summary?.monthOverMonthGrowth || 0) > 0 ? '+' : ''}{(reportData.summary?.monthOverMonthGrowth || 0).toFixed(1)}%
-                </div>
-                <p className="text-sm text-muted-foreground mt-1">Mes a Mes</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {reportData.projections && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Proyecciones</CardTitle>
-            <CardDescription>
-              Estimaciones para el próximo período
-            </CardDescription>
-          </CardHeader>
-          <CardContent>            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="text-center">
-                <div className="text-xl font-bold text-green-600">
-                  {formatCurrency(reportData.projections?.nextMonthRevenue || 0)}
-                </div>
-                <p className="text-sm text-muted-foreground mt-1">Ingresos Proyectados</p>
-              </div>
-              <div className="text-center">
-                <div className="text-xl font-bold text-blue-600">
-                  {formatNumber(Math.round(reportData.projections?.nextMonthOrders || 0))}
-                </div>
-                <p className="text-sm text-muted-foreground mt-1">Órdenes Proyectadas</p>
-              </div>
-              <div className="text-center">
-                <div className="text-xl font-bold text-purple-600">
-                  {formatNumber(reportData.projections?.confidence || 0)}%
-                </div>
-                <p className="text-sm text-muted-foreground mt-1">Confianza</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-    </>
-  );
+  // Contenido específico para tendencias de crecimiento  // La función renderGrowthSpecificContent ha sido eliminada
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

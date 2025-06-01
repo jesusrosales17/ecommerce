@@ -371,13 +371,7 @@ function getReportInfo(reportId: string) {
       category: 'operacional',
       defaultFilters: []
     },
-    'growth-trends': {
-      id: 'growth-trends',
-      title: 'Tendencias de Crecimiento',
-      description: 'Análisis de crecimiento, proyecciones y oportunidades de expansión.',
-      category: 'crecimiento',
-      defaultFilters: []
-    }
+    
   };
 
   return reportTypes[reportId] || reportTypes['sales-summary'];

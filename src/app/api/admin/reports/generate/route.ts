@@ -47,10 +47,6 @@ export async function POST(request: NextRequest) {
         reportData = await generateOrdersAnalysisReport(startDate, endDate, filters);
         break;
       
-      case 'growth-trends':
-        reportData = await generateGrowthTrendsReport(startDate, endDate, filters);
-        break;
-      
       default:
         return NextResponse.json(
           { error: "Tipo de reporte no reconocido" },
@@ -706,100 +702,7 @@ async function generateOrdersAnalysisReport(startDate: Date, endDate: Date, filt
   };
 }
 
-async function generateGrowthTrendsReport(startDate: Date, endDate: Date, filters: string[]) {
-  // Calcular períodos anteriores para comparación
-  const periodLength = endDate.getTime() - startDate.getTime();
-  const previousStartDate = new Date(startDate.getTime() - periodLength);
-  const previousEndDate = new Date(startDate.getTime());
-
-  const [
-    currentPeriodStats,
-    previousPeriodStats,
-    monthlyGrowth,
-    customerGrowth,
-    productGrowth
-  ] = await Promise.all([
-    // Estadísticas del período actual
-    prisma.order.aggregate({
-      where: {
-        status: { not: 'CANCELLED' },
-        createdAt: { gte: startDate, lte: endDate }
-      },
-      _sum: { total: true },
-      _count: { id: true }
-    }),
-
-    // Estadísticas del período anterior
-    prisma.order.aggregate({
-      where: {
-        status: { not: 'CANCELLED' },
-        createdAt: { gte: previousStartDate, lte: previousEndDate }
-      },
-      _sum: { total: true },
-      _count: { id: true }
-    }),
-
-    // Crecimiento mensual
-    prisma.$queryRaw<Array<{
-      month: string;
-      revenue: number;
-      orders: bigint;
-      customers: bigint;
-    }>>`
-      SELECT 
-        DATE_FORMAT(o.createdAt, '%Y-%m') as month,
-        SUM(o.total) as revenue,
-        COUNT(DISTINCT o.id) as orders,
-        COUNT(DISTINCT o.userId) as customers
-      FROM \`order\` o
-      WHERE o.createdAt >= ${new Date(startDate.getFullYear() - 1, startDate.getMonth(), 1)}
-        AND o.status != 'CANCELLED'
-      GROUP BY DATE_FORMAT(o.createdAt, '%Y-%m')
-      ORDER BY month DESC
-      LIMIT 12
-    `,    // Crecimiento de clientes
-    prisma.user.count({
-      where: {
-        role: 'USER',
-        createdAt: { gte: startDate, lte: endDate }
-      }
-    }),
-
-    // Crecimiento de productos
-    prisma.product.count({
-      where: {
-        status: 'ACTIVE',
-        createdAt: { gte: startDate, lte: endDate }
-      }
-    })
-  ]);
-
-  const currentRevenue = Number(currentPeriodStats._sum.total || 0);
-  const previousRevenue = Number(previousPeriodStats._sum.total || 0);
-  const revenueGrowth = calculateGrowthRate(currentRevenue, previousRevenue);
-
-  const currentOrders = currentPeriodStats._count.id;
-  const previousOrders = previousPeriodStats._count.id;
-  const ordersGrowth = calculateGrowthRate(currentOrders, previousOrders);
-  return {
-    overview: {
-      revenueGrowth,
-      ordersGrowth,
-      customerGrowth: customerGrowth,
-      productGrowth: productGrowth
-    },
-    monthlyTrends: monthlyGrowth.map(month => ({
-      month: month.month,
-      revenue: Number(month.revenue),
-      orders: Number(month.orders),
-      customers: Number(month.customers)
-    })),
-    projections: {
-      nextMonthRevenue: currentRevenue * (1 + (revenueGrowth / 100)),
-      nextMonthOrders: Math.round(currentOrders * (1 + (ordersGrowth / 100)))
-    }
-  };
-}
+// La función generateGrowthTrendsReport ha sido eliminada
 
 // Funciones auxiliares
 
