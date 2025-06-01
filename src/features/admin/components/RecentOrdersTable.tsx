@@ -7,6 +7,7 @@ import { formatDate, formatDateShort } from "@/utils/date";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { useOrderStore } from "@/features/orders/store/useOrderStore";
+import Link from "next/link";
 
 interface RecentOrder {
   id: string;
@@ -24,10 +25,12 @@ interface RecentOrdersTableProps {
 
 export default function RecentOrdersTable({ orders }: RecentOrdersTableProps) {
   const router = useRouter();
-  const { setOrderToShow, setIsOpenInfoDrawer } = useOrderStore();  const handleViewOrder = async (order: RecentOrder) => {
-    try {      // Navegar a la página de órdenes
-      router.push('/admin/orders');
-      
+  const { setOrderToShow, setIsOpenInfoDrawer } = useOrderStore();
+  const handleViewOrder = async (order: RecentOrder) => {
+    try {
+      // Navegar a la página de órdenes
+      router.push("/admin/orders");
+
       // Establecer la orden temporal y abrir el drawer (con casting para tipo temporal)
       const temporaryOrder = {
         id: order.id,
@@ -35,31 +38,31 @@ export default function RecentOrdersTable({ orders }: RecentOrdersTableProps) {
         status: order.status,
         createdAt: order.createdAt,
         updatedAt: order.createdAt,
-        userId: '',
-        addressId: '',
-        paymentId: '',
-        paymentStatus: 'PENDING' as const,
+        userId: "",
+        addressId: "",
+        paymentId: "",
+        paymentStatus: "PENDING" as const,
         User: {
           name: order.customerName,
-          email: order.customerEmail
+          email: order.customerEmail,
         },
         Address: null,
-        items: []
+        items: [],
       } as any; // Casting temporal - se actualizará con datos completos
-      
+
       setOrderToShow(temporaryOrder);
       setIsOpenInfoDrawer(true);
-      
+
       // Cargar los detalles completos en segundo plano
       const response = await fetch(`/api/admin/orders/${order.id}`);
       if (response.ok) {
         const fullOrder = await response.json();
         setOrderToShow(fullOrder);
       } else {
-        console.error('Error loading order details');
+        console.error("Error loading order details");
       }
     } catch (error) {
-      console.error('Error handling view order:', error);
+      console.error("Error handling view order:", error);
     }
   };
   const getStatusBadge = (status: string) => {
@@ -113,10 +116,12 @@ export default function RecentOrdersTable({ orders }: RecentOrdersTableProps) {
           <h3 className="text-base sm:text-lg font-semibold text-gray-900">
             Órdenes Recientes
           </h3>
-          <button className="text-sm font-medium text-blue-600 hover:text-blue-700">
-            <span className="hidden sm:inline">Ver todas</span>
-            <span className="sm:hidden">Ver</span>
-          </button>
+          <Button asChild variant={"ghost"} className="text-sm font-medium text-blue-600 hover:text-blue-700">
+            <Link href="/admin/orders" className="flex items-center">
+              <Eye className="w-4 h-4 mr-1" />
+                Ver todas las órdenes
+            </Link>
+          </Button>
         </div>
       </div>
 
@@ -147,7 +152,6 @@ export default function RecentOrdersTable({ orders }: RecentOrdersTableProps) {
                     {formatPrice(order.total)}
                   </span>
                 </div>
-
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-gray-900 truncate">
@@ -166,8 +170,9 @@ export default function RecentOrdersTable({ orders }: RecentOrdersTableProps) {
                       {formatDateShort(order.createdAt)}
                     </p>
                   </div>
-                </div>                <div className="flex justify-end">
-                  <button 
+                </div>{" "}
+                <div className="flex justify-end">
+                  <button
                     onClick={() => handleViewOrder(order)}
                     className="text-blue-600 hover:text-blue-700 text-sm font-medium inline-flex items-center"
                   >
@@ -240,7 +245,8 @@ export default function RecentOrdersTable({ orders }: RecentOrdersTableProps) {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {formatDate(order.createdAt)}
-                  </td>                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <Button
                       variant={"ghost"}
                       onClick={() => handleViewOrder(order)}

@@ -122,14 +122,14 @@ export default function AdminDashboard() {
         </div>
 
         {/* Secondary Grid */}
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
           {/* Recent Orders - Takes 2/3 of the width on large screens */}
-          <div className="xl:col-span-2">
+          <div className="2xl:col-span-2">
             <RecentOrdersTable orders={stats.recentOrders} />
           </div>
           
           {/* Top Products - Takes 1/3 of the width on large screens */}
-          <div className="xl:col-span-1">
+          <div className="2xl:col-span-1">
             <TopProducts products={stats.topProducts} />
           </div>
         </div>
