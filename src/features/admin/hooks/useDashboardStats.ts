@@ -32,11 +32,15 @@ interface DashboardStats {
     name: string;
     stock: number;
     category: { name: string } | null;
-  }>;
-  monthlyStats: Array<{
+  }>;  monthlyStats: Array<{
     month: string;
     orders: number;
     revenue: number;
+  }>;
+  orderStatusData: Array<{
+    status: string;
+    count: number;
+    color: string;
   }>;
 }
 

@@ -115,10 +115,9 @@ export default function AdminDashboard() {
           <div className="2xl:col-span-2">
             <RevenueChart data={stats.monthlyStats} />
           </div>
-          
-          {/* Order Status Chart - Takes 1/3 of the width on large screens */}
+            {/* Order Status Chart - Takes 1/3 of the width on large screens */}
           <div className="2xl:col-span-1">
-            <OrderStatusChart />
+            <OrderStatusChart data={stats.orderStatusData} />
           </div>
         </div>
 

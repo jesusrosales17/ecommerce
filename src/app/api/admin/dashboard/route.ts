@@ -8,9 +8,7 @@ export async function GET(request: NextRequest) {
     const authResult = await requireAuth(['ADMIN']);
     if (!authResult.isAutenticated) {
       return authResult.response;
-    }
-
-    // Obtener estadísticas generales
+    }    // Obtener estadísticas generales
     const [
       totalUsers,
       totalProducts,
@@ -21,7 +19,8 @@ export async function GET(request: NextRequest) {
       recentOrders,
       topProducts,
       lowStockProducts,
-      monthlyStats
+      monthlyStats,
+      orderStatusStats
     ] = await Promise.all([
       // Total de usuarios
       prisma.user.count({
@@ -95,9 +94,7 @@ export async function GET(request: NextRequest) {
           }
         },
         take: 5
-      }),
-
-      // Estadísticas mensuales (últimos 6 meses)
+      }),      // Estadísticas mensuales (últimos 6 meses)
       prisma.$queryRaw`
         SELECT 
           DATE_FORMAT(createdAt, '%Y-%m') as month,
@@ -108,7 +105,13 @@ export async function GET(request: NextRequest) {
           AND status != 'CANCELLED'
         GROUP BY DATE_FORMAT(createdAt, '%Y-%m')
         ORDER BY month DESC
-      `
+      `,
+
+      // Estadísticas de estado de órdenes
+      prisma.order.groupBy({
+        by: ['status'],
+        _count: { status: true }
+      })
     ]);
 
     // Obtener detalles de productos más vendidos
@@ -177,10 +180,23 @@ export async function GET(request: NextRequest) {
         return converted;
       }
       return value;
+    };    // Convert monthly stats to handle BigInt values
+    const convertedMonthlyStats = convertBigIntToNumber(monthlyStats);
+
+    // Formatear los datos de estado de órdenes
+    const statusColors = {
+      PENDING: "#f59e0b",
+      PROCESSING: "#3b82f6", 
+      SHIPPED: "#6366f1",
+      DELIVERED: "#10b981",
+      CANCELLED: "#ef4444"
     };
 
-    // Convert monthly stats to handle BigInt values
-    const convertedMonthlyStats = convertBigIntToNumber(monthlyStats);
+    const orderStatusData = orderStatusStats.map(stat => ({
+      status: stat.status,
+      count: stat._count.status,
+      color: statusColors[stat.status as keyof typeof statusColors] || "#6b7280"
+    }));
 
     const dashboardStats = {
       overview: {
@@ -204,10 +220,10 @@ export async function GET(request: NextRequest) {
       topProducts: topProductsDetails.map(product => ({
         ...product,
         price: Number(product?.price || 0),
-        totalSold: Number(product?.totalSold || 0)
-      })),
+        totalSold: Number(product?.totalSold || 0)      })),
       lowStockProducts,
-      monthlyStats: convertedMonthlyStats
+      monthlyStats: convertedMonthlyStats,
+      orderStatusData
     };
 
     return NextResponse.json(dashboardStats);
