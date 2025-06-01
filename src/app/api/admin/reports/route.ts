@@ -13,75 +13,54 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const dateRange = searchParams.get('dateRange') || '30d';
 
-    // Calcular fechas basadas en el rango seleccionado
-    const now = new Date();
-    let startDate = new Date();
+    // Calcular fechas basadas en el rango
+    const { startDate, endDate } = getDateRange(dateRange);
 
-    switch (dateRange) {
-      case '7d':
-        startDate.setDate(now.getDate() - 7);
-        break;
-      case '30d':
-        startDate.setDate(now.getDate() - 30);
-        break;
-      case '90d':
-        startDate.setDate(now.getDate() - 90);
-        break;
-      case '1y':
-        startDate.setFullYear(now.getFullYear() - 1);
-        break;
-      default:
-        startDate.setDate(now.getDate() - 30);
-    }
-
-    // Obtener estadísticas en paralelo
+    // Ejecutar todas las consultas en paralelo
     const [
       totalRevenue,
       totalOrders,
-      newCustomers,
-      totalProductsSold,
+      totalUsers,
+      totalProducts,
       topProducts,
-      recentReports
+      recentReports,
+      monthlyStats,
+      orderStatusData,      // Datos del período anterior para comparar tendencias
+      previousPeriodData
     ] = await Promise.all([
-      // Ingresos totales en el rango de fechas
+      // Ingresos totales en el período
       prisma.order.aggregate({
         where: {
           status: { not: 'CANCELLED' },
-          createdAt: { gte: startDate }
+          createdAt: { gte: startDate, lte: endDate }
         },
         _sum: { total: true }
       }),
 
-      // Total de órdenes en el rango
+      // Total de órdenes en el período
       prisma.order.count({
         where: {
-          createdAt: { gte: startDate }
+          createdAt: { gte: startDate, lte: endDate }
         }
       }),
 
-      // Nuevos clientes en el rango
+      // Total de usuarios registrados en el período
       prisma.user.count({
         where: {
           role: 'USER',
-          createdAt: { gte: startDate }
+          createdAt: { gte: startDate, lte: endDate }
         }
-      }),      // Total de productos vendidos
-      prisma.orderItem.aggregate({
-        where: {
-          Order: {
-            createdAt: { gte: startDate },
-            status: { not: 'CANCELLED' }
-          }
-        },
-        _sum: { quantity: true }
       }),
 
-      // Top 5 productos más vendidos
+      // Total de productos activos
+      prisma.product.count({
+        where: { status: 'ACTIVE' }
+      }),      // Top 5 productos más vendidos en el período
       prisma.orderItem.groupBy({
         by: ['productId'],
         where: {
           Order: {
-            createdAt: { gte: startDate },
+            createdAt: { gte: startDate, lte: endDate },
             status: { not: 'CANCELLED' }
           }
         },
@@ -91,17 +70,25 @@ export async function GET(request: NextRequest) {
       }),
 
       // Reportes recientes simulados (en una implementación real, estos vendrían de una tabla de reportes)
-      prisma.order.findMany({
-        take: 3,
-        orderBy: { createdAt: 'desc' },
-        select: {
-          id: true,
-          createdAt: true,
-          status: true,
-          total: true
-        }
-      })
-    ]);    // Obtener detalles de productos más vendidos
+      generateRecentReports(),
+
+      // Estadísticas mensuales para el gráfico
+      getMonthlyStats(startDate, endDate),
+
+      // Estadísticas de estado de órdenes
+      prisma.order.groupBy({
+        by: ['status'],
+        where: {
+          createdAt: { gte: startDate, lte: endDate }
+        },
+        _count: { status: true }
+      }),
+
+      // Datos del período anterior para comparar tendencias
+      getPreviousPeriodData(startDate, endDate)
+    ]);
+
+    // Obtener detalles de productos más vendidos
     const topProductsDetails = await Promise.all(
       topProducts.map(async (item) => {
         const product = await prisma.product.findUnique({
@@ -117,132 +104,58 @@ export async function GET(request: NextRequest) {
         });
         return {
           ...product,
-          totalSold: item._sum?.quantity || 0
+          totalSold: item._sum.quantity || 0
         };
       })
-    );
+    );    // Calcular tendencias comparando con el período anterior
+    const currentRevenue = Number(totalRevenue._sum.total || 0);
+    const previousRevenue = Number(previousPeriodData.revenue._sum.total || 0);
+    const revenueChange = calculatePercentageChange(currentRevenue, previousRevenue);
 
-    // Calcular cambios porcentuales (comparar con período anterior)
-    const previousStartDate = new Date(startDate);
-    const periodDays = Math.ceil((now.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
-    previousStartDate.setDate(previousStartDate.getDate() - periodDays);
+    const ordersChange = calculatePercentageChange(totalOrders, previousPeriodData.orders);
+    const usersChange = calculatePercentageChange(totalUsers, previousPeriodData.users);
 
-    const [
-      previousRevenue,
-      previousOrders,
-      previousCustomers,
-      previousProductsSold
-    ] = await Promise.all([
-      prisma.order.aggregate({
-        where: {
-          status: { not: 'CANCELLED' },
-          createdAt: { 
-            gte: previousStartDate,
-            lt: startDate
-          }
-        },
-        _sum: { total: true }
-      }),
+    // Formatear datos de estado de órdenes para el gráfico
+    const statusColors = {
+      PENDING: "#f59e0b",
+      PROCESSING: "#3b82f6",
+      SHIPPED: "#6366f1",
+      DELIVERED: "#10b981",
+      CANCELLED: "#ef4444"
+    };
 
-      prisma.order.count({
-        where: {
-          createdAt: { 
-            gte: previousStartDate,
-            lt: startDate
-          }
-        }
-      }),
+    const formattedOrderStatusData = orderStatusData.map(stat => ({
+      status: stat.status,
+      count: stat._count.status,
+      color: statusColors[stat.status as keyof typeof statusColors] || "#6b7280"
+    }));
 
-      prisma.user.count({
-        where: {
-          role: 'USER',
-          createdAt: { 
-            gte: previousStartDate,
-            lt: startDate
-          }
-        }
-      }),
-
-      prisma.orderItem.aggregate({
-        where: {
-          Order: {
-            createdAt: { 
-              gte: previousStartDate,
-              lt: startDate
-            },
-            status: { not: 'CANCELLED' }
-          }
-        },
-        _sum: { quantity: true }
-      })
-    ]);
-
-    // Helper para calcular porcentaje de cambio
-    const calculatePercentageChange = (current: number, previous: number): { change: string, trend: 'up' | 'down' } => {
-      if (previous === 0) {
-        return { change: current > 0 ? '+100%' : '0%', trend: 'up' };
-      }
-      const percentage = ((current - previous) / previous) * 100;
-      return {
-        change: `${percentage >= 0 ? '+' : ''}${percentage.toFixed(1)}%`,
-        trend: percentage >= 0 ? 'up' : 'down'
-      };
-    };    const currentRevenue = Number(totalRevenue._sum?.total || 0);
-    const prevRevenue = Number(previousRevenue._sum?.total || 0);
-    const currentProductsSold = Number(totalProductsSold._sum?.quantity || 0);
-    const prevProductsSold = Number(previousProductsSold._sum?.quantity || 0);
-
-    // Debug: Log para verificar los datos
-    console.log('=== REPORTS DEBUG ===');
-    console.log('Date range:', { startDate, endDate: now });
-    console.log('Current revenue:', currentRevenue);
-    console.log('Total orders:', totalOrders);
-    console.log('New customers:', newCustomers);
-    console.log('Products sold:', currentProductsSold);
-    console.log('Top products count:', topProducts.length);
-    console.log('Top products details:', topProductsDetails.length);
-    console.log('===================');
-
-    const revenueChange = calculatePercentageChange(currentRevenue, prevRevenue);
-    const ordersChange = calculatePercentageChange(totalOrders, previousOrders);
-    const customersChange = calculatePercentageChange(newCustomers, previousCustomers);
-    const productsSoldChange = calculatePercentageChange(currentProductsSold, prevProductsSold);// Formatear datos de respuesta
+    // Respuesta estructurada
     const reportData = {
       quickStats: {
         totalRevenue: currentRevenue,
-        totalOrders: totalOrders,
-        totalUsers: newCustomers,
-        totalProducts: currentProductsSold,
-        revenueChange: revenueChange.change,
-        ordersChange: ordersChange.change,
-        usersChange: customersChange.change,
-        productsChange: productsSoldChange.change,
-        revenueTrend: revenueChange.trend,
-        ordersTrend: ordersChange.trend,
-        usersTrend: customersChange.trend,
-        productsTrend: productsSoldChange.trend
+        totalOrders,
+        totalUsers,
+        totalProducts,
+        revenueChange: formatPercentageChange(revenueChange),
+        ordersChange: formatPercentageChange(ordersChange),
+        usersChange: formatPercentageChange(usersChange),
+        productsChange: "+0.0%", // Los productos no cambian frecuentemente
+        revenueTrend: revenueChange >= 0 ? 'up' : 'down',
+        ordersTrend: ordersChange >= 0 ? 'up' : 'down',
+        usersTrend: usersChange >= 0 ? 'up' : 'down',
+        productsTrend: 'up' as const
       },
-      topProducts: topProductsDetails.filter(product => product !== null).map(product => ({
-        id: product!.id,
-        name: product!.name,
-        price: Number(product!.price || 0),
-        category: product!.category,
-        totalSold: product!.totalSold
+      topProducts: topProductsDetails.map(product => ({
+        id: product?.id || '',
+        name: product?.name || 'Producto eliminado',
+        price: Number(product?.price || 0),
+        category: product?.category || null,
+        totalSold: Number(product?.totalSold || 0)
       })),
-      recentReports: recentReports.map((order, index) => ({
-        name: `Reporte de Ventas - ${order.createdAt.toLocaleDateString('es-MX')}`,
-        type: index % 3 === 0 ? "sales" : index % 3 === 1 ? "inventory" : "customers",
-        date: order.createdAt.toISOString().split('T')[0],
-        status: "completed" as const
-      })),
-      monthlyStats: [], // Podemos agregar esto después si es necesario
-      orderStatusData: [], // Podemos agregar esto después si es necesario
-      dateRange,
-      periodInfo: {
-        startDate: startDate.toISOString(),
-        endDate: now.toISOString(),
-        totalDays: periodDays
-      }
+      recentReports,
+      monthlyStats,
+      orderStatusData: formattedOrderStatusData
     };
 
     return NextResponse.json(reportData);
@@ -254,4 +167,120 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     );
   }
+}
+
+// Funciones auxiliares
+
+function getDateRange(range: string) {
+  const endDate = new Date();
+  const startDate = new Date();
+
+  switch (range) {
+    case '7d':
+      startDate.setDate(endDate.getDate() - 7);
+      break;
+    case '30d':
+      startDate.setDate(endDate.getDate() - 30);
+      break;
+    case '90d':
+      startDate.setDate(endDate.getDate() - 90);
+      break;
+    case '1y':
+      startDate.setFullYear(endDate.getFullYear() - 1);
+      break;
+    default:
+      startDate.setDate(endDate.getDate() - 30);
+  }
+
+  return { startDate, endDate };
+}
+
+async function getPreviousPeriodData(startDate: Date, endDate: Date) {
+  const periodLength = endDate.getTime() - startDate.getTime();
+  const previousStartDate = new Date(startDate.getTime() - periodLength);
+  const previousEndDate = new Date(startDate.getTime());
+
+  const [revenue, orders, users] = await Promise.all([
+    prisma.order.aggregate({
+      where: {
+        status: { not: 'CANCELLED' },
+        createdAt: { gte: previousStartDate, lte: previousEndDate }
+      },
+      _sum: { total: true }
+    }),
+    prisma.order.count({
+      where: {
+        createdAt: { gte: previousStartDate, lte: previousEndDate }
+      }
+    }),
+    prisma.user.count({
+      where: {
+        role: 'USER',
+        createdAt: { gte: previousStartDate, lte: previousEndDate }
+      }
+    })
+  ]);
+
+  return { revenue, orders, users };
+}
+
+async function getMonthlyStats(startDate: Date, endDate: Date) {
+  // Obtener estadísticas mensuales para gráficos
+  const monthlyData = await prisma.$queryRaw<Array<{
+    month: string;
+    orders: bigint;
+    revenue: number;
+  }>>`
+    SELECT 
+      DATE_FORMAT(createdAt, '%Y-%m') as month,
+      COUNT(*) as orders,
+      SUM(total) as revenue
+    FROM \`order\`
+    WHERE createdAt >= ${startDate}
+      AND createdAt <= ${endDate}
+      AND status != 'CANCELLED'
+    GROUP BY DATE_FORMAT(createdAt, '%Y-%m')
+    ORDER BY month DESC
+    LIMIT 6
+  `;
+
+  return monthlyData.map(item => ({
+    month: item.month,
+    orders: Number(item.orders),
+    revenue: Number(item.revenue)
+  }));
+}
+
+function generateRecentReports() {
+  // En una implementación real, esto vendría de una tabla de reportes
+  // Por ahora generamos datos simulados
+  const reportTypes = [
+    'Resumen de Ventas',
+    'Análisis de Clientes',
+    'Rendimiento de Productos',
+    'Reporte Financiero',
+    'Análisis de Órdenes'
+  ];
+
+  return reportTypes.slice(0, 3).map((type, index) => {
+    const date = new Date();
+    date.setDate(date.getDate() - index - 1);
+    
+    return {
+      name: `${type} - ${date.toLocaleDateString('es-ES')}`,
+      type,
+      date: date.toLocaleDateString('es-ES'),
+      status: index === 0 ? 'completed' : index === 1 ? 'pending' : 'completed'
+    };
+  });
+}
+
+function calculatePercentageChange(current: number, previous: number): number {
+  if (previous === 0) return current > 0 ? 100 : 0;
+  return ((current - previous) / previous) * 100;
+}
+
+function formatPercentageChange(change: number): string {
+  const sign = change >= 0 ? '+' : '';
+  return `${sign}${change.toFixed(1)}%`;
 }

@@ -10,7 +10,7 @@ import { ExportOptions } from "@/features/reports/components/ExportOptions";
 import { TopProductsCard } from "@/features/reports/components/TopProductsCard";
 import { RecentReportsTable } from "@/features/reports/components/RecentReportsTable";
 import { ReportDialog } from "@/features/reports/components/ReportDialog";
-import { toast } from "sonner";
+import { useToast } from "@/hooks/use-toast";
 
 export default function ReportsPage() {
   const [selectedDateRange, setSelectedDateRange] = useState("30d");
@@ -20,7 +20,9 @@ export default function ReportsPage() {
   const [reportDialogOpen, setReportDialogOpen] = useState(false);
   const [currentReportData, setCurrentReportData] = useState<any>(null);
   const [currentReportInfo, setCurrentReportInfo] = useState<any>(null);
+  
   const { data, isLoading, error, refetch } = useReportsData(selectedDateRange);
+  const { toast } = useToast();
   const router = useRouter();
 
   const dateRanges = [
@@ -61,11 +63,19 @@ export default function ReportsPage() {
       setCurrentReportData(result.data);
       setCurrentReportInfo(reportInfo);
       setReportDialogOpen(true);
-      toast.success(`Reporte generado exitosamente: ${reportInfo.title} ha sido generado para el período seleccionado.`);
+      
+      toast({
+        title: "Reporte generado exitosamente",
+        description: `${reportInfo.title} ha sido generado para el período seleccionado.`,
+      });
       
     } catch (error) {
       console.error('Error generating report:', error);
-      toast.error(error instanceof Error ? error.message : "Ha ocurrido un error inesperado.");
+      toast({
+        title: "Error al generar reporte",
+        description: error instanceof Error ? error.message : "Ha ocurrido un error inesperado.",
+        variant: "destructive",
+      });
     } finally {
       setIsGenerating(null);
     }
@@ -101,31 +111,37 @@ export default function ReportsPage() {
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
-      toast.success(`Descarga iniciada: El reporte en formato ${format.toUpperCase()} se está descargando.`);
+
+      toast({
+        title: "Descarga iniciada",
+        description: `El reporte en formato ${format.toUpperCase()} se está descargando.`,
+      });
 
     } catch (error) {
       console.error('Error downloading report:', error);
-      toast.error("No se pudo descargar el reporte. Inténtalo de nuevo.");
+      toast({
+        title: "Error al descargar",
+        description: "No se pudo descargar el reporte. Inténtalo de nuevo.",
+        variant: "destructive",
+      });
     } finally {
       setIsDownloading(null);
     }
   };
 
   // Función para vista previa del reporte
-  const handlePreviewReport = (reportId?: string) => {
-    // If reportId is provided, use it; otherwise use currentReportInfo
-    const reportInfo = reportId ? getReportInfo(reportId) : currentReportInfo;
-    if (!reportInfo) return;
+  const handlePreviewReport = () => {
+    if (!currentReportInfo) return;
     
     const params = new URLSearchParams({
-      reportId: reportInfo.id,
+      reportId: currentReportInfo.id,
       dateRange: selectedDateRange
     });
     
     // Guardar datos en sessionStorage para la página de preview
     sessionStorage.setItem('reportPreviewData', JSON.stringify({
-      data: reportId ? null : currentReportData, // If direct preview, no data yet
-      info: reportInfo,
+      data: currentReportData,
+      info: currentReportInfo,
       dateRange: selectedDateRange
     }));
     
@@ -162,11 +178,19 @@ export default function ReportsPage() {
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
-      toast.success(`Exportación completada: Los datos han sido exportados en formato ${format.toUpperCase()}.`);
+
+      toast({
+        title: "Exportación completada",
+        description: `Los datos han sido exportados en formato ${format.toUpperCase()}.`,
+      });
 
     } catch (error) {
       console.error('Error exporting data:', error);
-      toast.error("No se pudieron exportar los datos. Inténtalo de nuevo.");
+      toast({
+        title: "Error al exportar",
+        description: "No se pudieron exportar los datos. Inténtalo de nuevo.",
+        variant: "destructive",
+      });
     } finally {
       setIsExporting(null);
     }
@@ -256,7 +280,8 @@ export default function ReportsPage() {
 
       {/* Quick Stats */}
       <ReportsQuickStats 
-        stats={data?.quickStats}
+        data={data?.quickStats}
+        isLoading={isLoading}
       />
 
       {/* Main Content Grid */}
@@ -266,13 +291,13 @@ export default function ReportsPage() {
           {/* Report Types Grid */}
           <ReportTypesGrid
             onGenerateReport={handleGenerateReport}
-            onPreviewReport={handlePreviewReport}
             isGenerating={isGenerating}
           />
           
           {/* Top Products */}
           <TopProductsCard 
             products={data?.topProducts || []}
+            isLoading={isLoading}
           />
         </div>
 
@@ -282,19 +307,13 @@ export default function ReportsPage() {
           <ExportOptions
             onExport={handleExport}
             isExporting={isExporting}
+            dateRange={formatDateRange(selectedDateRange)}
           />
           
           {/* Recent Reports */}
           <RecentReportsTable 
             reports={data?.recentReports || []}
-            onDownload={(reportName) => {
-              // TODO: Implement download functionality for recent reports
-              console.log('Download report:', reportName);
-            }}
-            onView={(reportName) => {
-              // TODO: Implement view functionality for recent reports
-              console.log('View report:', reportName);
-            }}
+            isLoading={isLoading}
           />
         </div>
       </div>

@@ -2,7 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/libs/prisma";
 import { requireAuth } from "@/libs/auth/auth";
 
-export async function POST(request: NextRequest) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ reportId: string }> }
+) {
   try {
     // Verificar autenticación y rol de administrador
     const authResult = await requireAuth(['ADMIN']);
@@ -10,45 +13,39 @@ export async function POST(request: NextRequest) {
       return authResult.response;
     }
 
-    const body = await request.json();
-    const { reportId, reportType, dateRange, filters } = body;
-
-    if (!reportId || !reportType) {
-      return NextResponse.json(
-        { error: "reportId y reportType son requeridos" },
-        { status: 400 }
-      );
-    }
+    const { reportId } = await params;
+    const { searchParams } = new URL(request.url);
+    const dateRange = searchParams.get('dateRange') || '30d';
 
     // Calcular fechas basadas en el rango
-    const { startDate, endDate } = getDateRange(dateRange || '30d');
+    const { startDate, endDate } = getDateRange(dateRange);
 
     let reportData;
 
     // Generar reporte según el tipo
     switch (reportId) {
       case 'sales-summary':
-        reportData = await generateSalesSummaryReport(startDate, endDate, filters);
+        reportData = await generateSalesSummaryReport(startDate, endDate);
         break;
       
       case 'customer-analysis':
-        reportData = await generateCustomerAnalysisReport(startDate, endDate, filters);
+        reportData = await generateCustomerAnalysisReport(startDate, endDate);
         break;
       
       case 'product-performance':
-        reportData = await generateProductPerformanceReport(startDate, endDate, filters);
+        reportData = await generateProductPerformanceReport(startDate, endDate);
         break;
       
       case 'financial-report':
-        reportData = await generateFinancialReport(startDate, endDate, filters);
+        reportData = await generateFinancialReport(startDate, endDate);
         break;
       
       case 'orders-analysis':
-        reportData = await generateOrdersAnalysisReport(startDate, endDate, filters);
+        reportData = await generateOrdersAnalysisReport(startDate, endDate);
         break;
       
       case 'growth-trends':
-        reportData = await generateGrowthTrendsReport(startDate, endDate, filters);
+        reportData = await generateGrowthTrendsReport(startDate, endDate);
         break;
       
       default:
@@ -58,33 +55,65 @@ export async function POST(request: NextRequest) {
         );
     }
 
-    // En una implementación real, aquí se guardaría el reporte en la base de datos
-    // y se podría programar la generación del archivo (PDF, Excel, etc.)
-
     return NextResponse.json({
       success: true,
       reportId,
-      reportType,
       data: reportData,
       generatedAt: new Date().toISOString(),
       dateRange: {
         start: startDate.toISOString(),
-        end: endDate.toISOString()
+        end: endDate.toISOString(),
+        label: formatDateRangeText(dateRange)
       }
     });
 
   } catch (error) {
-    console.error("Error generating report:", error);
+    console.error("Error fetching report data:", error);
     return NextResponse.json(
-      { error: "Error al generar el reporte" },
+      { error: "Error al obtener los datos del reporte" },
       { status: 500 }
     );
   }
 }
 
-// Funciones para generar reportes específicos
+// Funciones auxiliares
 
-async function generateSalesSummaryReport(startDate: Date, endDate: Date, filters: string[]) {
+function getDateRange(range: string) {
+  const endDate = new Date();
+  const startDate = new Date();
+
+  switch (range) {
+    case '7d':
+      startDate.setDate(endDate.getDate() - 7);
+      break;
+    case '30d':
+      startDate.setDate(endDate.getDate() - 30);
+      break;
+    case '90d':
+      startDate.setDate(endDate.getDate() - 90);
+      break;
+    case '1y':
+      startDate.setFullYear(endDate.getFullYear() - 1);
+      break;
+    default:
+      startDate.setDate(endDate.getDate() - 30);
+  }
+
+  return { startDate, endDate };
+}
+
+function formatDateRangeText(range: string): string {
+  const ranges: { [key: string]: string } = {
+    '7d': 'Últimos 7 días',
+    '30d': 'Últimos 30 días',
+    '90d': 'Últimos 90 días',
+    '1y': 'Último año'
+  };
+  return ranges[range] || range;
+}
+
+// Función para generar reporte de resumen de ventas
+async function generateSalesSummaryReport(startDate: Date, endDate: Date) {
   const [
     totalSales,
     totalOrders,
@@ -92,7 +121,8 @@ async function generateSalesSummaryReport(startDate: Date, endDate: Date, filter
     topProducts,
     salesByDay,
     salesByCategory,
-    orderStatusBreakdown
+    orderStatusBreakdown,
+    topCustomers
   ] = await Promise.all([
     // Total de ventas
     prisma.order.aggregate({
@@ -180,79 +210,7 @@ async function generateSalesSummaryReport(startDate: Date, endDate: Date, filter
       },
       _count: { status: true },
       _sum: { total: true }
-    })
-  ]);
-
-  return {
-    summary: {
-      totalSales: Number(totalSales._sum.total || 0),
-      totalOrders,
-      averageOrderValue: Number(averageOrderValue._avg.total || 0),
-      conversionRate: 0.024 // Simulado - en una app real se calcularía
-    },
-    topProducts: await enrichProductData(topProducts),
-    salesTrends: {
-      daily: salesByDay.map(item => ({
-        date: item.date,
-        sales: Number(item.sales),
-        orders: Number(item.orders)
-      })),
-      byCategory: salesByCategory.map(item => ({
-        category: item.categoryName,
-        sales: Number(item.totalSales),
-        quantity: Number(item.totalQuantity)
-      }))
-    },
-    orderStatus: orderStatusBreakdown.map(item => ({
-      status: item.status,
-      count: item._count.status,
-      revenue: Number(item._sum.total || 0)
-    }))
-  };
-}
-
-async function generateCustomerAnalysisReport(startDate: Date, endDate: Date, filters: string[]) {
-  const [
-    totalCustomers,
-    newCustomers,
-    customerLifetimeValue,
-    topCustomers,
-    customersByRegion,
-    repeatCustomerRate
-  ] = await Promise.all([
-    // Total de clientes únicos con órdenes
-    prisma.user.count({
-      where: {
-        role: 'USER',
-        Order: {
-          some: {
-            createdAt: { gte: startDate, lte: endDate }
-          }
-        }
-      }
     }),
-
-    // Nuevos clientes en el período
-    prisma.user.count({
-      where: {
-        role: 'USER',
-        createdAt: { gte: startDate, lte: endDate }
-      }
-    }),
-
-    // Valor promedio de vida del cliente
-    prisma.$queryRaw<Array<{
-      averageLifetimeValue: number;
-    }>>`
-      SELECT AVG(customer_total) as averageLifetimeValue
-      FROM (
-        SELECT u.id, COALESCE(SUM(o.total), 0) as customer_total
-        FROM user u
-        LEFT JOIN \`order\` o ON u.id = o.userId AND o.status != 'CANCELLED'
-        WHERE u.role = 'USER'
-        GROUP BY u.id
-      ) as customer_totals
-    `,
 
     // Top clientes por valor
     prisma.$queryRaw<Array<{
@@ -278,9 +236,95 @@ async function generateCustomerAnalysisReport(startDate: Date, endDate: Date, fi
       HAVING totalSpent > 0
       ORDER BY totalSpent DESC
       LIMIT 10
+    `
+  ]);
+
+  // Enriquecer datos de productos
+  const enrichedProducts = await enrichProductData(topProducts);
+
+  return {
+    summary: {
+      totalRevenue: Number(totalSales._sum.total || 0),
+      totalOrders,
+      averageOrderValue: Number(averageOrderValue._avg.total || 0),
+      conversionRate: 2.4 // Simulado - en una app real se calcularía
+    },
+    topProducts: enrichedProducts,
+    topCustomers: topCustomers.map(customer => ({
+      id: customer.userId,
+      name: customer.userName,
+      email: customer.userEmail,
+      totalSpent: Number(customer.totalSpent),
+      orderCount: Number(customer.orderCount)
+    })),
+    salesTrends: {
+      daily: salesByDay.map(item => ({
+        date: item.date,
+        sales: Number(item.sales),
+        orders: Number(item.orders)
+      })),
+      byCategory: salesByCategory.map(item => ({
+        name: item.categoryName,
+        revenue: Number(item.totalSales),
+        products: 0, // Se podría calcular si es necesario
+        sales: Number(item.totalQuantity)
+      }))
+    },
+    orderStatus: orderStatusBreakdown.map(item => ({
+      status: item.status,
+      count: item._count.status,
+      revenue: Number(item._sum.total || 0)
+    }))
+  };
+}
+
+// Función para generar reporte de análisis de clientes
+async function generateCustomerAnalysisReport(startDate: Date, endDate: Date) {
+  const [
+    totalCustomers,
+    newCustomers,
+    topCustomers,
+    customersByRegion,
+    repeatCustomerRate
+  ] = await Promise.all([
+    // Total de clientes
+    prisma.user.count({
+      where: { role: 'USER' }
+    }),
+
+    // Nuevos clientes en el período
+    prisma.user.count({
+      where: {
+        role: 'USER',
+        createdAt: { gte: startDate, lte: endDate }
+      }
+    }),
+
+    // Top clientes por valor total
+    prisma.$queryRaw<Array<{
+      userId: string;
+      userName: string;
+      userEmail: string;
+      totalSpent: number;
+      orderCount: bigint;
+      lastOrderDate: Date;
+    }>>`
+      SELECT 
+        u.id as userId,
+        u.name as userName,
+        u.email as userEmail,
+        COALESCE(SUM(o.total), 0) as totalSpent,
+        COUNT(o.id) as orderCount,
+        MAX(o.createdAt) as lastOrderDate
+      FROM user u
+      LEFT JOIN \`order\` o ON u.id = o.userId AND o.status != 'CANCELLED'
+      WHERE u.role = 'USER'
+      GROUP BY u.id, u.name, u.email
+      ORDER BY totalSpent DESC
+      LIMIT 20
     `,
 
-    // Clientes por región (simulado - asumir que hay datos de dirección)
+    // Clientes por región (usando direcciones)
     prisma.address.groupBy({
       by: ['state'],
       _count: { userId: true },
@@ -299,24 +343,24 @@ async function generateCustomerAnalysisReport(startDate: Date, endDate: Date, fi
       FROM (
         SELECT u.id, COUNT(o.id) as order_count
         FROM user u
-        LEFT JOIN \`order\` o ON u.id = o.userId 
-          AND o.status != 'CANCELLED'
-          AND o.createdAt >= ${startDate}
-          AND o.createdAt <= ${endDate}
+        LEFT JOIN \`order\` o ON u.id = o.userId AND o.status != 'CANCELLED'
         WHERE u.role = 'USER'
         GROUP BY u.id
-        HAVING order_count > 0
       ) as customer_orders
     `
   ]);
 
+  const repeatRate = repeatCustomerRate[0] 
+    ? (Number(repeatCustomerRate[0].repeatCustomers) / Number(repeatCustomerRate[0].totalCustomers)) * 100
+    : 0;
+
   return {
-    overview: {
+    summary: {
       totalCustomers,
       newCustomers,
-      averageLifetimeValue: Number(customerLifetimeValue[0]?.averageLifetimeValue || 0),
-      repeatCustomerRate: repeatCustomerRate.length > 0 
-        ? (Number(repeatCustomerRate[0].repeatCustomers) / Number(repeatCustomerRate[0].totalCustomers)) * 100
+      repeatCustomerRate: repeatRate,
+      averageLifetimeValue: topCustomers.length > 0 
+        ? topCustomers.reduce((sum, c) => sum + Number(c.totalSpent), 0) / topCustomers.length
         : 0
     },
     topCustomers: topCustomers.map(customer => ({
@@ -324,24 +368,28 @@ async function generateCustomerAnalysisReport(startDate: Date, endDate: Date, fi
       name: customer.userName,
       email: customer.userEmail,
       totalSpent: Number(customer.totalSpent),
-      orderCount: Number(customer.orderCount)
+      orderCount: Number(customer.orderCount),
+      lastOrderDate: customer.lastOrderDate
     })),
-    demographics: {
-      byRegion: customersByRegion.map(region => ({
-        state: region.state,
-        customerCount: region._count.userId
-      }))
+    customersByRegion: customersByRegion.map(region => ({
+      region: region.state || 'Sin especificar',
+      customerCount: region._count.userId
+    })),
+    segmentation: {
+      highValue: topCustomers.filter(c => Number(c.totalSpent) > 1000).length,
+      mediumValue: topCustomers.filter(c => Number(c.totalSpent) >= 500 && Number(c.totalSpent) <= 1000).length,
+      lowValue: topCustomers.filter(c => Number(c.totalSpent) < 500).length
     }
   };
 }
 
-async function generateProductPerformanceReport(startDate: Date, endDate: Date, filters: string[]) {
+// Función para generar reporte de rendimiento de productos
+async function generateProductPerformanceReport(startDate: Date, endDate: Date) {
   const [
     bestSellingProducts,
-    worstPerformingProducts,
     categoryPerformance,
     inventoryStatus,
-    profitabilityAnalysis
+    profitabilityData
   ] = await Promise.all([
     // Productos más vendidos
     prisma.orderItem.groupBy({
@@ -355,20 +403,6 @@ async function generateProductPerformanceReport(startDate: Date, endDate: Date, 
       _sum: { quantity: true, price: true },
       orderBy: { _sum: { quantity: 'desc' } },
       take: 20
-    }),
-
-    // Productos con menos ventas
-    prisma.orderItem.groupBy({
-      by: ['productId'],
-      where: {
-        Order: {
-          createdAt: { gte: startDate, lte: endDate },
-          status: { not: 'CANCELLED' }
-        }
-      },
-      _sum: { quantity: true },
-      orderBy: { _sum: { quantity: 'asc' } },
-      take: 10
     }),
 
     // Rendimiento por categoría
@@ -407,7 +441,7 @@ async function generateProductPerformanceReport(startDate: Date, endDate: Date, 
       _avg: { stock: true }
     }),
 
-    // Análisis de rentabilidad (simulado)
+    // Datos de rentabilidad (productos activos con ventas)
     prisma.product.findMany({
       where: {
         status: 'ACTIVE',
@@ -424,6 +458,8 @@ async function generateProductPerformanceReport(startDate: Date, endDate: Date, 
         id: true,
         name: true,
         price: true,
+        stock: true,
+        category: { select: { name: true } },
         OrderItem: {
           where: {
             Order: {
@@ -441,74 +477,79 @@ async function generateProductPerformanceReport(startDate: Date, endDate: Date, 
     })
   ]);
 
+  const enrichedProducts = await enrichProductData(bestSellingProducts);
+
   return {
-    topPerformers: await enrichProductData(bestSellingProducts),
-    underPerformers: await enrichProductData(worstPerformingProducts),
+    topPerformers: enrichedProducts,
     categoryAnalysis: categoryPerformance.map(cat => ({
       categoryId: cat.categoryId,
-      categoryName: cat.categoryName,
-      totalRevenue: Number(cat.totalRevenue),
-      totalQuantity: Number(cat.totalQuantity),
+      name: cat.categoryName,
+      revenue: Number(cat.totalRevenue),
+      quantity: Number(cat.totalQuantity),
       productCount: Number(cat.productCount)
     })),
-    inventoryHealth: {
-      totalActiveProducts: inventoryStatus.reduce((sum, item) => sum + item._count.id, 0),
+    inventoryInsights: {
+      lowStock: profitabilityData.filter(p => p.stock < 10).length,
+      outOfStock: profitabilityData.filter(p => p.stock === 0).length,
+      totalActiveProducts: inventoryStatus.reduce((sum, status) => sum + status._count.id, 0),
       averageStock: inventoryStatus.length > 0 
-        ? Number(inventoryStatus[0]._avg.stock || 0) 
+        ? inventoryStatus.reduce((sum, status) => sum + Number(status._avg.stock || 0), 0) / inventoryStatus.length
         : 0
     },
-    profitability: profitabilityAnalysis.map(product => ({
-      id: product.id,
-      name: product.name,
-      price: Number(product.price),
-      totalSold: product.OrderItem.reduce((sum, item) => sum + item.quantity, 0),
-      totalRevenue: product.OrderItem.reduce((sum, item) => sum + (Number(item.price) * item.quantity), 0),
-      estimatedProfit: product.OrderItem.reduce((sum, item) => sum + (Number(item.price) * item.quantity), 0) * 0.3 // 30% margen estimado
-    }))
+    profitabilityAnalysis: profitabilityData.map(product => {
+      const totalQuantitySold = product.OrderItem.reduce((sum, item) => sum + item.quantity, 0);
+      const totalRevenue = product.OrderItem.reduce((sum, item) => sum + (Number(item.price) * item.quantity), 0);
+      return {
+        id: product.id,
+        name: product.name,
+        price: Number(product.price),
+        stock: product.stock,
+        category: product.category?.name || 'Sin categoría',
+        totalSold: totalQuantitySold,
+        totalRevenue: totalRevenue,
+        profitMargin: totalRevenue > 0 ? ((totalRevenue - (Number(product.price) * totalQuantitySold)) / totalRevenue) * 100 : 0
+      };
+    })
   };
 }
 
-async function generateFinancialReport(startDate: Date, endDate: Date, filters: string[]) {
+// Función para generar reporte financiero
+async function generateFinancialReport(startDate: Date, endDate: Date) {
   const [
-    totalRevenue,
-    totalCosts,
+    revenueData,
+    expensesData,
     profitMargins,
-    paymentMethods,
-    refundsAndCancellations,
-    financialTrends
+    paymentMethods
   ] = await Promise.all([
-    // Ingresos totales
+    // Datos de ingresos
     prisma.order.aggregate({
       where: {
         status: { not: 'CANCELLED' },
         createdAt: { gte: startDate, lte: endDate }
       },
       _sum: { total: true },
-      _count: { id: true }
+      _count: true,
+      _avg: { total: true }
     }),
 
-    // Costos estimados (simulado - 70% del precio como costo)
-    prisma.$queryRaw<Array<{
-      estimatedCosts: number;
-    }>>`
-      SELECT SUM(oi.price * oi.quantity * 0.7) as estimatedCosts
-      FROM orderitem oi
-      JOIN \`order\` o ON oi.orderId = o.id
-      WHERE o.createdAt >= ${startDate}
-        AND o.createdAt <= ${endDate}
-        AND o.status != 'CANCELLED'
-    `,
+    // Simulación de gastos (en una app real esto vendría de otra tabla)
+    Promise.resolve({
+      operationalCosts: 15000,
+      marketingCosts: 8000,
+      shippingCosts: 3500,
+      otherCosts: 2000
+    }),
 
-    // Márgenes por categoría
+    // Márgenes de beneficio por categoría
     prisma.$queryRaw<Array<{
       categoryName: string;
-      revenue: number;
-      estimatedCost: number;
+      totalRevenue: number;
+      totalCost: number;
     }>>`
       SELECT 
         c.name as categoryName,
-        SUM(oi.price * oi.quantity) as revenue,
-        SUM(oi.price * oi.quantity * 0.7) as estimatedCost
+        SUM(oi.price * oi.quantity) as totalRevenue,
+        SUM(p.price * oi.quantity * 0.6) as totalCost
       FROM orderitem oi
       JOIN product p ON oi.productId = p.id
       JOIN category c ON p.categoryId = c.id
@@ -517,106 +558,51 @@ async function generateFinancialReport(startDate: Date, endDate: Date, filters: 
         AND o.createdAt <= ${endDate}
         AND o.status != 'CANCELLED'
       GROUP BY c.id, c.name
-      ORDER BY revenue DESC
-    `,    // Métodos de pago (basado en paymentStatus)
-    prisma.order.groupBy({
-      by: ['paymentStatus'],
-      where: {
-        createdAt: { gte: startDate, lte: endDate },
-        status: { not: 'CANCELLED' },
-        paymentStatus: { not: null }
-      },
-      _count: { id: true },
-      _sum: { total: true }
-    }),
+      ORDER BY totalRevenue DESC
+    `,
 
-    // Reembolsos y cancelaciones
-    prisma.order.aggregate({
-      where: {
-        status: 'CANCELLED',
-        createdAt: { gte: startDate, lte: endDate }
-      },
-      _sum: { total: true },
-      _count: { id: true }
-    }),
-
-    // Tendencias financieras mensuales
-    prisma.$queryRaw<Array<{
-      month: string;
-      revenue: number;
-      orders: bigint;
-      averageOrderValue: number;
-    }>>`
-      SELECT 
-        DATE_FORMAT(createdAt, '%Y-%m') as month,
-        SUM(total) as revenue,
-        COUNT(*) as orders,
-        AVG(total) as averageOrderValue
-      FROM \`order\`
-      WHERE createdAt >= ${startDate}
-        AND createdAt <= ${endDate}
-        AND status != 'CANCELLED'
-      GROUP BY DATE_FORMAT(createdAt, '%Y-%m')
-      ORDER BY month DESC
-    `
+    // Métodos de pago (simulado ya que no tenemos esta información detallada)
+    Promise.resolve([
+      { method: 'Tarjeta de Crédito', count: 150, revenue: 45000 },
+      { method: 'PayPal', count: 80, revenue: 24000 },
+      { method: 'Transferencia', count: 45, revenue: 18000 }
+    ])
   ]);
 
-  const revenue = Number(totalRevenue._sum.total || 0);
-  const costs = Number(totalCosts[0]?.estimatedCosts || 0);
-  const profit = revenue - costs;
+  const totalExpenses = Object.values(expensesData).reduce((sum, cost) => sum + cost, 0);
+  const totalRevenue = Number(revenueData._sum.total || 0);
+  const netProfit = totalRevenue - totalExpenses;
 
   return {
     summary: {
-      totalRevenue: revenue,
-      totalCosts: costs,
-      grossProfit: profit,
-      profitMargin: revenue > 0 ? (profit / revenue) * 100 : 0,
-      totalOrders: totalRevenue._count.id
+      totalRevenue,
+      totalExpenses,
+      netProfit,
+      profitMargin: totalRevenue > 0 ? (netProfit / totalRevenue) * 100 : 0,
+      averageOrderValue: Number(revenueData._avg.total || 0)
     },
-    categoryMargins: profitMargins.map(cat => ({
-      category: cat.categoryName,
-      revenue: Number(cat.revenue),
-      costs: Number(cat.estimatedCost),
-      margin: Number(cat.revenue) > 0 
-        ? ((Number(cat.revenue) - Number(cat.estimatedCost)) / Number(cat.revenue)) * 100 
+    expenses: expensesData,
+    profitMargins: profitMargins.map(margin => ({
+      category: margin.categoryName,
+      revenue: Number(margin.totalRevenue),
+      cost: Number(margin.totalCost),
+      profit: Number(margin.totalRevenue) - Number(margin.totalCost),
+      margin: Number(margin.totalRevenue) > 0 
+        ? ((Number(margin.totalRevenue) - Number(margin.totalCost)) / Number(margin.totalRevenue)) * 100 
         : 0
-    })),    paymentAnalysis: paymentMethods.map(method => ({
-      method: method.paymentStatus || 'unknown',
-      count: method._count?.id || 0,
-      total: Number(method._sum?.total || 0)
     })),
-    losses: {
-      cancelledOrders: refundsAndCancellations._count.id,
-      lostRevenue: Number(refundsAndCancellations._sum.total || 0)
-    },
-    trends: financialTrends.map(trend => ({
-      month: trend.month,
-      revenue: Number(trend.revenue),
-      orders: Number(trend.orders),
-      averageOrderValue: Number(trend.averageOrderValue)
-    }))
+    paymentMethods
   };
 }
 
-async function generateOrdersAnalysisReport(startDate: Date, endDate: Date, filters: string[]) {
+// Función para generar reporte de análisis de órdenes
+async function generateOrdersAnalysisReport(startDate: Date, endDate: Date) {
   const [
-    orderStats,
     ordersByStatus,
-    ordersByPaymentMethod,
+    ordersByDay,
     averageProcessingTime,
-    abandonedCarts,
-    conversionRates
+    orderSizeDistribution
   ] = await Promise.all([
-    // Estadísticas generales de órdenes
-    prisma.order.aggregate({
-      where: {
-        createdAt: { gte: startDate, lte: endDate }
-      },
-      _count: { id: true },
-      _avg: { total: true },
-      _sum: { total: true }
-    }),
-
     // Órdenes por estado
     prisma.order.groupBy({
       by: ['status'],
@@ -624,89 +610,77 @@ async function generateOrdersAnalysisReport(startDate: Date, endDate: Date, filt
         createdAt: { gte: startDate, lte: endDate }
       },
       _count: { status: true },
-      _avg: { total: true }
-    }),    // Órdenes por método de pago (basado en paymentStatus)
-    prisma.order.groupBy({
-      by: ['paymentStatus'],
-      where: {
-        createdAt: { gte: startDate, lte: endDate },
-        paymentStatus: { not: null }
-      },
-      _count: { id: true },
       _sum: { total: true }
     }),
 
-    // Tiempo promedio de procesamiento (simulado)
+    // Órdenes por día
     prisma.$queryRaw<Array<{
-      status: string;
-      avgProcessingHours: number;
+      date: string;
+      orderCount: bigint;
+      totalRevenue: number;
     }>>`
       SELECT 
-        status,
-        AVG(TIMESTAMPDIFF(HOUR, createdAt, updatedAt)) as avgProcessingHours
+        DATE(createdAt) as date,
+        COUNT(*) as orderCount,
+        SUM(total) as totalRevenue
       FROM \`order\`
       WHERE createdAt >= ${startDate}
         AND createdAt <= ${endDate}
-        AND status IN ('PROCESSING', 'SHIPPED', 'DELIVERED')
-      GROUP BY status
+      GROUP BY DATE(createdAt)
+      ORDER BY date DESC
     `,
 
-    // Carritos abandonados (simulado basado en carritos vs órdenes)
-    prisma.cart.count({
-      where: {
-        updatedAt: { gte: startDate, lte: endDate },
-        items: {
-          some: {}
-        }
-      }
+    // Tiempo promedio de procesamiento (simulado)
+    Promise.resolve({
+      averageProcessingHours: 24,
+      averageShippingHours: 48,
+      averageDeliveryDays: 3
     }),
 
-    // Tasas de conversión por hora (simulado)
+    // Distribución del tamaño de órdenes
     prisma.$queryRaw<Array<{
-      hour: number;
-      orders: bigint;
+      orderRange: string;
+      orderCount: bigint;
     }>>`
       SELECT 
-        HOUR(createdAt) as hour,
-        COUNT(*) as orders
+        CASE 
+          WHEN total < 50 THEN '< $50'
+          WHEN total >= 50 AND total < 100 THEN '$50 - $100'
+          WHEN total >= 100 AND total < 200 THEN '$100 - $200'
+          WHEN total >= 200 AND total < 500 THEN '$200 - $500'
+          ELSE '$500+'
+        END as orderRange,
+        COUNT(*) as orderCount
       FROM \`order\`
       WHERE createdAt >= ${startDate}
         AND createdAt <= ${endDate}
-      GROUP BY HOUR(createdAt)
-      ORDER BY hour
+        AND status != 'CANCELLED'
+      GROUP BY orderRange
+      ORDER BY MIN(total)
     `
   ]);
 
   return {
-    overview: {
-      totalOrders: orderStats._count.id,
-      averageOrderValue: Number(orderStats._avg.total || 0),
-      totalRevenue: Number(orderStats._sum.total || 0)
-    },
     statusBreakdown: ordersByStatus.map(status => ({
       status: status.status,
       count: status._count.status,
-      averageValue: Number(status._avg.total || 0)
-    })),    paymentMethodAnalysis: ordersByPaymentMethod.map(method => ({
-      method: method.paymentStatus || 'unknown',
-      count: method._count?.id || 0,
-      total: Number(method._sum?.total || 0)
+      revenue: Number(status._sum.total || 0)
     })),
-    processingTimes: averageProcessingTime.map(time => ({
-      status: time.status,
-      averageHours: Number(time.avgProcessingHours || 0)
+    dailyTrends: ordersByDay.map(day => ({
+      date: day.date,
+      orders: Number(day.orderCount),
+      revenue: Number(day.totalRevenue)
     })),
-    conversionMetrics: {
-      abandonedCarts,
-      conversionByHour: conversionRates.map(rate => ({
-        hour: rate.hour,
-        orders: Number(rate.orders)
-      }))
-    }
+    processingMetrics: averageProcessingTime,
+    orderSizeDistribution: orderSizeDistribution.map(range => ({
+      range: range.orderRange,
+      count: Number(range.orderCount)
+    }))
   };
 }
 
-async function generateGrowthTrendsReport(startDate: Date, endDate: Date, filters: string[]) {
+// Función para generar reporte de tendencias de crecimiento
+async function generateGrowthTrendsReport(startDate: Date, endDate: Date) {
   // Calcular períodos anteriores para comparación
   const periodLength = endDate.getTime() - startDate.getTime();
   const previousStartDate = new Date(startDate.getTime() - periodLength);
@@ -716,8 +690,7 @@ async function generateGrowthTrendsReport(startDate: Date, endDate: Date, filter
     currentPeriodStats,
     previousPeriodStats,
     monthlyGrowth,
-    customerGrowth,
-    productGrowth
+    customerGrowth
   ] = await Promise.all([
     // Estadísticas del período actual
     prisma.order.aggregate({
@@ -726,7 +699,7 @@ async function generateGrowthTrendsReport(startDate: Date, endDate: Date, filter
         createdAt: { gte: startDate, lte: endDate }
       },
       _sum: { total: true },
-      _count: { id: true }
+      _count: true
     }),
 
     // Estadísticas del período anterior
@@ -736,7 +709,7 @@ async function generateGrowthTrendsReport(startDate: Date, endDate: Date, filter
         createdAt: { gte: previousStartDate, lte: previousEndDate }
       },
       _sum: { total: true },
-      _count: { id: true }
+      _count: true
     }),
 
     // Crecimiento mensual
@@ -749,44 +722,46 @@ async function generateGrowthTrendsReport(startDate: Date, endDate: Date, filter
       SELECT 
         DATE_FORMAT(o.createdAt, '%Y-%m') as month,
         SUM(o.total) as revenue,
-        COUNT(DISTINCT o.id) as orders,
+        COUNT(o.id) as orders,
         COUNT(DISTINCT o.userId) as customers
       FROM \`order\` o
-      WHERE o.createdAt >= ${new Date(startDate.getFullYear() - 1, startDate.getMonth(), 1)}
+      WHERE o.createdAt >= ${new Date(Date.now() - 6 * 30 * 24 * 60 * 60 * 1000)}
         AND o.status != 'CANCELLED'
       GROUP BY DATE_FORMAT(o.createdAt, '%Y-%m')
       ORDER BY month DESC
-      LIMIT 12
-    `,    // Crecimiento de clientes
+      LIMIT 6
+    `,
+
+    // Crecimiento de clientes
     prisma.user.count({
       where: {
         role: 'USER',
         createdAt: { gte: startDate, lte: endDate }
       }
-    }),
-
-    // Crecimiento de productos
-    prisma.product.count({
-      where: {
-        status: 'ACTIVE',
-        createdAt: { gte: startDate, lte: endDate }
-      }
     })
   ]);
 
-  const currentRevenue = Number(currentPeriodStats._sum.total || 0);
-  const previousRevenue = Number(previousPeriodStats._sum.total || 0);
-  const revenueGrowth = calculateGrowthRate(currentRevenue, previousRevenue);
+  const revenueGrowth = calculateGrowthRate(
+    Number(currentPeriodStats._sum.total || 0),
+    Number(previousPeriodStats._sum.total || 0)
+  );
 
-  const currentOrders = currentPeriodStats._count.id;
-  const previousOrders = previousPeriodStats._count.id;
-  const ordersGrowth = calculateGrowthRate(currentOrders, previousOrders);
+  const orderGrowth = calculateGrowthRate(
+    currentPeriodStats._count,
+    previousPeriodStats._count
+  );
+
   return {
-    overview: {
+    summary: {
       revenueGrowth,
-      ordersGrowth,
+      orderGrowth,
       customerGrowth: customerGrowth,
-      productGrowth: productGrowth
+      monthOverMonthGrowth: monthlyGrowth.length >= 2 
+        ? calculateGrowthRate(
+            Number(monthlyGrowth[0].revenue),
+            Number(monthlyGrowth[1].revenue)
+          )
+        : 0
     },
     monthlyTrends: monthlyGrowth.map(month => ({
       month: month.month,
@@ -795,38 +770,14 @@ async function generateGrowthTrendsReport(startDate: Date, endDate: Date, filter
       customers: Number(month.customers)
     })),
     projections: {
-      nextMonthRevenue: currentRevenue * (1 + (revenueGrowth / 100)),
-      nextMonthOrders: Math.round(currentOrders * (1 + (ordersGrowth / 100)))
+      nextMonthRevenue: Number(currentPeriodStats._sum.total || 0) * (1 + (revenueGrowth / 100)),
+      nextMonthOrders: currentPeriodStats._count * (1 + (orderGrowth / 100)),
+      confidence: 75 // Simulado
     }
   };
 }
 
-// Funciones auxiliares
-
-function getDateRange(range: string) {
-  const endDate = new Date();
-  const startDate = new Date();
-
-  switch (range) {
-    case '7d':
-      startDate.setDate(endDate.getDate() - 7);
-      break;
-    case '30d':
-      startDate.setDate(endDate.getDate() - 30);
-      break;
-    case '90d':
-      startDate.setDate(endDate.getDate() - 90);
-      break;
-    case '1y':
-      startDate.setFullYear(endDate.getFullYear() - 1);
-      break;
-    default:
-      startDate.setDate(endDate.getDate() - 30);
-  }
-
-  return { startDate, endDate };
-}
-
+// Función auxiliar para enriquecer datos de productos
 async function enrichProductData(productData: any[]) {
   return Promise.all(
     productData.map(async (item) => {
@@ -853,6 +804,7 @@ async function enrichProductData(productData: any[]) {
   );
 }
 
+// Función auxiliar para calcular tasa de crecimiento
 function calculateGrowthRate(current: number, previous: number): number {
   if (previous === 0) return current > 0 ? 100 : 0;
   return ((current - previous) / previous) * 100;
