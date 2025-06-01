@@ -35,7 +35,7 @@ export const menuItems = [
   { title: "Categorías", url: "/admin/categories", icon: Tag },
   { title: "Pedidos", url: "/admin/orders", icon: ShoppingCart },
   { title: "Clientes", url: "/admin/customers", icon: Users },
-  { title: "Estadísticas", url: "/admin/statistics", icon: BarChart },
+  { title: "Reportes y analisis", url: "/admin/reports", icon: BarChart },
   { title: "Notificaciones", url: "/admin/notifications", icon: Bell },
   { title: "Configuración", url: "/admin/settings", icon: Settings },
 ];

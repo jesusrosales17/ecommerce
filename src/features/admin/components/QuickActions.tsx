@@ -38,8 +38,7 @@ export default function QuickActions() {
       hoverColor: "hover:bg-purple-100",
       textColor: "text-purple-600",
       descColor: "text-purple-500"
-    },
-    {
+    },    {
       title: "Reportes",
       description: "Generar reportes",
       href: "/admin/reports",
