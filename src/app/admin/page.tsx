@@ -110,14 +110,14 @@ export default function AdminDashboard() {
         <OverviewCards stats={stats.overview} />
 
         {/* Main Content Grid */}
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
           {/* Revenue Chart - Takes 2/3 of the width on large screens */}
-          <div className="xl:col-span-2">
+          <div className="2xl:col-span-2">
             <RevenueChart data={stats.monthlyStats} />
           </div>
           
           {/* Order Status Chart - Takes 1/3 of the width on large screens */}
-          <div className="xl:col-span-1">
+          <div className="2xl:col-span-1">
             <OrderStatusChart />
           </div>
         </div>
