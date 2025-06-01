@@ -1,6 +1,8 @@
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
+import { getStatusText } from '@/features/orders/utils/orders';
+import { OrderStatus } from '@prisma/client';
 
 export interface ExportData {
   overview: {
@@ -229,16 +231,14 @@ export const exportToExcel = async (data: ExportData, dateRange: string, reportI
     const topProductsSheet = XLSX.utils.aoa_to_sheet(topProductsData);
     XLSX.utils.book_append_sheet(workbook, topProductsSheet, 'Top Productos');
   }
-  
-  // Hoja de órdenes recientes
+    // Hoja de órdenes recientes
   if (data.recentOrders.length > 0) {    const ordersData = [
       ['ID', 'Cliente', 'Email', 'Total', 'Estado', 'Fecha'],
       ...data.recentOrders.map(order => [
         order.id,
         order.customerName,
-        order.customerEmail,
-        order.total,
-        order.status,
+        order.customerEmail,        order.total,
+        getStatusText(order.status as OrderStatus),
         new Date(order.createdAt).toLocaleDateString('es-ES')
       ])
     ];
@@ -551,10 +551,8 @@ async function addSalesSummaryContent(doc: any, data: any, startY: number): Prom
     
     doc.setFontSize(16);
     doc.text('Estado de Órdenes', 14, currentY);
-    currentY += 5;
-    
-    const orderStatusData = data.orderStatus.map((status: any) => [
-      status.status || 'N/A',
+    currentY += 5;    const orderStatusData = data.orderStatus.map((status: any) => [
+      getStatusText(status.status as OrderStatus) || 'N/A',
       status.count?.toString() || '0',
       `$${status.revenue?.toLocaleString('es-ES', { minimumFractionDigits: 2 }) || '0.00'}`
     ]);
@@ -926,112 +924,130 @@ async function addFinancialReportContent(doc: any, data: any, startY: number): P
 async function addOrdersAnalysisContent(doc: any, data: any, startY: number): Promise<number> {
   let currentY = startY;
   
-  // Resumen de órdenes
-  if (data.summary) {
+  // Estado de órdenes (usando statusBreakdown)
+  if (data.statusBreakdown && data.statusBreakdown.length > 0) {
     doc.setFontSize(16);
-    doc.text('Resumen de Órdenes', 14, currentY);
+    doc.text('Distribución por Estado de Órdenes', 14, currentY);
     currentY += 10;
     
-    const summaryData = [
-      ['Total de Órdenes', data.summary.totalOrders?.toString() || '0'],
-      ['Órdenes Completadas', data.summary.completedOrders?.toString() || '0'],
-      ['Órdenes Pendientes', data.summary.pendingOrders?.toString() || '0'],
-      ['Tasa de Completación', `${data.summary.completionRate || 0}%`]
-    ];
-    
-    autoTable(doc, {
-      startY: currentY,
-      head: [['Métrica', 'Valor']],
-      body: summaryData,
-      theme: 'grid',
-      styles: { fontSize: 10 }
-    });
-    
-    currentY = (doc as any).lastAutoTable.finalY + 15;
-  }
-  
-  // Estado de órdenes
-  if (data.orderStatus && data.orderStatus.length > 0) {
-    if (currentY > 250) {
-      doc.addPage();
-      currentY = 20;
-    }
-    
-    doc.setFontSize(16);
-    doc.text('Distribución por Estado', 14, currentY);
-    currentY += 5;
-    
-    const statusData = data.orderStatus.map((status: any) => [
-      status.status || 'N/A',
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+      // Tabla de estado de órdenes
+    const orderStatusHeaders = ['Estado', 'Cantidad', 'Ingresos'];    const orderStatusData = data.statusBreakdown.map((status: any) => [
+      getStatusText(status.status as OrderStatus) || 'N/A',
       status.count?.toString() || '0',
-      `${status.percentage || 0}%`,
-      `$${status.revenue?.toLocaleString('es-ES', { minimumFractionDigits: 2 }) || '0.00'}`
+      `$${(status.revenue || 0).toLocaleString('es-ES')}`
     ]);
     
     autoTable(doc, {
       startY: currentY,
-      head: [['Estado', 'Cantidad', 'Porcentaje', 'Ingresos']],
-      body: statusData,
-      theme: 'striped',
-      styles: { fontSize: 9 }
+      head: [orderStatusHeaders],
+      body: orderStatusData,
+      theme: 'grid',
+      styles: { fontSize: 9, cellPadding: 3 },
+      headStyles: { fillColor: [74, 144, 226] },
+      margin: { left: 14, right: 14 }
     });
     
     currentY = (doc as any).lastAutoTable.finalY + 15;
   }
   
-  // Tendencias de tiempo
-  if (data.timeAnalysis) {
+  // Tendencias diarias (usando dailyTrends)
+  if (data.dailyTrends && data.dailyTrends.length > 0) {
     if (currentY > 250) {
       doc.addPage();
       currentY = 20;
     }
     
     doc.setFontSize(16);
-    doc.text('Análisis Temporal', 14, currentY);
+    doc.text('Tendencias Diarias (Últimos 10 días)', 14, currentY);
     currentY += 10;
     
-    const timeData = [
-      ['Tiempo Promedio de Procesamiento', `${data.timeAnalysis.avgProcessingTime || 0} horas`],
-      ['Tiempo Promedio de Envío', `${data.timeAnalysis.avgShippingTime || 0} días`],
-      ['Tiempo Total Promedio', `${data.timeAnalysis.avgTotalTime || 0} días`],
-      ['SLA Cumplido', `${data.timeAnalysis.slaCompliance || 0}%`]
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    
+    const trendsHeaders = ['Fecha', 'Órdenes', 'Ingresos'];
+    const trendsData = data.dailyTrends.slice(0, 10).map((trend: any) => [
+      trend.date || 'N/A',
+      trend.orders?.toString() || '0',
+      `$${(trend.revenue || 0).toLocaleString('es-ES')}`
+    ]);
+    
+    autoTable(doc, {
+      startY: currentY,
+      head: [trendsHeaders],
+      body: trendsData,
+      theme: 'grid',
+      styles: { fontSize: 9, cellPadding: 3 },
+      headStyles: { fillColor: [74, 144, 226] },
+      margin: { left: 14, right: 14 }
+    });
+    
+    currentY = (doc as any).lastAutoTable.finalY + 15;
+  }
+  
+  // Métricas de procesamiento (usando processingMetrics)
+  if (data.processingMetrics) {
+    if (currentY > 250) {
+      doc.addPage();
+      currentY = 20;
+    }
+    
+    doc.setFontSize(16);
+    doc.text('Métricas de Procesamiento', 14, currentY);
+    currentY += 10;
+    
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    
+    const metricsHeaders = ['Métrica', 'Valor'];
+    const metricsData = [
+      ['Tiempo Promedio de Procesamiento', `${data.processingMetrics.averageProcessingHours || 0} horas`],
+      ['Tiempo Promedio de Envío', `${data.processingMetrics.averageShippingHours || 0} horas`],
+      ['Días Promedio de Entrega', `${data.processingMetrics.averageDeliveryDays || 0} días`]
     ];
     
     autoTable(doc, {
       startY: currentY,
-      head: [['Métrica', 'Valor']],
-      body: timeData,
+      head: [metricsHeaders],
+      body: metricsData,
       theme: 'grid',
-      styles: { fontSize: 10 }
+      styles: { fontSize: 9, cellPadding: 3 },
+      headStyles: { fillColor: [74, 144, 226] },
+      margin: { left: 14, right: 14 }
     });
     
     currentY = (doc as any).lastAutoTable.finalY + 15;
   }
   
-  // Análisis por método de pago
-  if (data.paymentMethods && data.paymentMethods.length > 0) {
+  // Distribución por tamaño de orden (usando orderSizeDistribution)
+  if (data.orderSizeDistribution && data.orderSizeDistribution.length > 0) {
     if (currentY > 250) {
       doc.addPage();
       currentY = 20;
     }
     
     doc.setFontSize(16);
-    doc.text('Métodos de Pago', 14, currentY);
-    currentY += 5;
+    doc.text('Distribución por Tamaño de Orden', 14, currentY);
+    currentY += 10;
     
-    const paymentData = data.paymentMethods.map((method: any) => [
-      method.method || 'N/A',
-      method.orders?.toString() || '0',
-      `${method.percentage || 0}%`,
-      `$${method.revenue?.toLocaleString('es-ES', { minimumFractionDigits: 2 }) || '0.00'}`
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    
+    const sizeHeaders = ['Rango', 'Cantidad de Órdenes'];
+    const sizeData = data.orderSizeDistribution.map((size: any) => [
+      size.range || 'N/A',
+      size.count?.toString() || '0'
     ]);
     
     autoTable(doc, {
       startY: currentY,
-      head: [['Método', 'Órdenes', 'Porcentaje', 'Ingresos']],
-      body: paymentData,
-      theme: 'striped',
-      styles: { fontSize: 9 }
+      head: [sizeHeaders],
+      body: sizeData,
+      theme: 'grid',
+      styles: { fontSize: 9, cellPadding: 3 },
+      headStyles: { fillColor: [74, 144, 226] },
+      margin: { left: 14, right: 14 }
     });
     
     currentY = (doc as any).lastAutoTable.finalY + 15;
@@ -1162,13 +1178,11 @@ function addSalesSummaryExcelSheets(workbook: any, data: any) {
     const categorySheet = XLSX.utils.aoa_to_sheet(categoryData);
     XLSX.utils.book_append_sheet(workbook, categorySheet, 'Ventas por Categoría');
   }
-  
-  // Hoja de estado de órdenes
+    // Hoja de estado de órdenes
   if (data.orderStatus && data.orderStatus.length > 0) {
     const statusData = [
-      ['Estado', 'Cantidad', 'Ingresos'],
-      ...data.orderStatus.map((status: any) => [
-        status.status || 'N/A',
+      ['Estado', 'Cantidad', 'Ingresos'],      ...data.orderStatus.map((status: any) => [
+        getStatusText(status.status as OrderStatus) || 'N/A',
         status.count || 0,
         status.revenue || 0
       ])
@@ -1355,28 +1369,12 @@ function addFinancialReportExcelSheets(workbook: any, data: any) {
   }
 }
 
-function addOrdersAnalysisExcelSheets(workbook: any, data: any) {
-  // Hoja de resumen de órdenes
-  if (data.summary) {
-    const summaryData = [
-      ['Métrica', 'Valor'],
-      ['Total de Órdenes', data.summary.totalOrders || 0],
-      ['Órdenes Completadas', data.summary.completedOrders || 0],
-      ['Órdenes Pendientes', data.summary.pendingOrders || 0],
-      ['Tasa de Completación', `${data.summary.completionRate || 0}%`]
-    ];
-    const summarySheet = XLSX.utils.aoa_to_sheet(summaryData);
-    XLSX.utils.book_append_sheet(workbook, summarySheet, 'Resumen');
-  }
-  
-  // Hoja de estado de órdenes
-  if (data.orderStatus && data.orderStatus.length > 0) {
+function addOrdersAnalysisExcelSheets(workbook: any, data: any) {  // Hoja de distribución por estado
+  if (data.statusBreakdown && data.statusBreakdown.length > 0) {
     const statusData = [
-      ['Estado', 'Cantidad', 'Porcentaje', 'Ingresos'],
-      ...data.orderStatus.map((status: any) => [
-        status.status || 'N/A',
+      ['Estado', 'Cantidad', 'Ingresos'],      ...data.statusBreakdown.map((status: any) => [
+        getStatusText(status.status as OrderStatus) || 'N/A',
         status.count || 0,
-        `${status.percentage || 0}%`,
         status.revenue || 0
       ])
     ];
@@ -1384,32 +1382,43 @@ function addOrdersAnalysisExcelSheets(workbook: any, data: any) {
     XLSX.utils.book_append_sheet(workbook, statusSheet, 'Estado Órdenes');
   }
   
-  // Hoja de análisis temporal
-  if (data.timeAnalysis) {
-    const timeData = [
-      ['Métrica', 'Valor'],
-      ['Tiempo Promedio de Procesamiento', `${data.timeAnalysis.avgProcessingTime || 0} horas`],
-      ['Tiempo Promedio de Envío', `${data.timeAnalysis.avgShippingTime || 0} días`],
-      ['Tiempo Total Promedio', `${data.timeAnalysis.avgTotalTime || 0} días`],
-      ['SLA Cumplido', `${data.timeAnalysis.slaCompliance || 0}%`]
-    ];
-    const timeSheet = XLSX.utils.aoa_to_sheet(timeData);
-    XLSX.utils.book_append_sheet(workbook, timeSheet, 'Análisis Temporal');
-  }
-  
-  // Hoja de métodos de pago
-  if (data.paymentMethods && data.paymentMethods.length > 0) {
-    const paymentData = [
-      ['Método', 'Órdenes', 'Porcentaje', 'Ingresos'],
-      ...data.paymentMethods.map((method: any) => [
-        method.method || 'N/A',
-        method.orders || 0,
-        `${method.percentage || 0}%`,
-        method.revenue || 0
+  // Hoja de tendencias diarias
+  if (data.dailyTrends && data.dailyTrends.length > 0) {
+    const trendsData = [
+      ['Fecha', 'Órdenes', 'Ingresos'],
+      ...data.dailyTrends.slice(0, 30).map((day: any) => [
+        day.date || 'N/A',
+        day.orders || 0,
+        day.revenue || 0
       ])
     ];
-    const paymentSheet = XLSX.utils.aoa_to_sheet(paymentData);
-    XLSX.utils.book_append_sheet(workbook, paymentSheet, 'Métodos de Pago');
+    const trendsSheet = XLSX.utils.aoa_to_sheet(trendsData);
+    XLSX.utils.book_append_sheet(workbook, trendsSheet, 'Tendencias Diarias');
+  }
+  
+  // Hoja de métricas de procesamiento
+  if (data.processingMetrics) {
+    const metricsData = [
+      ['Métrica', 'Valor'],
+      ['Tiempo Promedio de Procesamiento', `${data.processingMetrics.averageProcessingHours || 0} horas`],
+      ['Tiempo Promedio de Envío', `${data.processingMetrics.averageShippingHours || 0} horas`],
+      ['Días Promedio de Entrega', `${data.processingMetrics.averageDeliveryDays || 0} días`]
+    ];
+    const metricsSheet = XLSX.utils.aoa_to_sheet(metricsData);
+    XLSX.utils.book_append_sheet(workbook, metricsSheet, 'Métricas de Procesamiento');
+  }
+  
+  // Hoja de distribución por tamaño de orden
+  if (data.orderSizeDistribution && data.orderSizeDistribution.length > 0) {
+    const sizeData = [
+      ['Rango de Tamaño', 'Cantidad de Órdenes'],
+      ...data.orderSizeDistribution.map((size: any) => [
+        size.range || 'N/A',
+        size.count || 0
+      ])
+    ];
+    const sizeSheet = XLSX.utils.aoa_to_sheet(sizeData);
+    XLSX.utils.book_append_sheet(workbook, sizeSheet, 'Distribución por Tamaño');
   }
 }
 
@@ -1505,13 +1514,11 @@ function generateSalesSummaryCSV(data: any): string {
     });
     content += '\n';
   }
-  
-  // Estado de órdenes
+    // Estado de órdenes
   if (data.orderStatus && data.orderStatus.length > 0) {
     content += 'ESTADO DE ÓRDENES\n';
-    content += 'Estado,Cantidad,Ingresos\n';
-    data.orderStatus.forEach((status: any) => {
-      content += `${status.status || 'N/A'},${status.count || 0},${status.revenue || 0}\n`;
+    content += 'Estado,Cantidad,Ingresos\n';    data.orderStatus.forEach((status: any) => {
+      content += `${getStatusText(status.status as OrderStatus) || 'N/A'},${status.count || 0},${status.revenue || 0}\n`;
     });
     content += '\n';
   }
@@ -1655,49 +1662,47 @@ function generateFinancialReportCSV(data: any): string {
 }
 
 function generateOrdersAnalysisCSV(data: any): string {
-  let content = '';
-  
-  // Resumen de órdenes
-  if (data.summary) {
-    content += 'RESUMEN DE ÓRDENES\n';
-    content += 'Métrica,Valor\n';
-    content += `Total de Órdenes,${data.summary.totalOrders || 0}\n`;
-    content += `Órdenes Completadas,${data.summary.completedOrders || 0}\n`;
-    content += `Órdenes Pendientes,${data.summary.pendingOrders || 0}\n`;
-    content += `Tasa de Completación,${data.summary.completionRate || 0}%\n\n`;
-  }
-  
-  // Estado de órdenes
-  if (data.orderStatus && data.orderStatus.length > 0) {
-    content += 'DISTRIBUCIÓN POR ESTADO\n';
-    content += 'Estado,Cantidad,Porcentaje,Ingresos\n';
-    data.orderStatus.forEach((status: any) => {
-      content += `${status.status || 'N/A'},${status.count || 0},${status.percentage || 0}%,${status.revenue || 0}\n`;
+  let csv = '';
+  // Distribución por estado
+  if (data.statusBreakdown && data.statusBreakdown.length > 0) {
+    csv += 'DISTRIBUCIÓN POR ESTADO\n';
+    csv += 'Estado,Cantidad,Ingresos\n';    data.statusBreakdown.forEach((status: any) => {
+      csv += `${getStatusText(status.status as OrderStatus) || 'N/A'},${status.count || 0},${status.revenue || 0}\n`;
     });
-    content += '\n';
+    csv += '\n';
   }
-  
-  // Análisis temporal
-  if (data.timeAnalysis) {
-    content += 'ANÁLISIS TEMPORAL\n';
-    content += 'Métrica,Valor\n';
-    content += `Tiempo Promedio de Procesamiento,${data.timeAnalysis.avgProcessingTime || 0} horas\n`;
-    content += `Tiempo Promedio de Envío,${data.timeAnalysis.avgShippingTime || 0} días\n`;
-    content += `Tiempo Total Promedio,${data.timeAnalysis.avgTotalTime || 0} días\n`;
-    content += `SLA Cumplido,${data.timeAnalysis.slaCompliance || 0}%\n\n`;
-  }
-  
-  // Métodos de pago
-  if (data.paymentMethods && data.paymentMethods.length > 0) {
-    content += 'MÉTODOS DE PAGO\n';
-    content += 'Método,Órdenes,Porcentaje,Ingresos\n';
-    data.paymentMethods.forEach((method: any) => {
-      content += `"${method.method || 'N/A'}",${method.orders || 0},${method.percentage || 0}%,${method.revenue || 0}\n`;
+
+  // Tendencias diarias (últimos 30 días)
+  if (data.dailyTrends && data.dailyTrends.length > 0) {
+    csv += 'TENDENCIAS DIARIAS (últimos 30 días)\n';
+    csv += 'Fecha,Órdenes,Ingresos\n';
+    data.dailyTrends.slice(0, 30).forEach((day: any) => {
+      csv += `${day.date || 'N/A'},${day.orders || 0},${day.revenue || 0}\n`;
     });
-    content += '\n';
+    csv += '\n';
   }
-  
-  return content;
+
+  // Métricas de procesamiento
+  if (data.processingMetrics) {
+    csv += 'MÉTRICAS DE PROCESAMIENTO\n';
+    csv += 'Métrica,Valor\n';
+    csv += `Tiempo Promedio de Procesamiento,${data.processingMetrics.averageProcessingHours || 0} horas\n`;
+    csv += `Tiempo Promedio de Envío,${data.processingMetrics.averageShippingHours || 0} horas\n`;
+    csv += `Días Promedio de Entrega,${data.processingMetrics.averageDeliveryDays || 0} días\n`;
+    csv += '\n';
+  }
+
+  // Distribución por tamaño de orden
+  if (data.orderSizeDistribution && data.orderSizeDistribution.length > 0) {
+    csv += 'DISTRIBUCIÓN POR TAMAÑO DE ORDEN\n';
+    csv += 'Rango,Cantidad\n';
+    data.orderSizeDistribution.forEach((size: any) => {
+      csv += `${size.range || 'N/A'},${size.count || 0}\n`;
+    });
+    csv += '\n';
+  }
+
+  return csv;
 }
 
 
@@ -1735,13 +1740,11 @@ function generateGeneralCSV(data: any): string {
     });
     content += '\n';
   }
-  
-  // Estado de órdenes
+    // Estado de órdenes
   if (data.orderStatusData && data.orderStatusData.length > 0) {
     content += 'ESTADO DE ÓRDENES\n';
-    content += 'Estado,Cantidad\n';
-    data.orderStatusData.forEach((status: any) => {
-      content += `${status.status || 'N/A'},${status.count || 0}\n`;
+    content += 'Estado,Cantidad\n';    data.orderStatusData.forEach((status: any) => {
+      content += `${getStatusText(status.status as OrderStatus) || 'N/A'},${status.count || 0}\n`;
     });
     content += '\n';
   }

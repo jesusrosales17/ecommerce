@@ -34,7 +34,7 @@ const page = () => {
       {/* right section */}
       <div className="bg-linear-120 from-gray-200 to-sky-300 m-3 sm:m-5 md:m-7 rounded-lg overflow-hidden relative hidden lg:flex lg:flex-col lg:justify-center lg:items-center">
         <Image
-          src="/images/signup.jpg"
+          src="/images/signup.png"
           alt="register"
           width={800}
           height={1000}

@@ -295,7 +295,7 @@ export default function ReportsPage() {
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-8">
+    <div className=" space-y-8">
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>
