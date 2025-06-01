@@ -342,22 +342,21 @@ export default function ReportPreviewPage() {
                             className="w-8 h-8 rounded-full flex items-center justify-center print:w-6 print:h-6"
                           >
                             {index + 1}
-                          </Badge>
-                          <div>
+                          </Badge>                          <div>
                             <p className="font-medium print:text-sm">
                               {product.name}
                             </p>
                             <p className="text-sm text-muted-foreground print:text-xs">
-                              {product.category?.name || "Sin categoría"}
+                              {(product.category?.name || product.category || "Sin categoría")}
                             </p>
                           </div>
                         </div>
                         <div className="text-right">
                           <p className="font-semibold print:text-sm">
-                            {formatNumber(product.totalSold)} vendidos
+                            {formatNumber(product.totalSold || product.totalQuantity || 0)} vendidos
                           </p>
                           <p className="text-sm text-muted-foreground print:text-xs">
-                            {formatCurrency(product.price)}
+                            {formatCurrency(product.price || product.averagePrice || 0)}
                           </p>
                         </div>
                       </div>
