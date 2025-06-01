@@ -117,9 +117,8 @@ export function LoginForm() {
             >
               Recordar contraseña
             </label>
-          </div>
-          <a
-            href="#"
+          </div>          <a
+            href="/auth/forgot-password"
             className="text-xs sm:text-sm   font-semibold text-gray-600 hover:underline"
           >
             Olvidé mi contraseña

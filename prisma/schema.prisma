@@ -308,3 +308,18 @@ model OrderItem {
   @@index([productId])
   @@map("orderitem")
 }
+
+// Tokens para recuperación de contraseña
+model PasswordResetToken {
+  id        String   @id @default(uuid())
+  email     String
+  token     String   @unique
+  expires   DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([email])
+  @@index([token])
+  @@map("passwordresettoken")
+}
