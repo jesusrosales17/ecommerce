@@ -26,7 +26,9 @@ const ProductViewPage = async ({ params }: Props) => {
     return (
       <div className="flex flex-col items-center justify-center h-screen space-y-4">
         <h1 className="text-3xl font-bold">Error al cargar</h1>
-        <p className="text-muted-foreground">No fue posible obtener la información del producto.</p>
+        <p className="text-muted-foreground">
+          No fue posible obtener la información del producto.
+        </p>
         <Link href="/admin/products">
           <Button variant="secondary">Volver a productos</Button>
         </Link>
@@ -37,68 +39,73 @@ const ProductViewPage = async ({ params }: Props) => {
   const product: Product = await res.json();
 
   return (
-    <div className="space-y-6 pb-8 max-w-7xl mx-auto px-4">
+    <div className="space-y-6 pb-8 ">
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div className="space-y-1">
-          <Link href="/admin/products" className="flex items-center text-sm text-primary hover:underline">
+          <Link
+            href="/admin/products"
+            className="flex items-center text-sm text-primary hover:underline"
+          >
             <ArrowLeft className="h-5 w-5 mr-1" /> Volver a productos
           </Link>
-          <h1 className="text-3xl font-extrabold tracking-tight">{product.name}</h1>
+          <h1 className="text-3xl font-extrabold tracking-tight">
+            {product.name}
+          </h1>
           <p className="text-sm text-muted-foreground">Detalles del producto</p>
         </div>
-        <Badge variant={product.status === "ACTIVE" ? "default" : "secondary"} className="uppercase">
+        <Badge
+          variant={product.status === "ACTIVE" ? "default" : "secondary"}
+          className="uppercase"
+        >
           {product.status === "ACTIVE" ? "Activo" : "Inactivo"}
         </Badge>
-      </div>      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      </div>{" "}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Images & Category & Dates */}
         <div className="space-y-6">
           {/* Images */}
-          <ProductImagesCard 
-            images={product.images} 
-            productName={product.name} 
+          <ProductImagesCard
+            images={product.images}
+            productName={product.name}
           />
 
           {/* Category */}
-          <ProductCategoryCard 
-            categoryName={product.category?.name} 
-          />
+          <ProductCategoryCard categoryName={product.category?.name} />
 
           {/* Dates */}
-          <ProductDatesCard 
-            createdAt={product.createdAt} 
-            updatedAt={product.updatedAt} 
+          <ProductDatesCard
+            createdAt={product.createdAt}
+            updatedAt={product.updatedAt}
           />
         </div>
 
         {/* Main Info */}
         <div className="lg:col-span-2 space-y-6">
           {/* General Info, Price, Stock */}
-          <ProductGeneralInfoCard 
-            price={product.price} 
-            stock={product.stock} 
-            isOnSale={product.isOnSale} 
-            salePrice={product.salePrice} 
-            isFeatured={product.isFeatured} 
-            brand={product.brand} 
-            color={product.color} 
+          <ProductGeneralInfoCard
+            price={product.price}
+            stock={product.stock}
+            isOnSale={product.isOnSale}
+            salePrice={product.salePrice}
+            isFeatured={product.isFeatured}
+            brand={product.brand}
+            color={product.color}
           />
 
           {/* Tabs for Description & Specs */}
-          <ProductTabsContent 
-            description={product.description} 
-            specifications={product.specifications} 
+          <ProductTabsContent
+            description={product.description}
+            specifications={product.specifications}
           />
 
           {/* Actions & Summary */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <ProductActionsCard 
-              productId={product.id} 
-            />
-            <ProductSummaryCard 
-              id={product.id} 
-              imagesCount={product.images.length} 
-              specificationsCount={product.specifications.length} 
+            <ProductActionsCard productId={product.id} />
+            <ProductSummaryCard
+              id={product.id}
+              imagesCount={product.images.length}
+              specificationsCount={product.specifications.length}
             />
           </div>
         </div>

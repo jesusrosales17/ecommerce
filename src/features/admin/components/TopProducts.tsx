@@ -1,7 +1,9 @@
 "use client";
 
 import React from "react";
-import { TrendingUp, Package, DollarSign } from "lucide-react";
+import { TrendingUp, Package, DollarSign, Eye } from "lucide-react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 interface TopProduct {
   id: string;
@@ -15,11 +17,12 @@ interface TopProductsProps {
   products: TopProduct[];
 }
 
-export default function TopProducts({ products }: TopProductsProps) {
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("es-ES", {
+export default function TopProducts({ products }: TopProductsProps) {  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat("es-MX", {
       style: "currency",
-      currency: "USD"
+      currency: "MXN",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
     }).format(amount);
   };
 
@@ -35,58 +38,102 @@ export default function TopProducts({ products }: TopProductsProps) {
             <TrendingUp className="w-5 h-5 mr-2 text-green-600" />
             Productos Más Vendidos
           </h3>
-          <button className="text-sm font-medium text-blue-600 hover:text-blue-700">
-            Ver todos
-          </button>
+          <Button
+            asChild
+            variant={"ghost"}
+            className="text-sm font-medium text-blue-600 hover:text-blue-700"
+          >
+            <Link href="/admin/products" className="flex items-center">
+              <Eye className="w-4 h-4 mr-1" />
+              Ver todas los productos
+            </Link>
+          </Button>
         </div>
-      </div>
-
-      <div className="p-6">
+      </div>      <div className="p-0">
         {products.length > 0 ? (
-          <div className="space-y-4">
-            {products.map((product, index) => (
-              <div 
-                key={product.id} 
-                className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
-              >
-                <div className="flex items-center space-x-4">
-                  <div className="flex-shrink-0">
-                    <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                      <span className="text-sm font-bold text-blue-600">
-                        #{index + 1}
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    #
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Producto
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Precio
+                  </th>
+                  <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Vendidos
+                  </th>                  <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Ingresos
+                  </th>
+                  <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Acciones
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {products.map((product, index) => (
+                  <tr key={product.id} className="hover:bg-gray-50">
+                    <td className="px-4 py-4 whitespace-nowrap">
+                      <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
+                        <span className="text-xs font-bold text-blue-600">
+                          {index + 1}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-4">
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-gray-900 truncate max-w-xs">
+                          {product.name}
+                        </p>
+                        <p className="text-xs text-gray-500 truncate">
+                          {product.category.name}
+                        </p>
+                      </div>
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap">
+                      <span className="text-sm text-gray-900">
+                        {formatCurrency(product.price)}
                       </span>
-                    </div>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900 truncate">
-                      {product.name}
-                    </p>
-                    <p className="text-sm text-gray-500">
-                      {product.category.name}
-                    </p>
-                    <p className="text-sm text-gray-600">
-                      {formatCurrency(product.price)}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-center space-x-6 text-right">
-                  <div className="flex items-center text-sm text-gray-600">
-                    <Package className="w-4 h-4 mr-1" />
-                    <span className="font-medium">{product.totalSold}</span>
-                    <span className="ml-1">vendidos</span>
-                  </div>
-                  
-                  <div className="flex items-center text-sm font-semibold text-green-600">
-                    <DollarSign className="w-4 h-4 mr-1" />
-                    {formatCurrency(calculateRevenue(product.price, product.totalSold))}
-                  </div>
-                </div>
-              </div>
-            ))}
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap text-right">
+                      <div className="flex items-center justify-end text-sm text-gray-600">
+                        <Package className="w-4 h-4 mr-1" />
+                        <span className="font-medium">{product.totalSold}</span>
+                      </div>
+                    </td>                    <td className="px-4 py-4 whitespace-nowrap text-right">
+                      <div className="flex items-center justify-end text-sm font-semibold text-green-600">
+                        <DollarSign className="w-4 h-4 mr-1" />
+                        <span>
+                          {formatCurrency(
+                            calculateRevenue(product.price, product.totalSold)
+                          )}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-4 whitespace-nowrap text-right">
+                      <Button
+                        asChild
+                        variant="ghost"
+                        size="sm"
+                        className="text-blue-600 hover:text-blue-700"
+                      >
+                        <Link href={`/admin/products/${product.id}`} className="flex items-center">
+                          <Eye className="w-4 h-4 mr-1" />
+                          Ver
+                        </Link>
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         ) : (
-          <div className="text-center py-8">
+          <div className="text-center py-8 px-4">
             <Package className="mx-auto h-12 w-12 text-gray-400" />
             <h3 className="mt-2 text-sm font-medium text-gray-900">
               No hay datos de ventas
