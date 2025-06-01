@@ -512,11 +512,11 @@ async function generateProductPerformanceReport(startDate: Date, endDate: Date) 
 async function generateFinancialReport(startDate: Date, endDate: Date) {
   const [
     revenueData,
-    expensesData,
-    profitMargins,
-    paymentMethods
+    salesByCategory,
+    salesByProduct,
+    salesByDay
   ] = await Promise.all([
-    // Datos de ingresos
+    // Datos de ingresos generales
     prisma.order.aggregate({
       where: {
         status: { not: 'CANCELLED' },
@@ -527,24 +527,18 @@ async function generateFinancialReport(startDate: Date, endDate: Date) {
       _avg: { total: true }
     }),
 
-    // Simulación de gastos (en una app real esto vendría de otra tabla)
-    Promise.resolve({
-      operationalCosts: 15000,
-      marketingCosts: 8000,
-      shippingCosts: 3500,
-      otherCosts: 2000
-    }),
-
-    // Márgenes de beneficio por categoría
+    // Ventas por categoría
     prisma.$queryRaw<Array<{
       categoryName: string;
-      totalRevenue: number;
-      totalCost: number;
+      totalSales: number;
+      totalQuantity: bigint;
+      orderCount: bigint;
     }>>`
       SELECT 
         c.name as categoryName,
-        SUM(oi.price * oi.quantity) as totalRevenue,
-        SUM(p.price * oi.quantity * 0.6) as totalCost
+        SUM(oi.price * oi.quantity) as totalSales,
+        SUM(oi.quantity) as totalQuantity,
+        COUNT(DISTINCT o.id) as orderCount
       FROM orderitem oi
       JOIN product p ON oi.productId = p.id
       JOIN category c ON p.categoryId = c.id
@@ -553,40 +547,83 @@ async function generateFinancialReport(startDate: Date, endDate: Date) {
         AND o.createdAt <= ${endDate}
         AND o.status != 'CANCELLED'
       GROUP BY c.id, c.name
-      ORDER BY totalRevenue DESC
+      ORDER BY totalSales DESC
     `,
 
-    // Métodos de pago (simulado ya que no tenemos esta información detallada)
-    Promise.resolve([
-      { method: 'Tarjeta de Crédito', count: 150, revenue: 45000 },
-      { method: 'PayPal', count: 80, revenue: 24000 },
-      { method: 'Transferencia', count: 45, revenue: 18000 }
-    ])
+    // Top productos vendidos
+    prisma.$queryRaw<Array<{
+      productName: string;
+      categoryName: string;
+      totalSales: number;
+      totalQuantity: bigint;
+      averagePrice: number;
+    }>>`
+      SELECT 
+        p.name as productName,
+        c.name as categoryName,
+        SUM(oi.price * oi.quantity) as totalSales,
+        SUM(oi.quantity) as totalQuantity,
+        AVG(oi.price) as averagePrice
+      FROM orderitem oi
+      JOIN product p ON oi.productId = p.id
+      JOIN category c ON p.categoryId = c.id
+      JOIN \`order\` o ON oi.orderId = o.id
+      WHERE o.createdAt >= ${startDate}
+        AND o.createdAt <= ${endDate}
+        AND o.status != 'CANCELLED'
+      GROUP BY p.id, p.name, c.name
+      ORDER BY totalSales DESC
+      LIMIT 10
+    `,
+
+    // Ventas por día
+    prisma.$queryRaw<Array<{
+      date: string;
+      totalSales: number;
+      orderCount: bigint;
+    }>>`
+      SELECT 
+        DATE(o.createdAt) as date,
+        SUM(o.total) as totalSales,
+        COUNT(*) as orderCount
+      FROM \`order\` o
+      WHERE o.createdAt >= ${startDate}
+        AND o.createdAt <= ${endDate}
+        AND o.status != 'CANCELLED'
+      GROUP BY DATE(o.createdAt)
+      ORDER BY date DESC
+    `
   ]);
 
-  const totalExpenses = Object.values(expensesData).reduce((sum, cost) => sum + cost, 0);
   const totalRevenue = Number(revenueData._sum.total || 0);
-  const netProfit = totalRevenue - totalExpenses;
+  const totalOrders = Number(revenueData._count || 0);
+  const averageOrderValue = Number(revenueData._avg.total || 0);
 
   return {
     summary: {
       totalRevenue,
-      totalExpenses,
-      netProfit,
-      profitMargin: totalRevenue > 0 ? (netProfit / totalRevenue) * 100 : 0,
-      averageOrderValue: Number(revenueData._avg.total || 0)
+      totalOrders,
+      averageOrderValue,
+      salesGrowth: 0 // Esto requeriría comparar con período anterior
     },
-    expenses: expensesData,
-    profitMargins: profitMargins.map(margin => ({
-      category: margin.categoryName,
-      revenue: Number(margin.totalRevenue),
-      cost: Number(margin.totalCost),
-      profit: Number(margin.totalRevenue) - Number(margin.totalCost),
-      margin: Number(margin.totalRevenue) > 0 
-        ? ((Number(margin.totalRevenue) - Number(margin.totalCost)) / Number(margin.totalRevenue)) * 100 
-        : 0
+    salesByCategory: salesByCategory.map(category => ({
+      category: category.categoryName,
+      totalSales: Number(category.totalSales),
+      totalQuantity: Number(category.totalQuantity),
+      orderCount: Number(category.orderCount)
     })),
-    paymentMethods
+    topProducts: salesByProduct.map(product => ({
+      name: product.productName,
+      category: product.categoryName,
+      totalSales: Number(product.totalSales),
+      totalQuantity: Number(product.totalQuantity),
+      averagePrice: Number(product.averagePrice)
+    })),
+    dailySales: salesByDay.map(day => ({
+      date: day.date,
+      totalSales: Number(day.totalSales),
+      orderCount: Number(day.orderCount)
+    }))
   };
 }
 

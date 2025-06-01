@@ -329,12 +329,11 @@ export default function ReportPreviewPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4 print:space-y-2">
-                  {reportData.topProducts
+                <div className="space-y-4 print:space-y-2">                  {reportData.topProducts
                     .slice(0, 10)
                     .map((product: any, index: number) => (
                       <div
-                        key={product.id}
+                        key={`top-product-${product.id || index}`}
                         className="flex items-center justify-between p-4 rounded-lg border print:p-2 print:border-gray-300"
                       >
                         <div className="flex items-center gap-3">
@@ -377,12 +376,11 @@ export default function ReportPreviewPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4 print:space-y-2">
-                  {reportData.topCustomers
+                <div className="space-y-4 print:space-y-2">                  {reportData.topCustomers
                     .slice(0, 10)
                     .map((customer: any, index: number) => (
                       <div
-                        key={customer.id}
+                        key={`top-customer-${customer.id || index}`}
                         className="flex items-center justify-between p-4 rounded-lg border print:p-2 print:border-gray-300"
                       >
                         <div className="flex items-center gap-3">
@@ -448,11 +446,10 @@ export default function ReportPreviewPage() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 print:gap-2">
-                      {reportData.salesTrends.byCategory.map(
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 print:gap-2">                      {reportData.salesTrends.byCategory.map(
                         (category: any, index: number) => (
                           <div
-                            key={index}
+                            key={`sales-category-${category.name || index}`}
                             className="p-4 rounded-lg border print:p-2 print:border-gray-300"
                           >
                             <div className="flex justify-between items-center mb-2">
@@ -539,11 +536,10 @@ export default function ReportPreviewPage() {
                     <CardDescription>Clientes por región</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-3 print:space-y-2">
-                      {reportData.customersByRegion.map(
+                    <div className="space-y-3 print:space-y-2">                      {reportData.customersByRegion.map(
                         (region: any, index: number) => (
                           <div
-                            key={index}
+                            key={`region-${region.region || index}`}
                             className="flex items-center justify-between p-3 rounded-lg border print:p-2 print:border-gray-300"
                           >
                             <span className="font-medium print:text-sm">
@@ -576,11 +572,10 @@ export default function ReportPreviewPage() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-4 print:space-y-2">
-                      {reportData.categoryAnalysis.map(
+                    <div className="space-y-4 print:space-y-2">                      {reportData.categoryAnalysis.map(
                         (category: any, index: number) => (
                           <div
-                            key={index}
+                            key={`category-analysis-${category.name || index}`}
                             className="p-4 rounded-lg border print:p-2 print:border-gray-300"
                           >
                             <div className="flex justify-between items-center mb-2">
@@ -661,96 +656,132 @@ export default function ReportPreviewPage() {
               </Card>
             )}
           </>
-        );
-
-      case "financial-report":
+        );      case "financial-report":
         return (
           <>
-            {/* Análisis de gastos */}
-            {reportData.expenses && (
+            {/* Ventas por categoría */}
+            {reportData.salesByCategory && reportData.salesByCategory.length > 0 && (
               <Card className="print:shadow-none print:border-gray-300 print:break-inside-avoid">
                 <CardHeader>
-                  <CardTitle>Análisis de Gastos</CardTitle>
+                  <CardTitle>Ventas por Categoría</CardTitle>
                   <CardDescription>
-                    Desglose de gastos operativos
+                    Rendimiento de ventas por categoría de productos
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 print:gap-2">
-                    <div className="text-center">
-                      <div className="text-xl font-bold text-red-600 print:text-lg">
-                        {formatCurrency(reportData.expenses.operationalCosts)}
-                      </div>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        Costos Operativos
-                      </p>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-xl font-bold text-orange-600 print:text-lg">
-                        {formatCurrency(reportData.expenses.marketingCosts)}
-                      </div>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        Marketing
-                      </p>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-xl font-bold text-blue-600 print:text-lg">
-                        {formatCurrency(reportData.expenses.shippingCosts)}
-                      </div>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        Envíos
-                      </p>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-xl font-bold text-purple-600 print:text-lg">
-                        {formatCurrency(reportData.expenses.otherCosts)}
-                      </div>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        Otros
-                      </p>
-                    </div>
+                  <div className="space-y-3 print:space-y-2">                    {reportData.salesByCategory.map(
+                      (category: any, index: number) => (
+                        <div
+                          key={`sales-by-category-${category.category || index}`}
+                          className="flex items-center justify-between p-3 rounded-lg border print:p-2 print:border-gray-300"
+                        >
+                          <div>
+                            <p className="font-medium print:text-sm">
+                              {category.category}
+                            </p>
+                            <p className="text-sm text-muted-foreground print:text-xs">
+                              {category.totalQuantity} unidades · {category.orderCount} órdenes
+                            </p>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-lg font-bold text-green-600 print:text-base">
+                              {formatCurrency(category.totalSales)}
+                            </p>
+                          </div>
+                        </div>
+                      )
+                    )}
                   </div>
                 </CardContent>
               </Card>
             )}
 
-            {/* Márgenes de beneficio */}
-            {reportData.profitMargins &&
-              reportData.profitMargins.length > 0 && (
+            {/* Top productos vendidos */}
+            {reportData.topProducts &&
+              reportData.topProducts.length > 0 && (
                 <Card className="print:shadow-none print:border-gray-300 print:break-inside-avoid">
                   <CardHeader>
-                    <CardTitle>Márgenes de Beneficio</CardTitle>
+                    <CardTitle>Productos Más Vendidos</CardTitle>
                     <CardDescription>
-                      Análisis de rentabilidad por categoría
+                      Los productos con mejores ventas en el período
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-3 print:space-y-2">
-                      {reportData.profitMargins.map(
-                        (margin: any, index: number) => (
+                    <div className="space-y-3 print:space-y-2">                      {reportData.topProducts.slice(0, 10).map(
+                        (product: any, index: number) => (
                           <div
-                            key={index}
+                            key={`financial-top-product-${product.id || product.name || index}`}
+                            className="flex items-center justify-between p-3 rounded-lg border print:p-2 print:border-gray-300"
+                          >
+                            <div className="flex items-center gap-3">
+                              <Badge
+                                variant="secondary"
+                                className="w-8 h-8 rounded-full flex items-center justify-center print:w-6 print:h-6"
+                              >
+                                {index + 1}
+                              </Badge>
+                              <div>
+                                <p className="font-medium print:text-sm">
+                                  {product.name}
+                                </p>
+                                <p className="text-sm text-muted-foreground print:text-xs">
+                                  {product.category} · {product.totalQuantity} unidades
+                                </p>
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-lg font-bold text-green-600 print:text-base">
+                                {formatCurrency(product.totalSales)}
+                              </p>
+                              <p className="text-sm text-muted-foreground print:text-xs">
+                                Prom. {formatCurrency(product.averagePrice)}
+                              </p>
+                            </div>
+                          </div>
+                        )
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+            {/* Ventas diarias recientes */}
+            {reportData.dailySales &&
+              reportData.dailySales.length > 0 && (
+                <Card className="print:shadow-none print:border-gray-300 print:break-inside-avoid">
+                  <CardHeader>
+                    <CardTitle>Ventas Diarias Recientes</CardTitle>
+                    <CardDescription>
+                      Rendimiento de ventas por día (últimos 10 días)
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3 print:space-y-2">                      {reportData.dailySales.slice(0, 10).map(
+                        (day: any, index: number) => (
+                          <div
+                            key={`daily-sales-${day.date || index}`}
                             className="flex items-center justify-between p-3 rounded-lg border print:p-2 print:border-gray-300"
                           >
                             <div>
                               <p className="font-medium print:text-sm">
-                                {margin.category}
+                                {new Date(day.date).toLocaleDateString('es-ES', {
+                                  day: '2-digit',
+                                  month: 'short',
+                                  year: 'numeric'
+                                })}
                               </p>
                               <p className="text-sm text-muted-foreground print:text-xs">
-                                Beneficio: {formatCurrency(margin.profit)}
+                                {day.orderCount} órdenes
                               </p>
                             </div>
-                            <Badge
-                              variant={
-                                margin.margin > 20
-                                  ? "default"
-                                  : margin.margin > 10
-                                  ? "secondary"
-                                  : "destructive"
-                              }
-                            >
-                              {margin.margin.toFixed(1)}%
-                            </Badge>
+                            <div className="text-right">
+                              <p className="text-lg font-bold text-green-600 print:text-base">
+                                {formatCurrency(day.totalSales)}
+                              </p>
+                              <p className="text-sm text-muted-foreground print:text-xs">
+                                Ticket prom: {formatCurrency(day.orderCount > 0 ? day.totalSales / day.orderCount : 0)}
+                              </p>
+                            </div>
                           </div>
                         )
                       )}
@@ -775,11 +806,10 @@ export default function ReportPreviewPage() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-3 print:space-y-2">
-                      {reportData.statusBreakdown.map(
+                    <div className="space-y-3 print:space-y-2">                      {reportData.statusBreakdown.map(
                         (status: any, index: number) => (
                           <div
-                            key={index}
+                            key={`status-breakdown-${status.status || index}`}
                             className="flex items-center justify-between p-3 rounded-lg border print:p-2 print:border-gray-300"
                           >
                             <div>

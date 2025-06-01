@@ -807,17 +807,17 @@ async function addProductPerformanceContent(doc: any, data: any, startY: number)
 async function addFinancialReportContent(doc: any, data: any, startY: number): Promise<number> {
   let currentY = startY;
   
-  // Resumen financiero
+  // Resumen Ejecutivo
   if (data.summary) {
     doc.setFontSize(16);
-    doc.text('Resumen Financiero', 14, currentY);
+    doc.text('Resumen Ejecutivo', 14, currentY);
     currentY += 10;
     
     const summaryData = [
       ['Ingresos Totales', `$${data.summary.totalRevenue?.toLocaleString('es-ES', { minimumFractionDigits: 2 }) || '0.00'}`],
-      ['Gastos Totales', `$${data.summary.totalExpenses?.toLocaleString('es-ES', { minimumFractionDigits: 2 }) || '0.00'}`],
-      ['Ganancia Neta', `$${data.summary.netProfit?.toLocaleString('es-ES', { minimumFractionDigits: 2 }) || '0.00'}`],
-      ['Margen de Ganancia', `${data.summary.profitMargin || 0}%`]
+      ['Total de Órdenes', data.summary.totalOrders?.toString() || '0'],
+      ['Ticket Promedio', `$${data.summary.averageOrderValue?.toLocaleString('es-ES', { minimumFractionDigits: 2 }) || '0.00'}`],
+      ['Crecimiento', `${data.summary.salesGrowth || 0}%`]
     ];
     
     autoTable(doc, {
@@ -831,57 +831,28 @@ async function addFinancialReportContent(doc: any, data: any, startY: number): P
     currentY = (doc as any).lastAutoTable.finalY + 15;
   }
   
-  // Análisis de ingresos
-  if (data.revenueAnalysis) {
+  // Ventas por Categoría
+  if (data.salesByCategory && data.salesByCategory.length > 0) {
     if (currentY > 250) {
       doc.addPage();
       currentY = 20;
     }
     
     doc.setFontSize(16);
-    doc.text('Análisis de Ingresos', 14, currentY);
+    doc.text('Ventas por Categoría', 14, currentY);
     currentY += 10;
     
-    const revenueData = [
-      ['Ingresos por Ventas', `$${data.revenueAnalysis.salesRevenue?.toLocaleString('es-ES', { minimumFractionDigits: 2 }) || '0.00'}`],
-      ['Ingresos por Envío', `$${data.revenueAnalysis.shippingRevenue?.toLocaleString('es-ES', { minimumFractionDigits: 2 }) || '0.00'}`],
-      ['Impuestos Recaudados', `$${data.revenueAnalysis.taxesCollected?.toLocaleString('es-ES', { minimumFractionDigits: 2 }) || '0.00'}`],
-      ['Descuentos Aplicados', `$${data.revenueAnalysis.discountsApplied?.toLocaleString('es-ES', { minimumFractionDigits: 2 }) || '0.00'}`]
-    ];
-    
-    autoTable(doc, {
-      startY: currentY,
-      head: [['Concepto', 'Monto']],
-      body: revenueData,
-      theme: 'grid',
-      styles: { fontSize: 10 }
-    });
-    
-    currentY = (doc as any).lastAutoTable.finalY + 15;
-  }
-  
-  // Análisis de gastos
-  if (data.expenseAnalysis && data.expenseAnalysis.length > 0) {
-    if (currentY > 250) {
-      doc.addPage();
-      currentY = 20;
-    }
-    
-    doc.setFontSize(16);
-    doc.text('Análisis de Gastos', 14, currentY);
-    currentY += 5;
-    
-    const expenseData = data.expenseAnalysis.map((expense: any) => [
-      expense.category || 'N/A',
-      `$${expense.amount?.toLocaleString('es-ES', { minimumFractionDigits: 2 }) || '0.00'}`,
-      `${expense.percentage || 0}%`,
-      expense.trend === 'up' ? '↗' : expense.trend === 'down' ? '↘' : '→'
+    const categoryData = data.salesByCategory.map((category: any) => [
+      category.category || 'N/A',
+      `$${category.totalSales?.toLocaleString('es-ES', { minimumFractionDigits: 2 }) || '0.00'}`,
+      category.totalQuantity?.toString() || '0',
+      category.orderCount?.toString() || '0'
     ]);
     
     autoTable(doc, {
       startY: currentY,
-      head: [['Categoría', 'Monto', 'Porcentaje', 'Tendencia']],
-      body: expenseData,
+      head: [['Categoría', 'Ventas Totales', 'Unidades', 'Órdenes']],
+      body: categoryData,
       theme: 'striped',
       styles: { fontSize: 9 }
     });
@@ -889,30 +860,61 @@ async function addFinancialReportContent(doc: any, data: any, startY: number): P
     currentY = (doc as any).lastAutoTable.finalY + 15;
   }
   
-  // Flujo de caja
-  if (data.cashFlow) {
+  // Top Productos Vendidos
+  if (data.topProducts && data.topProducts.length > 0) {
     if (currentY > 250) {
       doc.addPage();
       currentY = 20;
     }
     
     doc.setFontSize(16);
-    doc.text('Flujo de Caja', 14, currentY);
+    doc.text('Productos Más Vendidos', 14, currentY);
     currentY += 10;
     
-    const cashFlowData = [
-      ['Efectivo Inicial', `$${data.cashFlow.startingCash?.toLocaleString('es-ES', { minimumFractionDigits: 2 }) || '0.00'}`],
-      ['Entradas de Efectivo', `$${data.cashFlow.cashInflows?.toLocaleString('es-ES', { minimumFractionDigits: 2 }) || '0.00'}`],
-      ['Salidas de Efectivo', `$${data.cashFlow.cashOutflows?.toLocaleString('es-ES', { minimumFractionDigits: 2 }) || '0.00'}`],
-      ['Efectivo Final', `$${data.cashFlow.endingCash?.toLocaleString('es-ES', { minimumFractionDigits: 2 }) || '0.00'}`]
-    ];
+    const productData = data.topProducts.map((product: any, index: number) => [
+      (index + 1).toString(),
+      product.name || 'N/A',
+      product.category || 'Sin categoría',
+      `$${product.totalSales?.toLocaleString('es-ES', { minimumFractionDigits: 2 }) || '0.00'}`,
+      product.totalQuantity?.toString() || '0',
+      `$${product.averagePrice?.toLocaleString('es-ES', { minimumFractionDigits: 2 }) || '0.00'}`
+    ]);
     
     autoTable(doc, {
       startY: currentY,
-      head: [['Concepto', 'Monto']],
-      body: cashFlowData,
+      head: [['#', 'Producto', 'Categoría', 'Ventas Totales', 'Unidades', 'Precio Promedio']],
+      body: productData,
+      theme: 'striped',
+      styles: { fontSize: 8 }
+    });
+    
+    currentY = (doc as any).lastAutoTable.finalY + 15;
+  }
+  
+  // Ventas Diarias (últimos 10 días)
+  if (data.dailySales && data.dailySales.length > 0) {
+    if (currentY > 250) {
+      doc.addPage();
+      currentY = 20;
+    }
+    
+    doc.setFontSize(16);
+    doc.text('Ventas Diarias Recientes', 14, currentY);
+    currentY += 10;
+    
+    const dailyData = data.dailySales.slice(0, 10).map((day: any) => [
+      day.date || 'N/A',
+      `$${day.totalSales?.toLocaleString('es-ES', { minimumFractionDigits: 2 }) || '0.00'}`,
+      day.orderCount?.toString() || '0',
+      day.orderCount > 0 ? `$${(day.totalSales / day.orderCount)?.toLocaleString('es-ES', { minimumFractionDigits: 2 }) || '0.00'}` : '$0.00'
+    ]);
+    
+    autoTable(doc, {
+      startY: currentY,
+      head: [['Fecha', 'Ventas Totales', 'Órdenes', 'Ticket Promedio']],
+      body: dailyData,
       theme: 'grid',
-      styles: { fontSize: 10 }
+      styles: { fontSize: 9 }
     });
     
     currentY = (doc as any).lastAutoTable.finalY + 15;
@@ -1292,58 +1294,64 @@ function addProductPerformanceExcelSheets(workbook: any, data: any) {
 }
 
 function addFinancialReportExcelSheets(workbook: any, data: any) {
-  // Hoja de resumen financiero
+  // Hoja de resumen ejecutivo
   if (data.summary) {
     const summaryData = [
       ['Métrica', 'Valor'],
       ['Ingresos Totales', data.summary.totalRevenue || 0],
-      ['Gastos Totales', data.summary.totalExpenses || 0],
-      ['Ganancia Neta', data.summary.netProfit || 0],
-      ['Margen de Ganancia', `${data.summary.profitMargin || 0}%`]
+      ['Total de Órdenes', data.summary.totalOrders || 0],
+      ['Ticket Promedio', data.summary.averageOrderValue || 0],
+      ['Crecimiento', `${data.summary.salesGrowth || 0}%`]
     ];
     const summarySheet = XLSX.utils.aoa_to_sheet(summaryData);
-    XLSX.utils.book_append_sheet(workbook, summarySheet, 'Resumen Financiero');
+    XLSX.utils.book_append_sheet(workbook, summarySheet, 'Resumen Ejecutivo');
   }
   
-  // Hoja de análisis de ingresos
-  if (data.revenueAnalysis) {
-    const revenueData = [
-      ['Concepto', 'Monto'],
-      ['Ingresos por Ventas', data.revenueAnalysis.salesRevenue || 0],
-      ['Ingresos por Envío', data.revenueAnalysis.shippingRevenue || 0],
-      ['Impuestos Recaudados', data.revenueAnalysis.taxesCollected || 0],
-      ['Descuentos Aplicados', data.revenueAnalysis.discountsApplied || 0]
-    ];
-    const revenueSheet = XLSX.utils.aoa_to_sheet(revenueData);
-    XLSX.utils.book_append_sheet(workbook, revenueSheet, 'Análisis de Ingresos');
-  }
-  
-  // Hoja de análisis de gastos
-  if (data.expenseAnalysis && data.expenseAnalysis.length > 0) {
-    const expenseData = [
-      ['Categoría', 'Monto', 'Porcentaje', 'Tendencia'],
-      ...data.expenseAnalysis.map((expense: any) => [
-        expense.category || 'N/A',
-        expense.amount || 0,
-        `${expense.percentage || 0}%`,
-        expense.trend === 'up' ? 'Subida' : expense.trend === 'down' ? 'Bajada' : 'Estable'
+  // Hoja de ventas por categoría
+  if (data.salesByCategory && data.salesByCategory.length > 0) {
+    const categoryData = [
+      ['Categoría', 'Ventas Totales', 'Unidades', 'Órdenes'],
+      ...data.salesByCategory.map((category: any) => [
+        category.category || 'N/A',
+        category.totalSales || 0,
+        category.totalQuantity || 0,
+        category.orderCount || 0
       ])
     ];
-    const expenseSheet = XLSX.utils.aoa_to_sheet(expenseData);
-    XLSX.utils.book_append_sheet(workbook, expenseSheet, 'Análisis de Gastos');
+    const categorySheet = XLSX.utils.aoa_to_sheet(categoryData);
+    XLSX.utils.book_append_sheet(workbook, categorySheet, 'Ventas por Categoría');
   }
   
-  // Hoja de flujo de caja
-  if (data.cashFlow) {
-    const cashFlowData = [
-      ['Concepto', 'Monto'],
-      ['Efectivo Inicial', data.cashFlow.startingCash || 0],
-      ['Entradas de Efectivo', data.cashFlow.cashInflows || 0],
-      ['Salidas de Efectivo', data.cashFlow.cashOutflows || 0],
-      ['Efectivo Final', data.cashFlow.endingCash || 0]
+  // Hoja de top productos vendidos
+  if (data.topProducts && data.topProducts.length > 0) {
+    const productData = [
+      ['#', 'Producto', 'Categoría', 'Ventas Totales', 'Unidades', 'Precio Promedio'],
+      ...data.topProducts.map((product: any, index: number) => [
+        index + 1,
+        product.name || 'N/A',
+        product.category || 'Sin categoría',
+        product.totalSales || 0,
+        product.totalQuantity || 0,
+        product.averagePrice || 0
+      ])
     ];
-    const cashFlowSheet = XLSX.utils.aoa_to_sheet(cashFlowData);
-    XLSX.utils.book_append_sheet(workbook, cashFlowSheet, 'Flujo de Caja');
+    const productSheet = XLSX.utils.aoa_to_sheet(productData);
+    XLSX.utils.book_append_sheet(workbook, productSheet, 'Top Productos');
+  }
+  
+  // Hoja de ventas diarias
+  if (data.dailySales && data.dailySales.length > 0) {
+    const dailyData = [
+      ['Fecha', 'Ventas Totales', 'Órdenes', 'Ticket Promedio'],
+      ...data.dailySales.slice(0, 10).map((day: any) => [
+        day.date || 'N/A',
+        day.totalSales || 0,
+        day.orderCount || 0,
+        day.orderCount > 0 ? (day.totalSales / day.orderCount) : 0
+      ])
+    ];
+    const dailySheet = XLSX.utils.aoa_to_sheet(dailyData);
+    XLSX.utils.book_append_sheet(workbook, dailySheet, 'Ventas Diarias');
   }
 }
 
@@ -1602,43 +1610,45 @@ function generateProductPerformanceCSV(data: any): string {
 function generateFinancialReportCSV(data: any): string {
   let content = '';
   
-  // Resumen financiero
+  // Resumen Ejecutivo
   if (data.summary) {
-    content += 'RESUMEN FINANCIERO\n';
+    content += 'RESUMEN EJECUTIVO\n';
     content += 'Métrica,Valor\n';
     content += `Ingresos Totales,${data.summary.totalRevenue || 0}\n`;
-    content += `Gastos Totales,${data.summary.totalExpenses || 0}\n`;
-    content += `Ganancia Neta,${data.summary.netProfit || 0}\n`;
-    content += `Margen de Ganancia,${data.summary.profitMargin || 0}%\n\n`;
-  }
-    // Análisis de ingresos
-  if (data.revenueAnalysis) {
-    content += 'ANÁLISIS DE INGRESOS\n';
-    content += 'Concepto,Monto\n';
-    content += `Ingresos por Ventas,${data.revenueAnalysis.salesRevenue || 0}\n`;
-    content += `Ingresos por Envío,${data.revenueAnalysis.shippingRevenue || 0}\n`;
-    content += `Impuestos Recaudados,${data.revenueAnalysis.taxesCollected || 0}\n`;
-    content += `Descuentos Aplicados,${data.revenueAnalysis.discountsApplied || 0}\n\n`;
+    content += `Total de Órdenes,${data.summary.totalOrders || 0}\n`;
+    content += `Ticket Promedio,${data.summary.averageOrderValue || 0}\n`;
+    content += `Crecimiento,${data.summary.salesGrowth || 0}%\n\n`;
   }
   
-  // Análisis de gastos
-  if (data.expenseAnalysis && data.expenseAnalysis.length > 0) {
-    content += 'ANÁLISIS DE GASTOS\n';
-    content += 'Categoría,Monto,Porcentaje,Tendencia\n';
-    data.expenseAnalysis.forEach((expense: any) => {
-      const trendText = expense.trend === 'up' ? 'Subida' : expense.trend === 'down' ? 'Bajada' : 'Estable';
-      content += `"${expense.category || 'N/A'}",${expense.amount || 0},${expense.percentage || 0}%,${trendText}\n`;
+  // Ventas por Categoría
+  if (data.salesByCategory && data.salesByCategory.length > 0) {
+    content += 'VENTAS POR CATEGORÍA\n';
+    content += 'Categoría,Ventas Totales,Unidades,Órdenes\n';
+    data.salesByCategory.forEach((category: any) => {
+      content += `"${category.category || 'N/A'}",${category.totalSales || 0},${category.totalQuantity || 0},${category.orderCount || 0}\n`;
     });
     content += '\n';
   }
-    // Flujo de caja
-  if (data.cashFlow) {
-    content += 'FLUJO DE CAJA\n';
-    content += 'Concepto,Monto\n';
-    content += `Efectivo Inicial,${data.cashFlow.startingCash || 0}\n`;
-    content += `Entradas de Efectivo,${data.cashFlow.cashInflows || 0}\n`;
-    content += `Salidas de Efectivo,${data.cashFlow.cashOutflows || 0}\n`;
-    content += `Efectivo Final,${data.cashFlow.endingCash || 0}\n\n`;
+  
+  // Top Productos Vendidos
+  if (data.topProducts && data.topProducts.length > 0) {
+    content += 'PRODUCTOS MÁS VENDIDOS\n';
+    content += '#,Producto,Categoría,Ventas Totales,Unidades,Precio Promedio\n';
+    data.topProducts.forEach((product: any, index: number) => {
+      content += `${index + 1},"${product.name || 'N/A'}","${product.category || 'Sin categoría'}",${product.totalSales || 0},${product.totalQuantity || 0},${product.averagePrice || 0}\n`;
+    });
+    content += '\n';
+  }
+  
+  // Ventas Diarias Recientes
+  if (data.dailySales && data.dailySales.length > 0) {
+    content += 'VENTAS DIARIAS RECIENTES\n';
+    content += 'Fecha,Ventas Totales,Órdenes,Ticket Promedio\n';
+    data.dailySales.slice(0, 10).forEach((day: any) => {
+      const avgTicket = day.orderCount > 0 ? (day.totalSales / day.orderCount) : 0;
+      content += `"${day.date || 'N/A'}",${day.totalSales || 0},${day.orderCount || 0},${avgTicket}\n`;
+    });
+    content += '\n';
   }
   
   return content;
