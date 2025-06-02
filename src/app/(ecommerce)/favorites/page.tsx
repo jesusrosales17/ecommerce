@@ -13,7 +13,7 @@ export default async function FavoritesPage() {
   const session = await getSession();
   if(!session) {
     return (
-      <div className="container mx-auto py-8 px-4">
+      <div className="container mx-auto py-8 px-4 min-h-screen">
         {/* necesitas estar logeado */}
         <div className="flex flex-col items-center justify-center py-12 space-y-4">
           <Info className="w-12 h-12 text-gray-400" />
@@ -31,7 +31,7 @@ export default async function FavoritesPage() {
   }
 
   return (
-    <div className="container mx-auto py-8 px-4">
+    <div className="container mx-auto py-8 px-4 min-h-screen">
       <h1 className="text-3xl font-bold mb-6">Mis favoritos</h1>
       <FavoritesList />
     </div>
