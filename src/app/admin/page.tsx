@@ -15,31 +15,6 @@ import { RefreshCw, Settings, Bell } from "lucide-react";
 export default function AdminDashboard() {
   const { stats, isLoading, error, refetch } = useDashboardStats();
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen  p-4 sm:p-6">
-        <div className="max-w-[1400px] mx-auto">
-          <div className="animate-pulse">
-            <div className="h-6 sm:h-8 bg-gray-200 rounded w-32 sm:w-48 mb-6 sm:mb-8"></div>
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-6 mb-6 sm:mb-8">
-              {[...Array(6)].map((_, i) => (
-                <div key={i} className="bg-white rounded-lg border border-gray-200 p-3 sm:p-6">
-                  <div className="h-3 sm:h-4 bg-gray-200 rounded w-16 sm:w-24 mb-2"></div>
-                  <div className="h-6 sm:h-8 bg-gray-200 rounded w-12 sm:w-16"></div>
-                </div>
-              ))}
-            </div>
-            <div className="h-60 sm:h-80 bg-gray-200 rounded mb-6 sm:mb-8"></div>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-              <div className="h-60 sm:h-96 bg-gray-200 rounded"></div>
-              <div className="h-60 sm:h-96 bg-gray-200 rounded"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   if (error) {
     return (
       <div className="min-h-screen  flex items-center justify-center p-4">

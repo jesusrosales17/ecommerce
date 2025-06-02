@@ -90,14 +90,7 @@ export default function SettingsPage() {
       setSaving(false);
     }
   };
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <Loader2 className="h-8 w-8 animate-spin" />
-      </div>
-    );
-  }
+  // Loading state is now handled by loading.tsx
 
   return (
     <div className="space-y-6">
