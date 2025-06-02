@@ -379,12 +379,12 @@ async function generateCustomerAnalysisReport(startDate: Date, endDate: Date) {
 }
 
 // Función para generar reporte de rendimiento de productos
-async function generateProductPerformanceReport(startDate: Date, endDate: Date) {
-  const [
+async function generateProductPerformanceReport(startDate: Date, endDate: Date) {  const [
     bestSellingProducts,
     categoryPerformance,
     inventoryStatus,
-    profitabilityData
+    profitabilityData,
+    inventoryData
   ] = await Promise.all([
     // Productos más vendidos
     prisma.orderItem.groupBy({
@@ -424,9 +424,7 @@ async function generateProductPerformanceReport(startDate: Date, endDate: Date) 
       WHERE c.status = 'ACTIVE'
       GROUP BY c.id, c.name
       ORDER BY totalRevenue DESC
-    `,
-
-    // Estado del inventario
+    `,    // Estado del inventario
     prisma.product.groupBy({
       by: ['status'],
       where: {
@@ -469,6 +467,19 @@ async function generateProductPerformanceReport(startDate: Date, endDate: Date) 
         }
       },
       take: 50
+    }),
+
+    // Datos de inventario (todos los productos activos para cálculos de stock)
+    prisma.product.findMany({
+      where: {
+        status: 'ACTIVE'
+      },
+      select: {
+        id: true,
+        name: true,
+        stock: true,
+        category: { select: { name: true } }
+      }
     })
   ]);
 
@@ -482,13 +493,12 @@ async function generateProductPerformanceReport(startDate: Date, endDate: Date) 
       revenue: Number(cat.totalRevenue),
       quantity: Number(cat.totalQuantity),
       productCount: Number(cat.productCount)
-    })),
-    inventoryInsights: {
-      lowStock: profitabilityData.filter(p => p.stock! < 10 ).length,
-      outOfStock: profitabilityData.filter(p => p.stock === 0).length,
+    })),    inventoryInsights: {
+      lowStock: inventoryData.filter(p => (p.stock || 0) < 5).length,
+      outOfStock: inventoryData.filter(p => (p.stock || 0) === 0).length,
       totalActiveProducts: inventoryStatus.reduce((sum, status) => sum + status._count.id, 0),
-      averageStock: inventoryStatus.length > 0 
-        ? inventoryStatus.reduce((sum, status) => sum + Number(status._avg.stock || 0), 0) / inventoryStatus.length
+      averageStock: inventoryData.length > 0 
+        ? inventoryData.reduce((sum, product) => sum + (product.stock || 0), 0) / inventoryData.length
         : 0
     },
     profitabilityAnalysis: profitabilityData.map(product => {

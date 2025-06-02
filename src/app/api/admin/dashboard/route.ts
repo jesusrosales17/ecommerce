@@ -78,13 +78,11 @@ export async function GET(request: NextRequest) {
         _sum: { quantity: true },
         orderBy: { _sum: { quantity: 'desc' } },
         take: 5
-      }),
-
-      // Productos con stock bajo (menos de 10)
+      }),      // Productos con stock bajo (menos de 5)
       prisma.product.findMany({
         where: {
           status: 'ACTIVE',
-          stock: { lt: 10 }
+          stock: { lt: 5 }
         },
         select: {
           id: true,
@@ -137,12 +135,11 @@ export async function GET(request: NextRequest) {
             name: true,
             createdAt: true
           }
-        }),
-        // Productos con stock bajo (últimos 2)
+        }),        // Productos con stock bajo (últimos 2)
         prisma.product.findMany({
           where: {
             status: 'ACTIVE',
-            stock: { lt: 10 }
+            stock: { lt: 5 }
           },
           take: 2,
           orderBy: { updatedAt: 'desc' },
