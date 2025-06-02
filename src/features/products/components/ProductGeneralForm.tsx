@@ -19,6 +19,7 @@ import { useProductStore } from "../store/useProductStore";
 import { useCategoryStore } from "@/features/categories/store/useCategoryStore";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectGroup, SelectItem } from "@/components/ui/select";
 import { useEffect} from "react";
+import { ProductStore } from "../interfaces/productStore";
 
 export const ProductGeneralForm = forwardRef((_, ref) => {
   const { setGeneral, general } = useProductStore();
@@ -36,15 +37,26 @@ export const ProductGeneralForm = forwardRef((_, ref) => {
       status: general?.status || "ACTIVE",
       categoryId: general?.categoryId || "",
     },
-  });
-
-  useImperativeHandle(ref, () => ({
+  });  useImperativeHandle(ref, () => ({
     submit: async () => {
       const isValid = await form.trigger();
 
       if (isValid) {
         const data = form.getValues();
-        setGeneral(data);
+        // Ensure required fields are present since form is valid
+        const generalData: ProductStore['general'] = {
+          name: data.name!,
+          stock: data.stock!,
+          status: data.status!,
+          price: data.price,
+          isOnSale: data.isOnSale,
+          salePrice: data.salePrice,
+          isFeatured: data.isFeatured,
+          categoryId: data.categoryId,
+          brand: data.brand,
+          color: data.color,
+        };
+        setGeneral(generalData);
       }
 
       return isValid;
