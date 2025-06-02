@@ -36,7 +36,7 @@ export const menuItems = [
   { title: "Pedidos", url: "/admin/orders", icon: ShoppingCart },
   { title: "Clientes", url: "/admin/customers", icon: Users },
   { title: "Reportes y analisis", url: "/admin/reports", icon: BarChart },
-  { title: "Notificaciones", url: "/admin/notifications", icon: Bell },
+  // { title: "Notificaciones", url: "/admin/notifications", icon: Bell },
   { title: "Configuración", url: "/admin/settings", icon: Settings },
 ];
 
@@ -45,7 +45,8 @@ interface Props {
   session: Session;
 }
 
-export const SidebarAdmin = ({ session }: Props) => {  const pathname = usePathname();
+export const SidebarAdmin = ({ session }: Props) => {
+  const pathname = usePathname();
   const { state, setOpenMobile } = useSidebar();
   const isCollapsed = state === "collapsed";
   const [activeTooltip, setActiveTooltip] = useState<string | null>(null);
@@ -59,7 +60,7 @@ export const SidebarAdmin = ({ session }: Props) => {  const pathname = usePathn
   };
 
   return (
-    <SessionProvider  session={session} >
+    <SessionProvider session={session}>
       <Sidebar className=" h-dvh">
         <SidebarHeader className="p-">
           <div className="flex items-center space-x-2">
@@ -76,7 +77,9 @@ export const SidebarAdmin = ({ session }: Props) => {  const pathname = usePathn
             <SidebarMenu>
               {menuItems.slice(0, 5).map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <div className="relative">                    <SidebarMenuButton
+                  <div className="relative">
+                    {" "}
+                    <SidebarMenuButton
                       asChild
                       isActive={pathname === item.url}
                       onMouseEnter={() =>
@@ -91,7 +94,6 @@ export const SidebarAdmin = ({ session }: Props) => {  const pathname = usePathn
                         </span>
                       </Link>
                     </SidebarMenuButton>
-
                     {/* Custom tooltip */}
                     {isCollapsed && activeTooltip === item.title && (
                       <div className="absolute left-full ml-2 top-1/2 -translate-y-1/2 z-50 px-2 py-1 bg-yellow-50 text-yellow-900 text-sm rounded-md border border-yellow-200 whitespace-nowrap">
@@ -102,10 +104,11 @@ export const SidebarAdmin = ({ session }: Props) => {  const pathname = usePathn
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>
-          </SidebarGroup>          <SidebarGroup className="px-3 py-2 mt-4">
+          </SidebarGroup>{" "}
+          <SidebarGroup className="px-3 py-2 mt-4">
             <SidebarGroupLabel>Análisis</SidebarGroupLabel>
             <SidebarMenu>
-              {menuItems.slice(5, 7).map((item) => (
+              {menuItems.slice(5, 6).map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <div className="relative">
                     <SidebarMenuButton
@@ -134,10 +137,11 @@ export const SidebarAdmin = ({ session }: Props) => {  const pathname = usePathn
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>
-          </SidebarGroup>          <SidebarGroup className="px-3 py-2 mt-4">
+          </SidebarGroup>{" "}
+          <SidebarGroup className="px-3 py-2 mt-4">
             <SidebarGroupLabel>Sistema</SidebarGroupLabel>
             <SidebarMenu>
-              {menuItems.slice(7).map((item) => (
+              {menuItems.slice(6).map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <div className="relative">
                     <SidebarMenuButton
@@ -170,7 +174,6 @@ export const SidebarAdmin = ({ session }: Props) => {  const pathname = usePathn
         </SidebarContent>
 
         <SidebarFooterUser />
-        
       </Sidebar>
     </SessionProvider>
   );
