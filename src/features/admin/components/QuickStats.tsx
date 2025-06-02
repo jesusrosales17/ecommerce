@@ -20,7 +20,7 @@ export default function QuickStats({
 
 
   const formatGrowth = (percentage: number) => {
-    const abs = Math.abs(percentage);
+    // const abs = Math.abs(percentage);
     return `${percentage >= 0 ? "+" : ""}${percentage.toFixed(1)}%`;
   };
 

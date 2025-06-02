@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -7,14 +8,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Settings, User, Key, ExternalLink, Loader2 } from "lucide-react";
-import Link from "next/link";
-import { useState, useEffect } from "react";
-import { toast } from "sonner";
+import { ExternalLink, Key, Loader2, User } from "lucide-react";
 import { useSession } from "next-auth/react";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 interface UserProfile {
   id: string;

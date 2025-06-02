@@ -1,12 +1,10 @@
 'use client';
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { useRouter } from 'next/navigation';
 import { useCategoryStore } from '../store/useCategoryStore';
 
 export const useCategoryActions = () => {
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
-  const router = useRouter();
   const { deleteCategory: deleteCategoryFromStore } = useCategoryStore();
 
   const deleteCategory = async (categoryId: string) => {

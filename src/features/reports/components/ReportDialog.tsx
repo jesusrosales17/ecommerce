@@ -19,6 +19,7 @@ import { formatCurrency, formatNumber } from "@/utils/number";
 interface ReportDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   reportData: any;
   reportInfo: {
     id: string;
@@ -143,8 +144,8 @@ export function ReportDialog({
             Top {reportData.topProducts.length} productos del período
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
+        <CardContent>          <div className="space-y-3">
+            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
             {reportData.topProducts.slice(0, 10).map((product: any, index: number) => (
               <div key={product.id} className="flex items-center justify-between p-3 rounded-lg border">
                 <div className="flex items-center gap-3">
@@ -181,8 +182,8 @@ export function ReportDialog({
             Clientes con mayor volumen de compras
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
+        <CardContent>          <div className="space-y-3">
+            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
             {reportData.topCustomers.slice(0, 10).map((customer: any, index: number) => (
               <div key={customer.id} className="flex items-center justify-between p-3 rounded-lg border">
                 <div className="flex items-center gap-3">
@@ -282,8 +283,8 @@ export function ReportDialog({
               Rendimiento de ventas por categoría de productos
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CardContent>            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
               {reportData.salesTrends.byCategory.map((category: any, index: number) => (
                 <div key={index} className="p-4 rounded-lg border">
                   <div className="flex justify-between items-center mb-2">
@@ -353,8 +354,8 @@ export function ReportDialog({
               Clientes por región
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
+          <CardContent>            <div className="space-y-3">
+              {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
               {reportData.customersByRegion.map((region: any, index: number) => (
                 <div key={index} className="flex items-center justify-between p-3 rounded-lg border">
                   <span className="font-medium">{region?.region || 'Sin región'}</span>
@@ -380,7 +381,8 @@ export function ReportDialog({
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">              {reportData.categoryAnalysis.map((category: any, index: number) => (
+            <div className="space-y-4">              {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+              {reportData.categoryAnalysis.map((category: any, index: number) => (
                 <div key={index} className="p-4 rounded-lg border">
                   <div className="flex justify-between items-center mb-2">
                     <p className="font-medium">{category?.name || 'Sin nombre'}</p>
@@ -489,6 +491,7 @@ export function ReportDialog({
             </CardDescription>
           </CardHeader>
           <CardContent>            <div className="space-y-3">
+              {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
               {reportData.profitMargins.map((margin: any, index: number) => (
                 <div key={index} className="flex items-center justify-between p-3 rounded-lg border">
                   <div>
@@ -521,6 +524,7 @@ export function ReportDialog({
             </CardDescription>
           </CardHeader>
           <CardContent>            <div className="space-y-3">
+              {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
               {reportData.statusBreakdown.map((status: any, index: number) => (
                 <div key={index} className="flex items-center justify-between p-3 rounded-lg border">
                   <div>
@@ -623,8 +627,8 @@ export function ReportDialog({
                 <CardHeader>
                   <CardTitle>Análisis por Categoría</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <CardContent>                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                     {reportData.categoryAnalysis.map((category: any, index: number) => (
                       <div key={index} className="p-3 rounded-lg border">
                         <div className="flex justify-between items-center">

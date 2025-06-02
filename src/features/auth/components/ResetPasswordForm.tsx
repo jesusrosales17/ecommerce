@@ -51,6 +51,7 @@ export function ResetPasswordForm() {
         setError('El enlace ha expirado o es inválido');
       }
     } catch (error) {
+      console.log(error)
       setError('Error al validar el enlace');
     }
   };
@@ -100,6 +101,7 @@ export function ResetPasswordForm() {
       }
     } catch (error) {
       setError('Error de conexión. Inténtalo de nuevo.');
+      console.log(error);
     } finally {
       setIsLoading(false);
     }

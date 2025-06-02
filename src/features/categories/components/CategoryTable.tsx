@@ -15,7 +15,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Edit, Eye, MoreVertical, Trash } from "lucide-react";
+import { Edit, Eye, MoreVertical } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCategoryStore } from "../store/useCategoryStore";
 import { SearchInput } from "@/components/ui/SearchInput";

@@ -1,18 +1,15 @@
 "use client";
 
-import React, { useState } from "react";
 import { 
   BarChart3, 
   Users, 
   ShoppingCart, 
   DollarSign, 
   Package, 
-  TrendingUp,
   Download,
   Eye
 } from "lucide-react";
 import { ReportType } from "../interfaces/reportTypes";
-import { Button } from "@/components/ui/button";
 
 interface ReportTypesGridProps {
   onDownloadReport: (reportId: string, format: 'pdf' | 'excel' | 'csv') => void;

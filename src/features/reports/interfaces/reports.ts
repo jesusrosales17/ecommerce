@@ -37,6 +37,7 @@ export interface ReportType {
   title: string;
   description: string;
   type: "sales" | "products" | "customers" | "inventory";
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   icon: any;
   color: string;
   bgColor: string;
@@ -52,6 +53,8 @@ export interface ExportFormat {
   format: 'pdf' | 'excel' | 'csv';
   name: string;
   description: string;
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   icon: any;
   color: string;
   bgColor: string;

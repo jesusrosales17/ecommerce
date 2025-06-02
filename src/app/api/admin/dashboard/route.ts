@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
+import {  NextResponse } from "next/server";
 import prisma from "@/libs/prisma";
 import { requireAuth } from "@/libs/auth/auth";
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     // Verificar autenticación y rol de administrador
     const authResult = await requireAuth(['ADMIN']);
@@ -201,9 +201,8 @@ export async function GET(request: NextRequest) {
       })
     ]);    const userGrowthPercentage = lastMonthUsers > 0 
       ? ((currentMonthUsers - lastMonthUsers) / lastMonthUsers) * 100 
-      : 0;
-
-    // Helper function to convert BigInt to number
+      : 0;    // Helper function to convert BigInt to number
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const convertBigIntToNumber = (value: any): any => {
       if (typeof value === 'bigint') {
         return Number(value);
@@ -212,6 +211,7 @@ export async function GET(request: NextRequest) {
         return value.map(convertBigIntToNumber);
       }
       if (value !== null && typeof value === 'object') {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const converted: any = {};
         for (const [key, val] of Object.entries(value)) {
           converted[key] = convertBigIntToNumber(val);

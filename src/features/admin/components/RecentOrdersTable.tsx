@@ -48,6 +48,7 @@ export default function RecentOrdersTable({ orders }: RecentOrdersTableProps) {
         },
         Address: null,
         items: [],
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } as any; // Casting temporal - se actualizará con datos completos
 
       setOrderToShow(temporaryOrder);

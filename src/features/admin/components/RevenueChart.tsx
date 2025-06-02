@@ -9,8 +9,6 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  BarChart,
-  Bar
 } from "recharts";
 
 interface MonthlyStats {
@@ -24,6 +22,7 @@ interface RevenueChartProps {
 }
 
 export default function RevenueChart({ data }: RevenueChartProps) {  // Function to safely convert revenue to number
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const parseRevenue = (revenue: any): number => {
     console.log("Raw revenue:", revenue, typeof revenue);
     
@@ -134,6 +133,8 @@ export default function RevenueChart({ data }: RevenueChartProps) {  // Function
       maximumFractionDigits: 0
     }).format(value);
   };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const CustomTooltip = ({ active, payload, label }: any) => {
 
     console.log(payload)

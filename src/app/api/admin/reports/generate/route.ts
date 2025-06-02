@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { reportId, reportType, dateRange, filters } = body;
+    const { reportId, reportType, dateRange } = body;
 
     if (!reportId || !reportType) {
       return NextResponse.json(
@@ -28,23 +28,24 @@ export async function POST(request: NextRequest) {
     // Generar reporte según el tipo
     switch (reportId) {
       case 'sales-summary':
-        reportData = await generateSalesSummaryReport(startDate, endDate, filters);
+        // TODO: verificar si no afecta el filter
+        reportData = await generateSalesSummaryReport(startDate, endDate);
         break;
       
       case 'customer-analysis':
-        reportData = await generateCustomerAnalysisReport(startDate, endDate, filters);
+        reportData = await generateCustomerAnalysisReport(startDate, endDate);
         break;
       
       case 'product-performance':
-        reportData = await generateProductPerformanceReport(startDate, endDate, filters);
+        reportData = await generateProductPerformanceReport(startDate, endDate);
         break;
       
       case 'financial-report':
-        reportData = await generateFinancialReport(startDate, endDate, filters);
+        reportData = await generateFinancialReport(startDate, endDate);
         break;
       
       case 'orders-analysis':
-        reportData = await generateOrdersAnalysisReport(startDate, endDate, filters);
+        reportData = await generateOrdersAnalysisReport(startDate, endDate);
         break;
       
       default:
@@ -80,7 +81,7 @@ export async function POST(request: NextRequest) {
 
 // Funciones para generar reportes específicos
 
-async function generateSalesSummaryReport(startDate: Date, endDate: Date, filters: string[]) {
+async function generateSalesSummaryReport(startDate: Date, endDate: Date) {
   const [
     totalSales,
     totalOrders,
@@ -207,7 +208,7 @@ async function generateSalesSummaryReport(startDate: Date, endDate: Date, filter
   };
 }
 
-async function generateCustomerAnalysisReport(startDate: Date, endDate: Date, filters: string[]) {
+async function generateCustomerAnalysisReport(startDate: Date, endDate: Date) {
   const [
     totalCustomers,
     newCustomers,
@@ -331,7 +332,7 @@ async function generateCustomerAnalysisReport(startDate: Date, endDate: Date, fi
   };
 }
 
-async function generateProductPerformanceReport(startDate: Date, endDate: Date, filters: string[]) {
+async function generateProductPerformanceReport(startDate: Date, endDate: Date) {
   const [
     bestSellingProducts,
     worstPerformingProducts,
@@ -465,7 +466,7 @@ async function generateProductPerformanceReport(startDate: Date, endDate: Date, 
   };
 }
 
-async function generateFinancialReport(startDate: Date, endDate: Date, filters: string[]) {
+async function generateFinancialReport(startDate: Date, endDate: Date) {
   const [
     totalRevenue,
     totalCosts,
@@ -595,7 +596,7 @@ async function generateFinancialReport(startDate: Date, endDate: Date, filters: 
   };
 }
 
-async function generateOrdersAnalysisReport(startDate: Date, endDate: Date, filters: string[]) {
+async function generateOrdersAnalysisReport(startDate: Date, endDate: Date) {
   const [
     orderStats,
     ordersByStatus,
@@ -731,6 +732,7 @@ function getDateRange(range: string) {
   return { startDate, endDate };
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function enrichProductData(productData: any[]) {
   return Promise.all(
     productData.map(async (item) => {
@@ -757,7 +759,7 @@ async function enrichProductData(productData: any[]) {
   );
 }
 
-function calculateGrowthRate(current: number, previous: number): number {
-  if (previous === 0) return current > 0 ? 100 : 0;
-  return ((current - previous) / previous) * 100;
-}
+// function calculateGrowthRate(current: number, previous: number): number {
+//   if (previous === 0) return current > 0 ? 100 : 0;
+//   return ((current - previous) / previous) * 100;
+// }

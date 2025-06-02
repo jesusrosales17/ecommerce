@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const format = searchParams.get('format'); // pdf, excel, csv
     const dateRange = searchParams.get('dateRange') || '30d';
-    const reportType = searchParams.get('reportType') || 'all';
+    // const reportType = searchParams.get('reportType') || 'all';
 
     if (!format || !['pdf', 'excel', 'csv'].includes(format)) {
       return NextResponse.json(

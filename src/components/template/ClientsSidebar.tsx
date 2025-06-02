@@ -15,7 +15,6 @@ import {
   ShoppingBag,
   Star,
   User,
-  UserCircle,
 } from "lucide-react";
 import Link from "next/link";
 

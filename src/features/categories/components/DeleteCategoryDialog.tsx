@@ -38,9 +38,8 @@ export const DeleteCategoryDialog = ({ categoryId, categoryName }: DeleteCategor
         <AlertDialogHeader>
           <AlertDialogTitle>¿Eliminar categoría?</AlertDialogTitle>
           <AlertDialogDescription>
-            La categoría <strong>"{categoryName}"</strong> será eliminada y no se podrá recuperar.
+            La categoría <strong>&quot;{categoryName}&quot;</strong> será eliminada y no se podrá recuperar.
             Su estado pasará a DELETED y ya no aparecerá en la tabla de categorías ni en la tienda.
-            {" "}
             <br />
             <br />
             <strong>Importante:</strong> Si esta categoría tiene productos activos asociados, 

@@ -48,6 +48,7 @@ export function ForgotPasswordForm() {
         setError(result.error || 'Error al procesar la solicitud');
       }
     } catch (error) {
+      console.log(error)
       setError('Error de conexión. Inténtalo de nuevo.');
     } finally {
       setIsLoading(false);

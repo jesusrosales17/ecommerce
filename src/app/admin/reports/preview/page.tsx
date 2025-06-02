@@ -12,7 +12,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   ArrowLeft,
   Download,
@@ -35,9 +34,10 @@ export default function ReportPreviewPage() {
 
   // Obtener datos del reporte desde los search params o localStorage
   const reportId = searchParams.get("reportId");
-  const dateRange = searchParams.get("dateRange");
-  // Fetch real data from the API
+  const dateRange = searchParams.get("dateRange");  // Fetch real data from the API
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [reportData, setReportData] = React.useState<any>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [reportInfo, setReportInfo] = React.useState<any>(null);
   const [isLoading, setIsLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
@@ -188,7 +188,9 @@ export default function ReportPreviewPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">      {/* Header - no se imprime */}
+    <div className="min-h-screen bg-background">
+      {" "}
+      {/* Header - no se imprime */}
       <div className="print:hidden bg-white sticky top-0 z-10 border-b">
         <div className="mb-4">
           <div className="flex flex-col space-y-4 md:space-y-0 md:flex-row md:items-center md:justify-between">
@@ -201,30 +203,51 @@ export default function ReportPreviewPage() {
                   <span className="sm:hidden">Volver</span>
                 </Link>
               </Button>
-              
-              <Separator orientation="vertical" className="hidden md:block h-6" />
-              
+
+              <Separator
+                orientation="vertical"
+                className="hidden md:block h-6"
+              />
+
               <div className="flex items-center gap-2">
-                <div className="flex-shrink-0">{getIcon(reportInfo.category)}</div>
-                <h1 className="text-lg md:text-xl font-semibold truncate">{reportInfo.title}</h1>
+                <div className="flex-shrink-0">
+                  {getIcon(reportInfo.category)}
+                </div>
+                <h1 className="text-lg md:text-xl font-semibold truncate">
+                  {reportInfo.title}
+                </h1>
               </div>
             </div>
 
             {/* Right section - Action buttons */}
             <div className="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0">
-              <Button variant="outline" onClick={handlePrint} size="sm" className="flex-shrink-0">
+              <Button
+                variant="outline"
+                onClick={handlePrint}
+                size="sm"
+                className="flex-shrink-0"
+              >
                 <Printer className="h-4 w-4 mr-2" />
                 <span className="hidden sm:inline">Imprimir</span>
                 <span className="sm:hidden">Print</span>
               </Button>
-              
-              <Button variant="outline" onClick={() => handleDownload("excel")} size="sm" className="flex-shrink-0">
+
+              <Button
+                variant="outline"
+                onClick={() => handleDownload("excel")}
+                size="sm"
+                className="flex-shrink-0"
+              >
                 <Download className="h-4 w-4 mr-2" />
                 <span className="hidden sm:inline">Excel</span>
                 <span className="sm:hidden">XLS</span>
               </Button>
-              
-              <Button onClick={() => handleDownload("pdf")} size="sm" className="flex-shrink-0">
+
+              <Button
+                onClick={() => handleDownload("pdf")}
+                size="sm"
+                className="flex-shrink-0"
+              >
                 <Download className="h-4 w-4 mr-2" />
                 <span className="hidden sm:inline">PDF</span>
                 <span className="sm:hidden">PDF</span>
@@ -232,17 +255,22 @@ export default function ReportPreviewPage() {
             </div>
           </div>
         </div>
-      </div>      {/* Contenido del reporte - se imprime */}
+      </div>{" "}
+      {/* Contenido del reporte - se imprime */}
       <div className=" print:p-4 mt-4">
         {/* Header del reporte */}
         <div className="mb-8 print:mb-6">
           <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
-            <div className="print:hidden flex-shrink-0">{getIcon(reportInfo.category)}</div>
+            <div className="print:hidden flex-shrink-0">
+              {getIcon(reportInfo.category)}
+            </div>
             <h1 className="text-2xl sm:text-3xl font-bold print:text-2xl break-words">
               {reportInfo.title}
             </h1>
           </div>
-          <p className="text-muted-foreground mb-4 text-sm sm:text-base">{reportInfo.description}</p>
+          <p className="text-muted-foreground mb-4 text-sm sm:text-base">
+            {reportInfo.description}
+          </p>
 
           <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm">
             <Badge variant="outline" className="gap-1 self-start">
@@ -261,7 +289,6 @@ export default function ReportPreviewPage() {
             </Badge>
           </div>
         </div>
-
         {/* Resumen ejecutivo */}
         {reportData.summary && (
           <Card className="mb-8 print:mb-6 print:shadow-none print:border-gray-300">
@@ -273,7 +300,8 @@ export default function ReportPreviewPage() {
               <CardDescription>
                 Principales métricas del período seleccionado
               </CardDescription>
-            </CardHeader>            <CardContent>
+            </CardHeader>{" "}
+            <CardContent>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 print:gap-4">
                 {reportData.summary.totalRevenue && (
                   <div className="text-center p-4 rounded-lg bg-green-50 border border-green-200">
@@ -304,7 +332,8 @@ export default function ReportPreviewPage() {
                       Ticket Promedio
                     </p>
                   </div>
-                )}                {reportData.summary.conversionRate && (
+                )}{" "}
+                {reportData.summary.conversionRate && (
                   <div className="text-center p-4 rounded-lg bg-orange-50 border border-orange-200">
                     <div className="text-2xl sm:text-3xl font-bold text-orange-600 print:text-xl">
                       {reportData.summary.conversionRate.toFixed(2)}%
@@ -317,7 +346,8 @@ export default function ReportPreviewPage() {
               </div>
             </CardContent>
           </Card>
-        )}        {/* Grid de contenido */}
+        )}{" "}
+        {/* Grid de contenido */}
         <div className="grid gap-4 sm:gap-6 lg:gap-8 print:gap-6">
           {/* Productos más vendidos */}
           {reportData.topProducts && reportData.topProducts.length > 0 && (
@@ -327,10 +357,11 @@ export default function ReportPreviewPage() {
                 <CardDescription>
                   Top {reportData.topProducts.length} productos del período
                 </CardDescription>
-              </CardHeader>              <CardContent>
-                <div className="space-y-3 sm:space-y-4 print:space-y-2">
+              </CardHeader>{" "}
+              <CardContent>                <div className="space-y-3 sm:space-y-4 print:space-y-2">
                   {reportData.topProducts
                     .slice(0, 10)
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     .map((product: any, index: number) => (
                       <div
                         key={`top-product-${product.id || index}`}
@@ -348,16 +379,23 @@ export default function ReportPreviewPage() {
                               {product.name}
                             </p>
                             <p className="text-xs sm:text-sm text-muted-foreground print:text-xs">
-                              {(product.category?.name || product.category || "Sin categoría")}
+                              {product.category?.name ||
+                                product.category ||
+                                "Sin categoría"}
                             </p>
                           </div>
                         </div>
                         <div className="text-right flex-shrink-0">
                           <p className="font-semibold print:text-sm text-sm sm:text-base">
-                            {formatNumber(product.totalSold || product.totalQuantity || 0)} vendidos
+                            {formatNumber(
+                              product.totalSold || product.totalQuantity || 0
+                            )}{" "}
+                            vendidos
                           </p>
                           <p className="text-xs sm:text-sm text-muted-foreground print:text-xs">
-                            {formatCurrency(product.price || product.averagePrice || 0)}
+                            {formatCurrency(
+                              product.price || product.averagePrice || 0
+                            )}
                           </p>
                         </div>
                       </div>
@@ -374,10 +412,11 @@ export default function ReportPreviewPage() {
                 <CardDescription>
                   Clientes con mayor volumen de compras
                 </CardDescription>
-              </CardHeader>              <CardContent>
-                <div className="space-y-3 sm:space-y-4 print:space-y-2">
-                  {reportData.topCustomers
+              </CardHeader>{" "}
+              <CardContent>
+                <div className="space-y-3 sm:space-y-4 print:space-y-2">                  {reportData.topCustomers
                     .slice(0, 10)
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     .map((customer: any, index: number) => (
                       <div
                         key={`top-customer-${customer.id || index}`}
@@ -397,7 +436,8 @@ export default function ReportPreviewPage() {
                             <p className="text-xs sm:text-sm text-muted-foreground print:text-xs truncate">
                               {customer.email}
                             </p>
-                          </div>                        </div>
+                          </div>
+                        </div>
                         <div className="text-right flex-shrink-0">
                           <p className="font-semibold print:text-sm text-sm sm:text-base">
                             {formatCurrency(customer.totalSpent)}
@@ -414,7 +454,8 @@ export default function ReportPreviewPage() {
           )}{" "}
           {/* Análisis por categoría o datos adicionales según el tipo de reporte */}
           {renderAdditionalData()}
-        </div>        {/* Footer del reporte */}
+        </div>{" "}
+        {/* Footer del reporte */}
         <div className="mt-8 sm:mt-12 print:mt-8 pt-4 sm:pt-6 border-t text-center text-xs sm:text-sm text-muted-foreground">
           <p className="px-4">
             Este reporte fue generado automáticamente el{" "}
@@ -442,8 +483,9 @@ export default function ReportPreviewPage() {
                       Rendimiento de ventas por categoría de productos
                     </CardDescription>
                   </CardHeader>
-                  <CardContent>                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 print:gap-2">
-                      {reportData.salesTrends.byCategory.map(
+                  <CardContent>
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 print:gap-2">                      {reportData.salesTrends.byCategory.map(
+                          // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         (category: any, index: number) => (
                           <div
                             key={`sales-category-${category.name || index}`}
@@ -486,7 +528,8 @@ export default function ReportPreviewPage() {
                   <CardDescription>
                     Distribución de clientes por valor de compra
                   </CardDescription>
-                </CardHeader>                <CardContent>
+                </CardHeader>{" "}
+                <CardContent>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 print:gap-2">
                     <div className="p-3 sm:p-4 rounded-lg border print:p-2 print:border-gray-300 bg-green-50">
                       <div className="text-center">
@@ -531,8 +574,9 @@ export default function ReportPreviewPage() {
                     <CardTitle>Distribución Geográfica</CardTitle>
                     <CardDescription>Clientes por región</CardDescription>
                   </CardHeader>
-                  <CardContent>                    <div className="space-y-2 sm:space-y-3 print:space-y-2">
-                      {reportData.customersByRegion.map(
+                  <CardContent>
+                    <div className="space-y-2 sm:space-y-3 print:space-y-2">                      {reportData.customersByRegion.map(
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         (region: any, index: number) => (
                           <div
                             key={`region-${region.region || index}`}
@@ -541,7 +585,10 @@ export default function ReportPreviewPage() {
                             <span className="font-medium print:text-sm text-sm sm:text-base">
                               {region.region}
                             </span>
-                            <Badge variant="secondary" className="self-start text-xs sm:text-sm">
+                            <Badge
+                              variant="secondary"
+                              className="self-start text-xs sm:text-sm"
+                            >
                               {region.customerCount} clientes
                             </Badge>
                           </div>
@@ -568,7 +615,9 @@ export default function ReportPreviewPage() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-4 print:space-y-2">                      {reportData.categoryAnalysis.map(
+                    <div className="space-y-4 print:space-y-2">
+                      {" "}                      {reportData.categoryAnalysis.map(
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         (category: any, index: number) => (
                           <div
                             key={`category-analysis-${category.name || index}`}
@@ -652,141 +701,159 @@ export default function ReportPreviewPage() {
               </Card>
             )}
           </>
-        );      case "financial-report":
+        );
+      case "financial-report":
         return (
           <>
             {/* Ventas por categoría */}
-            {reportData.salesByCategory && reportData.salesByCategory.length > 0 && (
+            {reportData.salesByCategory &&
+              reportData.salesByCategory.length > 0 && (
+                <Card className="print:shadow-none print:border-gray-300 print:break-inside-avoid">
+                  <CardHeader>
+                    <CardTitle>Ventas por Categoría</CardTitle>
+                    <CardDescription>
+                      Rendimiento de ventas por categoría de productos
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3 print:space-y-2">
+                      {" "}                      {reportData.salesByCategory.map(
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        (category: any, index: number) => (
+                          <div
+                            key={`sales-by-category-${
+                              category.category || index
+                            }`}
+                            className="flex items-center justify-between p-3 rounded-lg border print:p-2 print:border-gray-300"
+                          >
+                            <div>
+                              <p className="font-medium print:text-sm">
+                                {category.category}
+                              </p>
+                              <p className="text-sm text-muted-foreground print:text-xs">
+                                {category.totalQuantity} unidades ·{" "}
+                                {category.orderCount} órdenes
+                              </p>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-lg font-bold text-green-600 print:text-base">
+                                {formatCurrency(category.totalSales)}
+                              </p>
+                            </div>
+                          </div>
+                        )
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+            {/* Top productos vendidos */}
+            {reportData.topProducts && reportData.topProducts.length > 0 && (
               <Card className="print:shadow-none print:border-gray-300 print:break-inside-avoid">
                 <CardHeader>
-                  <CardTitle>Ventas por Categoría</CardTitle>
+                  <CardTitle>Productos Más Vendidos</CardTitle>
                   <CardDescription>
-                    Rendimiento de ventas por categoría de productos
+                    Los productos con mejores ventas en el período
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-3 print:space-y-2">                    {reportData.salesByCategory.map(
-                      (category: any, index: number) => (
+                  <div className="space-y-3 print:space-y-2">
+                    {" "}                    {reportData.topProducts
+                      .slice(0, 10)
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      .map((product: any, index: number) => (
                         <div
-                          key={`sales-by-category-${category.category || index}`}
+                          key={`financial-top-product-${
+                            product.id || product.name || index
+                          }`}
                           className="flex items-center justify-between p-3 rounded-lg border print:p-2 print:border-gray-300"
                         >
-                          <div>
-                            <p className="font-medium print:text-sm">
-                              {category.category}
-                            </p>
-                            <p className="text-sm text-muted-foreground print:text-xs">
-                              {category.totalQuantity} unidades · {category.orderCount} órdenes
-                            </p>
+                          <div className="flex items-center gap-3">
+                            <Badge
+                              variant="secondary"
+                              className="w-8 h-8 rounded-full flex items-center justify-center print:w-6 print:h-6"
+                            >
+                              {index + 1}
+                            </Badge>
+                            <div>
+                              <p className="font-medium print:text-sm">
+                                {product.name}
+                              </p>
+                              <p className="text-sm text-muted-foreground print:text-xs">
+                                {product.category} · {product.totalQuantity}{" "}
+                                unidades
+                              </p>
+                            </div>
                           </div>
                           <div className="text-right">
                             <p className="text-lg font-bold text-green-600 print:text-base">
-                              {formatCurrency(category.totalSales)}
+                              {formatCurrency(product.totalSales)}
+                            </p>
+                            <p className="text-sm text-muted-foreground print:text-xs">
+                              Prom. {formatCurrency(product.averagePrice)}
                             </p>
                           </div>
                         </div>
-                      )
-                    )}
+                      ))}
                   </div>
                 </CardContent>
               </Card>
             )}
 
-            {/* Top productos vendidos */}
-            {reportData.topProducts &&
-              reportData.topProducts.length > 0 && (
-                <Card className="print:shadow-none print:border-gray-300 print:break-inside-avoid">
-                  <CardHeader>
-                    <CardTitle>Productos Más Vendidos</CardTitle>
-                    <CardDescription>
-                      Los productos con mejores ventas en el período
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3 print:space-y-2">                      {reportData.topProducts.slice(0, 10).map(
-                        (product: any, index: number) => (
-                          <div
-                            key={`financial-top-product-${product.id || product.name || index}`}
-                            className="flex items-center justify-between p-3 rounded-lg border print:p-2 print:border-gray-300"
-                          >
-                            <div className="flex items-center gap-3">
-                              <Badge
-                                variant="secondary"
-                                className="w-8 h-8 rounded-full flex items-center justify-center print:w-6 print:h-6"
-                              >
-                                {index + 1}
-                              </Badge>
-                              <div>
-                                <p className="font-medium print:text-sm">
-                                  {product.name}
-                                </p>
-                                <p className="text-sm text-muted-foreground print:text-xs">
-                                  {product.category} · {product.totalQuantity} unidades
-                                </p>
-                              </div>
-                            </div>
-                            <div className="text-right">
-                              <p className="text-lg font-bold text-green-600 print:text-base">
-                                {formatCurrency(product.totalSales)}
-                              </p>
-                              <p className="text-sm text-muted-foreground print:text-xs">
-                                Prom. {formatCurrency(product.averagePrice)}
-                              </p>
-                            </div>
-                          </div>
-                        )
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
-
             {/* Ventas diarias recientes */}
-            {reportData.dailySales &&
-              reportData.dailySales.length > 0 && (
-                <Card className="print:shadow-none print:border-gray-300 print:break-inside-avoid">
-                  <CardHeader>
-                    <CardTitle>Ventas Diarias Recientes</CardTitle>
-                    <CardDescription>
-                      Rendimiento de ventas por día (últimos 10 días)
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3 print:space-y-2">                      {reportData.dailySales.slice(0, 10).map(
-                        (day: any, index: number) => (
-                          <div
-                            key={`daily-sales-${day.date || index}`}
-                            className="flex items-center justify-between p-3 rounded-lg border print:p-2 print:border-gray-300"
-                          >
-                            <div>
-                              <p className="font-medium print:text-sm">
-                                {new Date(day.date).toLocaleDateString('es-ES', {
-                                  day: '2-digit',
-                                  month: 'short',
-                                  year: 'numeric'
-                                })}
-                              </p>
-                              <p className="text-sm text-muted-foreground print:text-xs">
-                                {day.orderCount} órdenes
-                              </p>
-                            </div>
-                            <div className="text-right">
-                              <p className="text-lg font-bold text-green-600 print:text-base">
-                                {formatCurrency(day.totalSales)}
-                              </p>
-                              <p className="text-sm text-muted-foreground print:text-xs">
-                                Ticket prom: {formatCurrency(day.orderCount > 0 ? day.totalSales / day.orderCount : 0)}
-                              </p>
-                            </div>
+            {reportData.dailySales && reportData.dailySales.length > 0 && (
+              <Card className="print:shadow-none print:border-gray-300 print:break-inside-avoid">
+                <CardHeader>
+                  <CardTitle>Ventas Diarias Recientes</CardTitle>
+                  <CardDescription>
+                    Rendimiento de ventas por día (últimos 10 días)
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3 print:space-y-2">
+                    {" "}                    {reportData.dailySales
+                      .slice(0, 10)
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      .map((day: any, index: number) => (
+                        <div
+                          key={`daily-sales-${day.date || index}`}
+                          className="flex items-center justify-between p-3 rounded-lg border print:p-2 print:border-gray-300"
+                        >
+                          <div>
+                            <p className="font-medium print:text-sm">
+                              {new Date(day.date).toLocaleDateString("es-ES", {
+                                day: "2-digit",
+                                month: "short",
+                                year: "numeric",
+                              })}
+                            </p>
+                            <p className="text-sm text-muted-foreground print:text-xs">
+                              {day.orderCount} órdenes
+                            </p>
                           </div>
-                        )
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
+                          <div className="text-right">
+                            <p className="text-lg font-bold text-green-600 print:text-base">
+                              {formatCurrency(day.totalSales)}
+                            </p>
+                            <p className="text-sm text-muted-foreground print:text-xs">
+                              Ticket prom:{" "}
+                              {formatCurrency(
+                                day.orderCount > 0
+                                  ? day.totalSales / day.orderCount
+                                  : 0
+                              )}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </>
-        );      case "orders-analysis":
+        );
+      case "orders-analysis":
         return (
           <>
             {/* Estado de órdenes */}
@@ -800,8 +867,11 @@ export default function ReportPreviewPage() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-3 print:space-y-2">                      {reportData.statusBreakdown.map(
-                        (status: any, index: number) => (                          <div
+                    <div className="space-y-3 print:space-y-2">
+                      {" "}                      {reportData.statusBreakdown.map(
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        (status: any, index: number) => (
+                          <div
                             key={`status-breakdown-${status.status || index}`}
                             className="flex items-center justify-between p-3 rounded-lg border print:p-2 print:border-gray-300"
                           >
@@ -822,51 +892,57 @@ export default function ReportPreviewPage() {
                     </div>
                   </CardContent>
                 </Card>
-              )}            {/* Tendencias diarias */}
-            {reportData.dailyTrends &&
-              reportData.dailyTrends.length > 0 && (
-                <Card className="print:shadow-none print:border-gray-300 print:break-inside-avoid">
-                  <CardHeader>
-                    <CardTitle>Tendencias Diarias</CardTitle>
-                    <CardDescription>
-                      Evolución de órdenes por día (últimos 10 días)
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3 print:space-y-2">                      {reportData.dailyTrends.slice(0, 10).map(
-                        (day: any, index: number) => (
-                          <div
-                            key={`daily-trend-${day.date || index}`}
-                            className="flex items-center justify-between p-3 rounded-lg border print:p-2 print:border-gray-300"
-                          >
-                            <div>
-                              <p className="font-medium print:text-sm">
-                                {new Date(day.date).toLocaleDateString('es-ES', {
-                                  day: '2-digit',
-                                  month: 'short',
-                                  year: 'numeric'
-                                })}
-                              </p>
-                              <p className="text-sm text-muted-foreground print:text-xs">
-                                Ingresos: {formatCurrency(day.revenue || 0)}
-                              </p>
-                            </div>
-                            <div className="text-right">
-                              <Badge variant="secondary" className="mb-1">
-                                {day.orders || 0} órdenes
-                              </Badge>
-                              <p className="text-sm text-muted-foreground print:text-xs">
-                                Ticket prom: {formatCurrency((day.orders && day.orders > 0) ? (day.revenue || 0) / day.orders : 0)}
-                              </p>
-                            </div>
+              )}{" "}
+            {/* Tendencias diarias */}
+            {reportData.dailyTrends && reportData.dailyTrends.length > 0 && (
+              <Card className="print:shadow-none print:border-gray-300 print:break-inside-avoid">
+                <CardHeader>
+                  <CardTitle>Tendencias Diarias</CardTitle>
+                  <CardDescription>
+                    Evolución de órdenes por día (últimos 10 días)
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3 print:space-y-2">
+                    {" "}                    {reportData.dailyTrends
+                      .slice(0, 10)
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      .map((day: any, index: number) => (
+                        <div
+                          key={`daily-trend-${day.date || index}`}
+                          className="flex items-center justify-between p-3 rounded-lg border print:p-2 print:border-gray-300"
+                        >
+                          <div>
+                            <p className="font-medium print:text-sm">
+                              {new Date(day.date).toLocaleDateString("es-ES", {
+                                day: "2-digit",
+                                month: "short",
+                                year: "numeric",
+                              })}
+                            </p>
+                            <p className="text-sm text-muted-foreground print:text-xs">
+                              Ingresos: {formatCurrency(day.revenue || 0)}
+                            </p>
                           </div>
-                        )
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
-
+                          <div className="text-right">
+                            <Badge variant="secondary" className="mb-1">
+                              {day.orders || 0} órdenes
+                            </Badge>
+                            <p className="text-sm text-muted-foreground print:text-xs">
+                              Ticket prom:{" "}
+                              {formatCurrency(
+                                day.orders && day.orders > 0
+                                  ? (day.revenue || 0) / day.orders
+                                  : 0
+                              )}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
             {/* Métricas de procesamiento */}
             {reportData.processingMetrics && (
               <Card className="print:shadow-none print:border-gray-300 print:break-inside-avoid">
@@ -905,7 +981,8 @@ export default function ReportPreviewPage() {
                   </div>
                 </CardContent>
               </Card>
-            )}            {/* Distribución por tamaño de órdenes */}
+            )}{" "}
+            {/* Distribución por tamaño de órdenes */}
             {reportData.orderSizeDistribution &&
               reportData.orderSizeDistribution.length > 0 && (
                 <Card className="print:shadow-none print:border-gray-300 print:break-inside-avoid">
@@ -916,11 +993,25 @@ export default function ReportPreviewPage() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-3 print:space-y-2">                      {reportData.orderSizeDistribution.map(
+                    <div className="space-y-3 print:space-y-2">
+                      {" "}                      {reportData.orderSizeDistribution.map(
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         (size: any, index: number) => {
-                          const totalOrders = reportData.orderSizeDistribution.reduce((total: number, item: any) => total + (item.count || 0), 0);
-                          const percentage = totalOrders > 0 ? ((size.count || 0) / totalOrders * 100).toFixed(1) : '0.0';
-                          
+                          const totalOrders =
+                            reportData.orderSizeDistribution.reduce(
+                              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                              (total: number, item: any) =>
+                                total + (item.count || 0),
+                              0
+                            );
+                          const percentage =
+                            totalOrders > 0
+                              ? (
+                                  ((size.count || 0) / totalOrders) *
+                                  100
+                                ).toFixed(1)
+                              : "0.0";
+
                           return (
                             <div
                               key={`order-size-${size.range || index}`}
@@ -950,7 +1041,6 @@ export default function ReportPreviewPage() {
           </>
         );
 
-     
       default:
         return null;
     }
@@ -959,6 +1049,7 @@ export default function ReportPreviewPage() {
 
 // Funciones auxiliares
 function getReportInfo(reportId: string) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const reportTypes: { [key: string]: any } = {
     "sales-summary": {
       id: "sales-summary",
@@ -995,9 +1086,7 @@ function getReportInfo(reportId: string) {
         "Análisis del procesamiento de órdenes, tiempos y eficiencia operativa.",
       category: "operacional",
     },
-    
   };
 
   return reportTypes[reportId] || reportTypes["sales-summary"];
 }
-

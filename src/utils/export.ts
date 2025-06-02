@@ -83,10 +83,15 @@ export interface ReportData {
     color: string;
   }>;
   // Para reportes específicos
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   summary?: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   salesTrends?: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   topCustomers?: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   categoryAnalysis?: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any;
 }
 
@@ -123,9 +128,9 @@ export const exportToPDF = (data: ExportData) => {
     head: [['Métrica', 'Valor']],
     body: overviewData,
     theme: 'grid',
-    styles: { fontSize: 10 }
-  });
+    styles: { fontSize: 10 }  });
   
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   currentY = (doc as any).lastAutoTable.finalY + 15;
   
   // Productos más vendidos
@@ -134,6 +139,7 @@ export const exportToPDF = (data: ExportData) => {
     doc.text('Productos Más Vendidos', 14, currentY);
     currentY += 5;
     
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const topProductsData = data.topProducts.map(product => [
       product.name,
       product.category.name,
@@ -146,9 +152,9 @@ export const exportToPDF = (data: ExportData) => {
       head: [['Producto', 'Categoría', 'Precio', 'Vendidos']],
       body: topProductsData,
       theme: 'striped',
-      styles: { fontSize: 9 }
-    });
+      styles: { fontSize: 9 }    });
     
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     currentY = (doc as any).lastAutoTable.finalY + 15;
   }
   
@@ -156,11 +162,10 @@ export const exportToPDF = (data: ExportData) => {
   if (data.recentOrders.length > 0) {
     doc.addPage();
     currentY = 20;
-    
-    doc.setFontSize(16);
-    doc.text('Órdenes Recientes', 14, currentY);
+      doc.setFontSize(16);    doc.text('Órdenes Recientes', 14, currentY);
     currentY += 5;
-      const ordersData = data.recentOrders.map(order => [
+    
+    const ordersData = data.recentOrders.map(order => [
       order.id.substring(0, 8) + '...',
       order.customerName,
       order.customerEmail,
@@ -182,8 +187,7 @@ export const exportToPDF = (data: ExportData) => {
   doc.save(`dashboard-report-${new Date().toISOString().split('T')[0]}.pdf`);
 };
 
-export const exportToExcel = async (data: ExportData, dateRange: string, reportId?: string) => {
-  // Si tenemos reportId, obtener los datos completos del mismo endpoint que usa la vista previa
+export const exportToExcel = async (data: ExportData, dateRange: string, reportId?: string) => {  // Si tenemos reportId, obtener los datos completos del mismo endpoint que usa la vista previa
   let completeData = data;
   if (reportId) {
     try {
@@ -200,27 +204,25 @@ export const exportToExcel = async (data: ExportData, dateRange: string, reportI
   }
 
   const workbook = XLSX.utils.book_new();
-  
-  // Hoja de resumen
+    // Hoja de resumen
   const overviewData = [
     ['Métrica', 'Valor'],
-    ['Total Usuarios', data.overview.totalUsers],
-    ['Total Productos', data.overview.totalProducts],
-    ['Total Categorías', data.overview.totalCategories],
-    ['Total Órdenes', data.overview.totalOrders],
-    ['Órdenes Pendientes', data.overview.pendingOrders],
-    ['Ingresos Totales', data.overview.totalRevenue],
-    ['Crecimiento de Usuarios (%)', data.overview.userGrowthPercentage]
+    ['Total Usuarios', completeData.overview?.totalUsers || 0],
+    ['Total Productos', completeData.overview?.totalProducts || 0],
+    ['Total Categorías', completeData.overview?.totalCategories || 0],
+    ['Total Órdenes', completeData.overview?.totalOrders || 0],
+    ['Órdenes Pendientes', completeData.overview?.pendingOrders || 0],
+    ['Ingresos Totales', completeData.overview?.totalRevenue || 0],
+    ['Crecimiento de Usuarios (%)', completeData.overview?.userGrowthPercentage || 0]
   ];
   
   const overviewSheet = XLSX.utils.aoa_to_sheet(overviewData);
   XLSX.utils.book_append_sheet(workbook, overviewSheet, 'Resumen');
-  
-  // Hoja de productos más vendidos
-  if (data.topProducts.length > 0) {
+    // Hoja de productos más vendidos
+  if (completeData.topProducts && completeData.topProducts.length > 0) {
     const topProductsData = [
       ['Producto', 'Categoría', 'Precio', 'Total Vendidos'],
-      ...data.topProducts.map(product => [
+      ...completeData.topProducts.map(product => [
         product.name,
         product.category.name,
         product.price,
@@ -230,11 +232,10 @@ export const exportToExcel = async (data: ExportData, dateRange: string, reportI
     
     const topProductsSheet = XLSX.utils.aoa_to_sheet(topProductsData);
     XLSX.utils.book_append_sheet(workbook, topProductsSheet, 'Top Productos');
-  }
-    // Hoja de órdenes recientes
-  if (data.recentOrders.length > 0) {    const ordersData = [
+  }    // Hoja de órdenes recientes
+  if (completeData.recentOrders && completeData.recentOrders.length > 0) {    const ordersData = [
       ['ID', 'Cliente', 'Email', 'Total', 'Estado', 'Fecha'],
-      ...data.recentOrders.map(order => [
+      ...completeData.recentOrders.map(order => [
         order.id,
         order.customerName,
         order.customerEmail,        order.total,
@@ -319,10 +320,10 @@ export const generatePDFReport = async (data: ReportData, dateRange: string, rep
       default:
         // Fallback para reportes generales
         currentY = await addGeneralReportContent(doc, completeData, currentY);
-        break;
-    }
+        break;    }
   } else {
     // Fallback para reportes sin tipo específico
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     currentY = await addGeneralReportContent(doc, completeData, currentY);
   }
   
@@ -429,6 +430,7 @@ function formatDateRangeText(range: string): string {
   return ranges[range] || range;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function addSalesSummaryContent(doc: any, data: any, startY: number): Promise<number> {
   let currentY = startY;
   
@@ -453,6 +455,7 @@ async function addSalesSummaryContent(doc: any, data: any, startY: number): Prom
       styles: { fontSize: 10 }
     });
     
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     currentY = (doc as any).lastAutoTable.finalY + 15;
   }
   
@@ -467,6 +470,7 @@ async function addSalesSummaryContent(doc: any, data: any, startY: number): Prom
     doc.text('Productos Más Vendidos', 14, currentY);
     currentY += 5;
     
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const topProductsData = data.topProducts.slice(0, 10).map((product: any) => [
       product.name || 'N/A',
       product.category?.name || 'Sin categoría',
@@ -482,6 +486,7 @@ async function addSalesSummaryContent(doc: any, data: any, startY: number): Prom
       styles: { fontSize: 9 }
     });
     
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     currentY = (doc as any).lastAutoTable.finalY + 15;
   }
   
@@ -496,6 +501,7 @@ async function addSalesSummaryContent(doc: any, data: any, startY: number): Prom
     doc.text('Mejores Clientes', 14, currentY);
     currentY += 5;
     
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any    
     const topCustomersData = data.topCustomers.slice(0, 10).map((customer: any) => [
       customer.name || 'N/A',
       customer.email || 'N/A',
@@ -511,6 +517,7 @@ async function addSalesSummaryContent(doc: any, data: any, startY: number): Prom
       styles: { fontSize: 9 }
     });
     
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     currentY = (doc as any).lastAutoTable.finalY + 15;
   }
   
@@ -524,7 +531,7 @@ async function addSalesSummaryContent(doc: any, data: any, startY: number): Prom
     doc.setFontSize(16);
     doc.text('Ventas por Categoría', 14, currentY);
     currentY += 5;
-    
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const categoryData = data.salesTrends.byCategory.map((category: any) => [
       category.name || 'N/A',
       `$${category.revenue?.toLocaleString('es-ES', { minimumFractionDigits: 2 }) || '0.00'}`,
@@ -538,7 +545,8 @@ async function addSalesSummaryContent(doc: any, data: any, startY: number): Prom
       theme: 'striped',
       styles: { fontSize: 9 }
     });
-    
+   
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     currentY = (doc as any).lastAutoTable.finalY + 15;
   }
   
@@ -548,10 +556,12 @@ async function addSalesSummaryContent(doc: any, data: any, startY: number): Prom
       doc.addPage();
       currentY = 20;
     }
-    
-    doc.setFontSize(16);
+      doc.setFontSize(16);
     doc.text('Estado de Órdenes', 14, currentY);
-    currentY += 5;    const orderStatusData = data.orderStatus.map((status: any) => [
+    currentY += 5;
+    
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any   
+    const orderStatusData = data.orderStatus.map((status: any) => [
       getStatusText(status.status as OrderStatus) || 'N/A',
       status.count?.toString() || '0',
       `$${status.revenue?.toLocaleString('es-ES', { minimumFractionDigits: 2 }) || '0.00'}`
@@ -565,12 +575,13 @@ async function addSalesSummaryContent(doc: any, data: any, startY: number): Prom
       styles: { fontSize: 9 }
     });
     
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     currentY = (doc as any).lastAutoTable.finalY + 15;
   }
-  
-  return currentY;
+    return currentY;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function addCustomerAnalysisContent(doc: any, data: any, startY: number): Promise<number> {
   let currentY = startY;
   
@@ -595,6 +606,7 @@ async function addCustomerAnalysisContent(doc: any, data: any, startY: number): 
       styles: { fontSize: 10 }
     });
     
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     currentY = (doc as any).lastAutoTable.finalY + 15;
   }
 
@@ -609,6 +621,7 @@ async function addCustomerAnalysisContent(doc: any, data: any, startY: number): 
     doc.text('Principales Clientes', 14, currentY);
     currentY += 5;
     
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const topCustomersData = data.topCustomers.slice(0, 10).map((customer: any, index: number) => [
       (index + 1).toString(),
       customer.name || 'N/A',
@@ -625,6 +638,7 @@ async function addCustomerAnalysisContent(doc: any, data: any, startY: number): 
       styles: { fontSize: 9 }
     });
     
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     currentY = (doc as any).lastAutoTable.finalY + 15;
   }
   
@@ -653,6 +667,7 @@ async function addCustomerAnalysisContent(doc: any, data: any, startY: number): 
       styles: { fontSize: 10 }
     });
     
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     currentY = (doc as any).lastAutoTable.finalY + 15;
   }
 
@@ -667,6 +682,7 @@ async function addCustomerAnalysisContent(doc: any, data: any, startY: number): 
     doc.text('Distribución Geográfica', 14, currentY);
     currentY += 5;
     
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const regionData = data.customersByRegion.map((region: any) => [
       region.region || 'Sin especificar',
       region.customerCount?.toString() || '0'
@@ -677,15 +693,16 @@ async function addCustomerAnalysisContent(doc: any, data: any, startY: number): 
       head: [['Región', 'Cantidad de Clientes']],
       body: regionData,
       theme: 'grid',
-      styles: { fontSize: 10 }
-    });
-    
-    currentY = (doc as any).lastAutoTable.finalY + 15;
-  }
+    styles: { fontSize: 10 }
+  });
   
-  return currentY;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  currentY = (doc as any).lastAutoTable.finalY + 15;
+  }
+    return currentY;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function addProductPerformanceContent(doc: any, data: any, startY: number): Promise<number> {
   let currentY = startY;
   
@@ -710,6 +727,7 @@ async function addProductPerformanceContent(doc: any, data: any, startY: number)
       styles: { fontSize: 10 }
     });
     
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     currentY = (doc as any).lastAutoTable.finalY + 15;
   }
     // Top productos
@@ -723,6 +741,7 @@ async function addProductPerformanceContent(doc: any, data: any, startY: number)
     doc.text('Productos Más Vendidos', 14, currentY);
     currentY += 5;
     
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const topProductsData = data.topProducts.slice(0, 10).map((product: any, index: number) => [
       (index + 1).toString(),
       product.name || 'N/A',
@@ -739,6 +758,7 @@ async function addProductPerformanceContent(doc: any, data: any, startY: number)
       styles: { fontSize: 8 }
     });
     
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     currentY = (doc as any).lastAutoTable.finalY + 15;
   }
   
@@ -752,7 +772,9 @@ async function addProductPerformanceContent(doc: any, data: any, startY: number)
     doc.setFontSize(16);
     doc.text('Rendimiento por Categoría', 14, currentY);
     currentY += 5;
-      const categoryData = data.categoryAnalysis.map((category: any) => [
+    
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const categoryData = data.categoryAnalysis.map((category: any) => [
       category.name || 'N/A',
       category.productCount.toString() || '0',
       `$${category.revenue?.toLocaleString('es-ES', { minimumFractionDigits: 2 }) || '0.00'}`,
@@ -767,6 +789,7 @@ async function addProductPerformanceContent(doc: any, data: any, startY: number)
       styles: { fontSize: 9 }
     });
     
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     currentY = (doc as any).lastAutoTable.finalY + 15;
   }
   
@@ -796,12 +819,14 @@ async function addProductPerformanceContent(doc: any, data: any, startY: number)
       styles: { fontSize: 10 }
     });
     
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     currentY = (doc as any).lastAutoTable.finalY + 15;
   }
   
   return currentY;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function addFinancialReportContent(doc: any, data: any, startY: number): Promise<number> {
   let currentY = startY;
   
@@ -826,6 +851,7 @@ async function addFinancialReportContent(doc: any, data: any, startY: number): P
       styles: { fontSize: 10 }
     });
     
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     currentY = (doc as any).lastAutoTable.finalY + 15;
   }
   
@@ -839,7 +865,7 @@ async function addFinancialReportContent(doc: any, data: any, startY: number): P
     doc.setFontSize(16);
     doc.text('Ventas por Categoría', 14, currentY);
     currentY += 10;
-    
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const categoryData = data.salesByCategory.map((category: any) => [
       category.category || 'N/A',
       `$${category.totalSales?.toLocaleString('es-ES', { minimumFractionDigits: 2 }) || '0.00'}`,
@@ -855,10 +881,10 @@ async function addFinancialReportContent(doc: any, data: any, startY: number): P
       styles: { fontSize: 9 }
     });
     
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     currentY = (doc as any).lastAutoTable.finalY + 15;
   }
-  
-  // Top Productos Vendidos
+    // Top Productos Vendidos
   if (data.topProducts && data.topProducts.length > 0) {
     if (currentY > 250) {
       doc.addPage();
@@ -869,6 +895,7 @@ async function addFinancialReportContent(doc: any, data: any, startY: number): P
     doc.text('Productos Más Vendidos', 14, currentY);
     currentY += 10;
     
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const productData = data.topProducts.map((product: any, index: number) => [
       (index + 1).toString(),
       product.name || 'N/A',
@@ -886,6 +913,7 @@ async function addFinancialReportContent(doc: any, data: any, startY: number): P
       styles: { fontSize: 8 }
     });
     
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     currentY = (doc as any).lastAutoTable.finalY + 15;
   }
   
@@ -899,7 +927,7 @@ async function addFinancialReportContent(doc: any, data: any, startY: number): P
     doc.setFontSize(16);
     doc.text('Ventas Diarias Recientes', 14, currentY);
     currentY += 10;
-    
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const dailyData = data.dailySales.slice(0, 10).map((day: any) => [
       day.date || 'N/A',
       `$${day.totalSales?.toLocaleString('es-ES', { minimumFractionDigits: 2 }) || '0.00'}`,
@@ -915,12 +943,14 @@ async function addFinancialReportContent(doc: any, data: any, startY: number): P
       styles: { fontSize: 9 }
     });
     
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     currentY = (doc as any).lastAutoTable.finalY + 15;
   }
   
   return currentY;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function addOrdersAnalysisContent(doc: any, data: any, startY: number): Promise<number> {
   let currentY = startY;
   
@@ -933,7 +963,10 @@ async function addOrdersAnalysisContent(doc: any, data: any, startY: number): Pr
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
       // Tabla de estado de órdenes
-    const orderStatusHeaders = ['Estado', 'Cantidad', 'Ingresos'];    const orderStatusData = data.statusBreakdown.map((status: any) => [
+    const orderStatusHeaders = ['Estado', 'Cantidad', 'Ingresos'];    
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const orderStatusData = data.statusBreakdown.map((status: any) => [
       getStatusText(status.status as OrderStatus) || 'N/A',
       status.count?.toString() || '0',
       `$${(status.revenue || 0).toLocaleString('es-ES')}`
@@ -948,7 +981,7 @@ async function addOrdersAnalysisContent(doc: any, data: any, startY: number): Pr
       headStyles: { fillColor: [74, 144, 226] },
       margin: { left: 14, right: 14 }
     });
-    
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any   
     currentY = (doc as any).lastAutoTable.finalY + 15;
   }
   
@@ -966,7 +999,9 @@ async function addOrdersAnalysisContent(doc: any, data: any, startY: number): Pr
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
     
-    const trendsHeaders = ['Fecha', 'Órdenes', 'Ingresos'];
+    const trendsHeaders = ['Fecha', 'Órdenes', 'Ingresos'];    
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const trendsData = data.dailyTrends.slice(0, 10).map((trend: any) => [
       trend.date || 'N/A',
       trend.orders?.toString() || '0',
@@ -983,6 +1018,7 @@ async function addOrdersAnalysisContent(doc: any, data: any, startY: number): Pr
       margin: { left: 14, right: 14 }
     });
     
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
     currentY = (doc as any).lastAutoTable.finalY + 15;
   }
   
@@ -1016,7 +1052,7 @@ async function addOrdersAnalysisContent(doc: any, data: any, startY: number): Pr
       headStyles: { fillColor: [74, 144, 226] },
       margin: { left: 14, right: 14 }
     });
-    
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     currentY = (doc as any).lastAutoTable.finalY + 15;
   }
   
@@ -1033,8 +1069,8 @@ async function addOrdersAnalysisContent(doc: any, data: any, startY: number): Pr
     
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
-    
-    const sizeHeaders = ['Rango', 'Cantidad de Órdenes'];
+    const sizeHeaders = ['Rango', 'Cantidad de Órdenes']; 
+       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const sizeData = data.orderSizeDistribution.map((size: any) => [
       size.range || 'N/A',
       size.count?.toString() || '0'
@@ -1049,7 +1085,7 @@ async function addOrdersAnalysisContent(doc: any, data: any, startY: number): Pr
       headStyles: { fillColor: [74, 144, 226] },
       margin: { left: 14, right: 14 }
     });
-    
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     currentY = (doc as any).lastAutoTable.finalY + 15;
   }
   
@@ -1058,6 +1094,7 @@ async function addOrdersAnalysisContent(doc: any, data: any, startY: number): Pr
 
 
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function addGeneralReportContent(doc: any, data: any, startY: number): Promise<number> {
   let currentY = startY;
   
@@ -1083,6 +1120,7 @@ async function addGeneralReportContent(doc: any, data: any, startY: number): Pro
       styles: { fontSize: 10 }
     });
     
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     currentY = (doc as any).lastAutoTable.finalY + 15;
   }
   
@@ -1092,11 +1130,11 @@ async function addGeneralReportContent(doc: any, data: any, startY: number): Pro
       doc.addPage();
       currentY = 20;
     }
-    
-    doc.setFontSize(16);
+      doc.setFontSize(16);
     doc.text('Productos Más Vendidos', 14, currentY);
     currentY += 5;
     
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const topProductsData = data.topProducts.slice(0, 10).map((product: any) => [
       product.name || 'N/A',
       product.category?.name || 'Sin categoría',
@@ -1112,6 +1150,7 @@ async function addGeneralReportContent(doc: any, data: any, startY: number): Pro
       styles: { fontSize: 9 }
     });
     
+// eslint-disable-next-line @typescript-eslint/no-explicit-any   
     currentY = (doc as any).lastAutoTable.finalY + 15;
   }
   
@@ -1120,6 +1159,7 @@ async function addGeneralReportContent(doc: any, data: any, startY: number): Pro
 
 // Funciones auxiliares para generar hojas Excel específicas por tipo de reporte
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function addSalesSummaryExcelSheets(workbook: any, data: any) {
   // Hoja de resumen
   if (data.summary) {
@@ -1138,6 +1178,7 @@ function addSalesSummaryExcelSheets(workbook: any, data: any) {
   if (data.topProducts && data.topProducts.length > 0) {
     const topProductsData = [
       ['Producto', 'Categoría', 'Precio', 'Vendidos', 'Ingresos'],
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ...data.topProducts.map((product: any) => [
         product.name || 'N/A',
         product.category?.name || 'Sin categoría',
@@ -1149,11 +1190,11 @@ function addSalesSummaryExcelSheets(workbook: any, data: any) {
     const topProductsSheet = XLSX.utils.aoa_to_sheet(topProductsData);
     XLSX.utils.book_append_sheet(workbook, topProductsSheet, 'Top Productos');
   }
-  
-  // Hoja de top clientes
+    // Hoja de top clientes
   if (data.topCustomers && data.topCustomers.length > 0) {
     const topCustomersData = [
       ['Cliente', 'Email', 'Total Gastado', 'Órdenes'],
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ...data.topCustomers.map((customer: any) => [
         customer.name || 'N/A',
         customer.email || 'N/A',
@@ -1164,11 +1205,11 @@ function addSalesSummaryExcelSheets(workbook: any, data: any) {
     const topCustomersSheet = XLSX.utils.aoa_to_sheet(topCustomersData);
     XLSX.utils.book_append_sheet(workbook, topCustomersSheet, 'Top Clientes');
   }
-  
-  // Hoja de ventas por categoría
+    // Hoja de ventas por categoría
   if (data.salesTrends?.byCategory && data.salesTrends.byCategory.length > 0) {
     const categoryData = [
       ['Categoría', 'Ingresos', 'Unidades Vendidas'],
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ...data.salesTrends.byCategory.map((category: any) => [
         category.name || 'N/A',
         category.revenue || 0,
@@ -1181,6 +1222,8 @@ function addSalesSummaryExcelSheets(workbook: any, data: any) {
     // Hoja de estado de órdenes
   if (data.orderStatus && data.orderStatus.length > 0) {
     const statusData = [
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ['Estado', 'Cantidad', 'Ingresos'],      ...data.orderStatus.map((status: any) => [
         getStatusText(status.status as OrderStatus) || 'N/A',
         status.count || 0,
@@ -1192,6 +1235,7 @@ function addSalesSummaryExcelSheets(workbook: any, data: any) {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function addCustomerAnalysisExcelSheets(workbook: any, data: any) {
   // Hoja de resumen de clientes
   if (data.summary) {
@@ -1210,6 +1254,7 @@ function addCustomerAnalysisExcelSheets(workbook: any, data: any) {
   if (data.topCustomers && data.topCustomers.length > 0) {
     const topCustomersData = [
       ['#', 'Cliente', 'Email', 'Total Gastado', 'Órdenes'],
+// eslint-disable-next-line @typescript-eslint/no-explicit-any   
       ...data.topCustomers.map((customer: any, index: number) => [
         index + 1,
         customer.name || 'N/A',
@@ -1238,6 +1283,7 @@ function addCustomerAnalysisExcelSheets(workbook: any, data: any) {
   if (data.customersByRegion && data.customersByRegion.length > 0) {
     const geographicData = [
       ['Región', 'Cantidad de Clientes'],
+// eslint-disable-next-line @typescript-eslint/no-explicit-any   
       ...data.customersByRegion.map((region: any) => [
         region.region || 'Sin especificar',
         region.customerCount || 0
@@ -1248,6 +1294,7 @@ function addCustomerAnalysisExcelSheets(workbook: any, data: any) {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function addProductPerformanceExcelSheets(workbook: any, data: any) {
   // Hoja de resumen de productos
   if (data.summary) {
@@ -1261,11 +1308,11 @@ function addProductPerformanceExcelSheets(workbook: any, data: any) {
     const summarySheet = XLSX.utils.aoa_to_sheet(summaryData);
     XLSX.utils.book_append_sheet(workbook, summarySheet, 'Resumen');
   }
-  
-  // Hoja de top productos
+    // Hoja de top productos
   if (data.topProducts && data.topProducts.length > 0) {
     const topProductsData = [
       ['Producto', 'Categoría', 'Precio', 'Vendidos', 'Ingresos'],
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ...data.topProducts.map((product: any) => [
         product.name || 'N/A',
         product.category?.name || 'Sin categoría',
@@ -1282,6 +1329,7 @@ function addProductPerformanceExcelSheets(workbook: any, data: any) {
   if (data.categoryAnalysis && data.categoryAnalysis.length > 0) {
     const categoryData = [
       ['Categoría', 'Productos', 'Ingresos', 'Ventas'],
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any   
       ...data.categoryAnalysis.map((category: any) => [
         category.name || 'N/A',
         category.productCount || 0,
@@ -1307,6 +1355,7 @@ function addProductPerformanceExcelSheets(workbook: any, data: any) {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function addFinancialReportExcelSheets(workbook: any, data: any) {
   // Hoja de resumen ejecutivo
   if (data.summary) {
@@ -1325,6 +1374,7 @@ function addFinancialReportExcelSheets(workbook: any, data: any) {
   if (data.salesByCategory && data.salesByCategory.length > 0) {
     const categoryData = [
       ['Categoría', 'Ventas Totales', 'Unidades', 'Órdenes'],
+// eslint-disable-next-line @typescript-eslint/no-explicit-any   
       ...data.salesByCategory.map((category: any) => [
         category.category || 'N/A',
         category.totalSales || 0,
@@ -1340,6 +1390,7 @@ function addFinancialReportExcelSheets(workbook: any, data: any) {
   if (data.topProducts && data.topProducts.length > 0) {
     const productData = [
       ['#', 'Producto', 'Categoría', 'Ventas Totales', 'Unidades', 'Precio Promedio'],
+// eslint-disable-next-line @typescript-eslint/no-explicit-any   
       ...data.topProducts.map((product: any, index: number) => [
         index + 1,
         product.name || 'N/A',
@@ -1357,6 +1408,7 @@ function addFinancialReportExcelSheets(workbook: any, data: any) {
   if (data.dailySales && data.dailySales.length > 0) {
     const dailyData = [
       ['Fecha', 'Ventas Totales', 'Órdenes', 'Ticket Promedio'],
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
       ...data.dailySales.slice(0, 10).map((day: any) => [
         day.date || 'N/A',
         day.totalSales || 0,
@@ -1369,9 +1421,11 @@ function addFinancialReportExcelSheets(workbook: any, data: any) {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function addOrdersAnalysisExcelSheets(workbook: any, data: any) {  // Hoja de distribución por estado
   if (data.statusBreakdown && data.statusBreakdown.length > 0) {
     const statusData = [
+// eslint-disable-next-line @typescript-eslint/no-explicit-any   
       ['Estado', 'Cantidad', 'Ingresos'],      ...data.statusBreakdown.map((status: any) => [
         getStatusText(status.status as OrderStatus) || 'N/A',
         status.count || 0,
@@ -1386,6 +1440,7 @@ function addOrdersAnalysisExcelSheets(workbook: any, data: any) {  // Hoja de di
   if (data.dailyTrends && data.dailyTrends.length > 0) {
     const trendsData = [
       ['Fecha', 'Órdenes', 'Ingresos'],
+// eslint-disable-next-line @typescript-eslint/no-explicit-any   
       ...data.dailyTrends.slice(0, 30).map((day: any) => [
         day.date || 'N/A',
         day.orders || 0,
@@ -1412,6 +1467,7 @@ function addOrdersAnalysisExcelSheets(workbook: any, data: any) {  // Hoja de di
   if (data.orderSizeDistribution && data.orderSizeDistribution.length > 0) {
     const sizeData = [
       ['Rango de Tamaño', 'Cantidad de Órdenes'],
+// eslint-disable-next-line @typescript-eslint/no-explicit-any   
       ...data.orderSizeDistribution.map((size: any) => [
         size.range || 'N/A',
         size.count || 0
@@ -1424,6 +1480,7 @@ function addOrdersAnalysisExcelSheets(workbook: any, data: any) {  // Hoja de di
 
 
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function addGeneralExcelSheets(workbook: any, data: any) {
   // Hoja de resumen general
   const statsToShow = data.quickStats || data.summary || {};
@@ -1443,6 +1500,7 @@ function addGeneralExcelSheets(workbook: any, data: any) {
   if (data.topProducts && data.topProducts.length > 0) {
     const topProductsData = [
       ['Producto', 'Categoría', 'Precio', 'Total Vendidos'],
+// eslint-disable-next-line @typescript-eslint/no-explicit-any   
       ...data.topProducts.map((product: any) => [
         product.name || 'N/A',
         product.category?.name || 'Sin categoría',
@@ -1458,6 +1516,7 @@ function addGeneralExcelSheets(workbook: any, data: any) {
   if (data.monthlyStats && data.monthlyStats.length > 0) {
     const monthlyData = [
       ['Mes', 'Órdenes', 'Ingresos'],
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ...data.monthlyStats.map((stat: any) => [
         stat.month || 'N/A',
         stat.orders || 0,
@@ -1471,6 +1530,7 @@ function addGeneralExcelSheets(workbook: any, data: any) {
 
 // Funciones auxiliares para generar contenido CSV específico por tipo de reporte
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function generateSalesSummaryCSV(data: any): string {
   let content = '';
   
@@ -1489,6 +1549,7 @@ function generateSalesSummaryCSV(data: any): string {
   if (data.topProducts && data.topProducts.length > 0) {
     content += 'PRODUCTOS MÁS VENDIDOS\n';
     content += 'Producto,Categoría,Precio,Vendidos,Ingresos\n';
+// eslint-disable-next-line @typescript-eslint/no-explicit-any   
     data.topProducts.forEach((product: any) => {
       content += `"${product.name || 'N/A'}","${product.category?.name || 'Sin categoría'}",${product.price || 0},${product.totalSold || 0},${product.revenue || 0}\n`;
     });
@@ -1499,6 +1560,7 @@ function generateSalesSummaryCSV(data: any): string {
   if (data.topCustomers && data.topCustomers.length > 0) {
     content += 'MEJORES CLIENTES\n';
     content += 'Cliente,Email,Total Gastado,Órdenes\n';
+// eslint-disable-next-line @typescript-eslint/no-explicit-any   
     data.topCustomers.forEach((customer: any) => {
       content += `"${customer.name || 'N/A'}","${customer.email || 'N/A'}",${customer.totalSpent || 0},${customer.orderCount || 0}\n`;
     });
@@ -1509,6 +1571,8 @@ function generateSalesSummaryCSV(data: any): string {
   if (data.salesTrends?.byCategory && data.salesTrends.byCategory.length > 0) {
     content += 'VENTAS POR CATEGORÍA\n';
     content += 'Categoría,Ingresos,Unidades Vendidas\n';
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any   
     data.salesTrends.byCategory.forEach((category: any) => {
       content += `"${category.name || 'N/A'}",${category.revenue || 0},${category.sales || 0}\n`;
     });
@@ -1517,6 +1581,7 @@ function generateSalesSummaryCSV(data: any): string {
     // Estado de órdenes
   if (data.orderStatus && data.orderStatus.length > 0) {
     content += 'ESTADO DE ÓRDENES\n';
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
     content += 'Estado,Cantidad,Ingresos\n';    data.orderStatus.forEach((status: any) => {
       content += `${getStatusText(status.status as OrderStatus) || 'N/A'},${status.count || 0},${status.revenue || 0}\n`;
     });
@@ -1526,6 +1591,7 @@ function generateSalesSummaryCSV(data: any): string {
   return content;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function generateCustomerAnalysisCSV(data: any): string {
   let content = '';
   
@@ -1542,6 +1608,7 @@ function generateCustomerAnalysisCSV(data: any): string {
   if (data.topCustomers && data.topCustomers.length > 0) {
     content += 'PRINCIPALES CLIENTES\n';
     content += '#,Cliente,Email,Total Gastado,Órdenes\n';
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
     data.topCustomers.forEach((customer: any, index: number) => {
       content += `${index + 1},"${customer.name || 'N/A'}","${customer.email || 'N/A'}",${customer.totalSpent || 0},${customer.orderCount || 0}\n`;
     });
@@ -1561,6 +1628,7 @@ function generateCustomerAnalysisCSV(data: any): string {
   if (data.customersByRegion && data.customersByRegion.length > 0) {
     content += 'DISTRIBUCIÓN GEOGRÁFICA\n';
     content += 'Región,Cantidad de Clientes\n';
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
     data.customersByRegion.forEach((region: any) => {
       content += `"${region.region || 'Sin especificar'}",${region.customerCount || 0}\n`;
     });
@@ -1570,6 +1638,7 @@ function generateCustomerAnalysisCSV(data: any): string {
   return content;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function generateProductPerformanceCSV(data: any): string {
   let content = '';
     // Resumen de productos
@@ -1586,6 +1655,7 @@ function generateProductPerformanceCSV(data: any): string {
   if (data.topProducts && data.topProducts.length > 0) {
     content += 'PRODUCTOS MÁS VENDIDOS\n';
     content += 'Producto,Categoría,Precio,Vendidos,Ingresos\n';
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
     data.topProducts.forEach((product: any) => {
       content += `"${product.name || 'N/A'}","${product.category?.name || 'Sin categoría'}",${product.price || 0},${product.totalSold || 0},${product.revenue || 0}\n`;
     });
@@ -1596,6 +1666,7 @@ function generateProductPerformanceCSV(data: any): string {
   if (data.categoryAnalysis && data.categoryAnalysis.length > 0) {
     content += 'ANÁLISIS POR CATEGORÍA\n';
     content += 'Categoría,Productos,Ingresos,Ventas,Participación\n';
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
     data.categoryAnalysis.forEach((category: any) => {
       content += `"${category.name || 'N/A'}",${category.products || 0},${category.revenue || 0},${category.sales || 0},${category.percentage || 0}%\n`;
     });
@@ -1614,6 +1685,7 @@ function generateProductPerformanceCSV(data: any): string {
   return content;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function generateFinancialReportCSV(data: any): string {
   let content = '';
   
@@ -1631,6 +1703,8 @@ function generateFinancialReportCSV(data: any): string {
   if (data.salesByCategory && data.salesByCategory.length > 0) {
     content += 'VENTAS POR CATEGORÍA\n';
     content += 'Categoría,Ventas Totales,Unidades,Órdenes\n';
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     data.salesByCategory.forEach((category: any) => {
       content += `"${category.category || 'N/A'}",${category.totalSales || 0},${category.totalQuantity || 0},${category.orderCount || 0}\n`;
     });
@@ -1641,7 +1715,9 @@ function generateFinancialReportCSV(data: any): string {
   if (data.topProducts && data.topProducts.length > 0) {
     content += 'PRODUCTOS MÁS VENDIDOS\n';
     content += '#,Producto,Categoría,Ventas Totales,Unidades,Precio Promedio\n';
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
     data.topProducts.forEach((product: any, index: number) => {
+
       content += `${index + 1},"${product.name || 'N/A'}","${product.category || 'Sin categoría'}",${product.totalSales || 0},${product.totalQuantity || 0},${product.averagePrice || 0}\n`;
     });
     content += '\n';
@@ -1651,6 +1727,7 @@ function generateFinancialReportCSV(data: any): string {
   if (data.dailySales && data.dailySales.length > 0) {
     content += 'VENTAS DIARIAS RECIENTES\n';
     content += 'Fecha,Ventas Totales,Órdenes,Ticket Promedio\n';
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
     data.dailySales.slice(0, 10).forEach((day: any) => {
       const avgTicket = day.orderCount > 0 ? (day.totalSales / day.orderCount) : 0;
       content += `"${day.date || 'N/A'}",${day.totalSales || 0},${day.orderCount || 0},${avgTicket}\n`;
@@ -1661,11 +1738,14 @@ function generateFinancialReportCSV(data: any): string {
   return content;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function generateOrdersAnalysisCSV(data: any): string {
   let csv = '';
   // Distribución por estado
   if (data.statusBreakdown && data.statusBreakdown.length > 0) {
     csv += 'DISTRIBUCIÓN POR ESTADO\n';
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     csv += 'Estado,Cantidad,Ingresos\n';    data.statusBreakdown.forEach((status: any) => {
       csv += `${getStatusText(status.status as OrderStatus) || 'N/A'},${status.count || 0},${status.revenue || 0}\n`;
     });
@@ -1676,6 +1756,7 @@ function generateOrdersAnalysisCSV(data: any): string {
   if (data.dailyTrends && data.dailyTrends.length > 0) {
     csv += 'TENDENCIAS DIARIAS (últimos 30 días)\n';
     csv += 'Fecha,Órdenes,Ingresos\n';
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
     data.dailyTrends.slice(0, 30).forEach((day: any) => {
       csv += `${day.date || 'N/A'},${day.orders || 0},${day.revenue || 0}\n`;
     });
@@ -1696,6 +1777,7 @@ function generateOrdersAnalysisCSV(data: any): string {
   if (data.orderSizeDistribution && data.orderSizeDistribution.length > 0) {
     csv += 'DISTRIBUCIÓN POR TAMAÑO DE ORDEN\n';
     csv += 'Rango,Cantidad\n';
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
     data.orderSizeDistribution.forEach((size: any) => {
       csv += `${size.range || 'N/A'},${size.count || 0}\n`;
     });
@@ -1707,6 +1789,7 @@ function generateOrdersAnalysisCSV(data: any): string {
 
 
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function generateGeneralCSV(data: any): string {
   let content = '';
   
@@ -1725,6 +1808,7 @@ function generateGeneralCSV(data: any): string {
   if (data.topProducts && data.topProducts.length > 0) {
     content += 'PRODUCTOS MÁS VENDIDOS\n';
     content += 'Producto,Categoría,Precio,Total Vendidos\n';
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     data.topProducts.forEach((product: any) => {
       content += `"${product.name || 'N/A'}","${product.category?.name || 'Sin categoría'}",${product.price || 0},${product.totalSold || 0}\n`;
     });
@@ -1735,6 +1819,8 @@ function generateGeneralCSV(data: any): string {
   if (data.monthlyStats && data.monthlyStats.length > 0) {
     content += 'ESTADÍSTICAS MENSUALES\n';
     content += 'Mes,Órdenes,Ingresos\n';
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any   
     data.monthlyStats.forEach((stat: any) => {
       content += `${stat.month || 'N/A'},${stat.orders || 0},${stat.revenue || 0}\n`;
     });
@@ -1743,7 +1829,9 @@ function generateGeneralCSV(data: any): string {
     // Estado de órdenes
   if (data.orderStatusData && data.orderStatusData.length > 0) {
     content += 'ESTADO DE ÓRDENES\n';
-    content += 'Estado,Cantidad\n';    data.orderStatusData.forEach((status: any) => {
+    content += 'Estado,Cantidad\n';  
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      data.orderStatusData.forEach((status: any) => {
       content += `${getStatusText(status.status as OrderStatus) || 'N/A'},${status.count || 0}\n`;
     });
     content += '\n';

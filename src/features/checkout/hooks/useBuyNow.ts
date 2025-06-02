@@ -39,6 +39,7 @@ export const useBuyNow = () => {
       }
 
       // Use default address or first available
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const defaultAddress = addresses.find((addr: any) => addr.isDefault) || addresses[0];
 
       // Create buy now checkout session

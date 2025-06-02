@@ -37,7 +37,7 @@ export const DeleteProductDialog = ({ productId, productName }: DeleteProductDia
       <AlertDialogContent>        <AlertDialogHeader>
           <AlertDialogTitle>¿Eliminar producto?</AlertDialogTitle>
           <AlertDialogDescription>
-            El producto <strong>"{productName}"</strong> quedará eliminado y no se podrá recuperar.
+            El producto <strong>&quot;{productName}&quot;</strong> quedará eliminado y no se podrá recuperar.
             Su estado pasará a DELETED y ya no aparecerá en la tabla de productos ni en la tienda.
             Esta acción no se puede deshacer.
           </AlertDialogDescription>

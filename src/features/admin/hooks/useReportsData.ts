@@ -63,6 +63,7 @@ export function useReportsData(dateRange: string = '30d') {
 
   useEffect(() => {
     fetchData();
+    
   }, [dateRange]);
 
   const refetch = () => {

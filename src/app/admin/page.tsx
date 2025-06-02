@@ -1,19 +1,18 @@
 "use client";
 
-import React from "react";
-import { useDashboardStats } from "@/features/admin/hooks/useDashboardStats";
-import OverviewCards from "@/features/admin/components/OverviewCards";
-import RevenueChart from "@/features/admin/components/RevenueChart";
-import RecentOrdersTable from "@/features/admin/components/RecentOrdersTable";
-import TopProducts from "@/features/admin/components/TopProducts";
 import OrderStatusChart from "@/features/admin/components/OrderStatusChart";
+import OverviewCards from "@/features/admin/components/OverviewCards";
+import QuickActions from "@/features/admin/components/QuickActions";
 import QuickStats from "@/features/admin/components/QuickStats";
 import RecentActivity from "@/features/admin/components/RecentActivity";
-import QuickActions from "@/features/admin/components/QuickActions";
-import { RefreshCw, Settings, Bell } from "lucide-react";
+import RecentOrdersTable from "@/features/admin/components/RecentOrdersTable";
+import RevenueChart from "@/features/admin/components/RevenueChart";
+import TopProducts from "@/features/admin/components/TopProducts";
+import { useDashboardStats } from "@/features/admin/hooks/useDashboardStats";
+import { RefreshCw } from "lucide-react";
 
 export default function AdminDashboard() {
-  const { stats, isLoading, error, refetch } = useDashboardStats();
+  const { stats,  error, refetch } = useDashboardStats();
 
   if (error) {
     return (

@@ -724,6 +724,7 @@ async function generateOrdersAnalysisReport(startDate: Date, endDate: Date) {
 
 
 // Función auxiliar para enriquecer datos de productos
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function enrichProductData(productData: any[]) {
   return Promise.all(
     productData.map(async (item) => {
@@ -751,7 +752,7 @@ async function enrichProductData(productData: any[]) {
 }
 
 // Función auxiliar para calcular tasa de crecimiento
-function calculateGrowthRate(current: number, previous: number): number {
-  if (previous === 0) return current > 0 ? 100 : 0;
-  return ((current - previous) / previous) * 100;
-}
+// function calculateGrowthRate(current: number, previous: number): number {
+//   if (previous === 0) return current > 0 ? 100 : 0;
+//   return ((current - previous) / previous) * 100;
+// }

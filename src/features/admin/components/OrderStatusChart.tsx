@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from "recharts";
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import { Clock, Package, Truck, CheckCircle, XCircle } from "lucide-react";
 
 interface OrderStatusData {
@@ -38,6 +38,7 @@ export default function OrderStatusChart({ data = [] }: OrderStatusChartProps) {
     return statusConfig[status as keyof typeof statusConfig] || { label: status, icon: Package };
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
