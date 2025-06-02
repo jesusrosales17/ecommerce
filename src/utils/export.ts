@@ -14,7 +14,7 @@ export interface ExportData {
     totalRevenue: number;
     userGrowthPercentage: number;
   };
-  recentOrders: Array<{
+  recentOrders: Array<{ 
     id: string;
     total: number;
     status: string;
