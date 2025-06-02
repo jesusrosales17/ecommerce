@@ -8,6 +8,7 @@ export interface CategoryStore  {
     setCategoryToUpdate: (category: Category) => void;
     addCategory: (category: Category) => void;
     updateCategory: (category: Category) => void;
+    deleteCategory: (categoryId: string) => void;
     setCategoryToShow: (category: Category) => void;
     // category drawer 
     isOpenDrawer: boolean;

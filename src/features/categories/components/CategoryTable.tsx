@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import { useCategoryStore } from "../store/useCategoryStore";
 import { SearchInput } from "@/components/ui/SearchInput";
 import { useState,  useMemo } from "react";
+import { DeleteCategoryDialog } from "./DeleteCategoryDialog";
 
 interface Props {
   categories: Category[];
@@ -113,17 +114,15 @@ export function CategoryTable({ categories }: Props) {
                           <Eye />
                           Ver detalles
                         </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-
-                        <DropdownMenuItem onClick={() => handleEdit(category)}>
+                        <DropdownMenuSeparator />                        <DropdownMenuItem onClick={() => handleEdit(category)}>
                           <Edit />
                           Editar
                         </DropdownMenuItem>
 
-                        <DropdownMenuItem className="text-red-500">
-                          <Trash />
-                          Eliminar
-                        </DropdownMenuItem>
+                        <DeleteCategoryDialog 
+                          categoryId={category.id}
+                          categoryName={category.name}
+                        />
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>

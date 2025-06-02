@@ -121,3 +121,75 @@ export async function PUT(request: Request, { params }: Params) {
         );
     }
 }
+
+// Eliminar una categoría (borrado lógico)
+export async function DELETE(request: Request, { params }: Params) {
+    try {
+        const auth = await requireAuth();
+
+        if (!auth.isAutenticated) {
+            return auth.response;
+        }
+
+        // Obtener el id de la categoría
+        const { id } = await params;
+
+        // Verificar si la categoría existe
+        const category = await prisma.category.findUnique({
+            where: {
+                id,
+            },
+        });
+
+        if (!category) {
+            return NextResponse.json({
+                error: "La categoría no existe",
+            }, { status: 404 });
+        }
+
+        // Verificar si la categoría ya está eliminada
+        if (category.status === 'DELETED') {
+            return NextResponse.json({
+                error: "La categoría ya está eliminada",
+            }, { status: 400 });
+        }
+
+        // Verificar si hay productos activos asociados a esta categoría
+        const activeProductsCount = await prisma.product.count({
+            where: {
+                categoryId: id,
+                status: {
+                    not: 'DELETED'
+                }
+            }
+        });
+
+        if (activeProductsCount > 0) {
+            return NextResponse.json({
+                error: `No se puede eliminar la categoría porque tiene ${activeProductsCount} producto(s) activo(s) asociado(s). Primero debe eliminar, desactivar o mover los productos a otra categoría.`,
+            }, { status: 400 });
+        }
+
+        // Actualizar el status de la categoría a DELETED (soft delete)
+        const deletedCategory = await prisma.category.update({
+            where: {
+                id
+            },
+            data: {
+                status: 'DELETED',
+            }
+        });
+
+        return NextResponse.json({
+            message: "Categoría eliminada correctamente",
+            category: deletedCategory,
+        }, { status: 200 });
+
+    } catch (error) {
+        console.error('Error al eliminar la categoría:', error);
+        
+        return NextResponse.json({
+            error: 'Error al eliminar la categoría',
+        }, { status: 500 });
+    }
+}
