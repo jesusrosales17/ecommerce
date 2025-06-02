@@ -73,12 +73,26 @@ export function AddressForm({
       let result;
       if (initialData) {
         result = await updateAddress(initialData.id, {
-          ...data,
+          name: data.name,
+          street: data.street,
+          city: data.city,
+          state: data.state,
+          postalCode: data.postalCode,
+          country: data.country,
+          phone: data.phone,
+          isDefault: data.isDefault,
           reference: data.reference || "" // Ensure reference is always a string
         });
       } else {
         result = await createAddress({
-          ...data,
+          name: data.name,
+          street: data.street,
+          city: data.city,
+          state: data.state,
+          postalCode: data.postalCode,
+          country: data.country,
+          phone: data.phone,
+          isDefault: data.isDefault,
           reference: data.reference || "" // Ensure reference is always a string
         });
       }
