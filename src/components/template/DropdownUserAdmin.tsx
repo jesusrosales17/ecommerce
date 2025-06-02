@@ -42,7 +42,7 @@ export const DropdownUser = async () => {
         <DropdownMenuSeparator />
         <DropdownMenuItem>Perfil</DropdownMenuItem>
         <DropdownMenuItem>Configuración</DropdownMenuItem>
-        <DropdownMenuItem>Facturación</DropdownMenuItem>
+        {/* <DropdownMenuItem>Facturación</DropdownMenuItem> */}
         <DropdownMenuSeparator />
         <DropdownMenuItem className="text-red-500">
           <SignOutButton className="flex items-center gap-2 w-full">

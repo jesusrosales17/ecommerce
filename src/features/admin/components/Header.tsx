@@ -9,11 +9,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-import { ChevronDown, LogOut } from "lucide-react";
+import { ChevronDown, LogOut, Settings } from "lucide-react";
 import { getInitials } from "@/libs/utils";
 import { SignOutButton } from "@/components/auth/SignOutButton";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
+import Link from "next/link";
 
 export const Header = async () => {
   const session = await getServerSession(authOptions);
@@ -43,9 +44,13 @@ export const Header = async () => {
           <DropdownMenuLabel>Mi Cuenta</DropdownMenuLabel>
           {/* <DropdownMenuLabel className="text-xs font-normal opacity-60">{userEmail}</DropdownMenuLabel> */}
           <DropdownMenuSeparator />
-          <DropdownMenuItem>Perfil</DropdownMenuItem>
-          <DropdownMenuItem>Configuración</DropdownMenuItem>
-          <DropdownMenuItem>Facturación</DropdownMenuItem>
+          <DropdownMenuItem>
+            <Link href="/admin/settings" className="flex items-center gap-2 w-full p-2">
+            <Settings />
+            Configuraciones
+              </Link>
+          </DropdownMenuItem>
+          {/* <DropdownMenuItem>Facturación</DropdownMenuItem> */}
           <DropdownMenuSeparator />
           <DropdownMenuItem className="text-red-500 p-0">
             <SignOutButton className="flex items-center gap-2 w-full p-2 justify-start">
