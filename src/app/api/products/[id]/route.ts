@@ -74,6 +74,11 @@ export async function PUT(request: Request, { params }: Params) {
     const formData = await request.formData();
     const generalInformation = JSON.parse(formData.get('general')?.toString() || '{}');
 
+    let categoryId = generalInformation.categoryId;
+
+
+
+
     const validatedData = await productFormSchema.parseAsync({
       name: generalInformation.name,
       description: generalInformation.description,
@@ -85,8 +90,11 @@ export async function PUT(request: Request, { params }: Params) {
       salePrice: generalInformation.salePrice,
       isFeatured: generalInformation.isFeatured,
       status: generalInformation.status || existingProduct.status,
-      categoryId: generalInformation.categoryId,
+      categoryId:  categoryId
     });
+    if(!categoryId || categoryId === 'undefined') {
+      categoryId = null;
+    }
     
     // 4. Preparar imágenes a eliminar
     const imagesToDelete = JSON.parse(formData.get('imagesToDelete')?.toString() || '[]');
@@ -130,7 +138,7 @@ export async function PUT(request: Request, { params }: Params) {
           salePrice: validatedData.salePrice,
           isFeatured: validatedData.isFeatured,
           status: validatedData.status,
-          categoryId: validatedData.categoryId,
+          categoryId: categoryId,
         },
       });
 

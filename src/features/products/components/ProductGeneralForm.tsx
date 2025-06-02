@@ -188,7 +188,7 @@ export const ProductGeneralForm = forwardRef((_, ref) => {
                           ))}
                         </SelectGroup>
                       ) : (
-                        <SelectItem value="undefinedk">
+                        <SelectItem value="undefined" disabled>
                           No hay categorias
                         </SelectItem>
                       )
