@@ -26,8 +26,8 @@ export function CategoryFormDrawer() {
         direction={isMobile ? "bottom" : "right"}
       >
 
-        <DrawerContent>
-          <div className={`overflow-y-auto`}>
+        <DrawerContent className="">
+          <div className={`overflow-y-auto h-full`}>
           <DrawerHeader>
             <DrawerTitle className="text-2xl">
               {categoryToUpdate ? "Actualizar categoria" : "Nueva categoria"}

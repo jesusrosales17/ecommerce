@@ -21,7 +21,7 @@ export const CategoryForm = () => {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className=" h-full flex flex-col justify-between"
+        className="  flex flex-col justify-between"
       >
         <div className="space-y-4">
           <FormField
