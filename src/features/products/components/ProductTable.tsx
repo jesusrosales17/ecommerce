@@ -23,6 +23,7 @@ import { useState, useMemo } from "react";
 import Link from "next/link";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { formattedPrice } from '@/utils/price';
+import { DeleteProductDialog } from './DeleteProductDialog';
 
 interface Category {
   id: string;
@@ -151,19 +152,17 @@ const ProductTable = ({ products, categories }: Props) => {
                             Ver detalles
                           </DropdownMenuItem>
                         </Link>
-                        <DropdownMenuSeparator />
-
-                        <Link href={`/admin/products/update/${product.id}`}>
+                        <DropdownMenuSeparator />                        <Link href={`/admin/products/update/${product.id}`}>
                           <DropdownMenuItem>
                             <Edit className="mr-2 h-4 w-4" />
                             Editar
                           </DropdownMenuItem>
                         </Link>
 
-                        <DropdownMenuItem className="text-red-500">
-                          <Trash className="mr-2 h-4 w-4" />
-                          Eliminar
-                        </DropdownMenuItem>
+                        <DeleteProductDialog 
+                          productId={product.id}
+                          productName={product.name}
+                        />
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
