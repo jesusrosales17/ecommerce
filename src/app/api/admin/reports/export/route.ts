@@ -23,8 +23,8 @@ export async function GET(request: NextRequest) {
     }    // Obtener datos para la exportación
     // Obtener cookies de la petición original para mantener la sesión
     const cookieHeader = request.headers.get('cookie');
-    
-    const reportDataResponse = await fetch(`${request.nextUrl.origin}/api/admin/reports?dateRange=${dateRange}`, {
+
+    const reportDataResponse = await fetch(`http://localhost:3000/api/admin/reports?dateRange=${dateRange}`, {
       headers: {
         cookie: cookieHeader || ''
       }
