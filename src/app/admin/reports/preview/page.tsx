@@ -138,10 +138,24 @@ export default function ReportPreviewPage() {
       console.error("Error downloading report:", error);
     }
   };
-
   const handlePrint = () => {
     window.print();
-  };  // Loading state is now handled by loading.tsx
+  };
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="container mx-auto p-6">
+        <div className="text-center py-12">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary mx-auto mb-4"></div>
+          <h2 className="text-2xl font-semibold mb-2">Cargando reporte...</h2>
+          <p className="text-muted-foreground">
+            Obteniendo datos del reporte, por favor espera un momento.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   if (error) {
     return (
