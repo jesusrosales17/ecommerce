@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { CategoryStore } from '../interfaces/categoryStore';
+import { CategoryStore, CategorySearchParams } from '../interfaces/categoryStore';
 import { Category } from '@prisma/client';
 
 export const useCategoryStore = create<CategoryStore>()((set, get) => ({
@@ -55,15 +55,48 @@ export const useCategoryStore = create<CategoryStore>()((set, get) => ({
             isOpenInfoDrawer: isOpen,
             categoryToShow: null,
         })
-    },
-    categoriesFetch: async () => {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/categories`, {
-            method: 'GET',
-            cache: 'no-store',
-        });
-        const data = await res.json();
-        set({
-            categories: data,
-        })
+    },    categoriesFetch: async (params?: CategorySearchParams) => {
+        try {
+            // Build query parameters
+            const queryParams = new URLSearchParams();
+            
+            if (params?.status) {
+                queryParams.append('status', params.status);
+            }
+            if (params?.search) {
+                queryParams.append('search', params.search);
+            }
+            if (params?.sortBy) {
+                queryParams.append('sortBy', params.sortBy);
+            }
+            if (params?.sortOrder) {
+                queryParams.append('sortOrder', params.sortOrder);
+            }
+            if (params?.limit) {
+                queryParams.append('limit', params.limit.toString());
+            }
+            if (params?.page) {
+                queryParams.append('page', params.page.toString());
+            }
+
+            const url = `/api/categories${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+            
+            const res = await fetch(url, {
+                method: 'GET',
+                cache: 'no-store',
+            });
+            
+            if (!res.ok) {
+                throw new Error('Error fetching categories');
+            }
+            
+            const data = await res.json();
+            set({
+                categories: data,
+            });
+        } catch (error) {
+            console.error('Error fetching categories:', error);
+            // Optionally set an error state or show toast
+        }
     },
 }))

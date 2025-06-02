@@ -7,8 +7,7 @@ export const metadata = {
 
 const CategoryPage = async () => {
   const base_url = process.env.NEXT_PUBLIC_URL;
-
-  const res = await fetch(`${base_url}/api/categories`, {
+  const res = await fetch(`${base_url}/api/categories?status=ALL`, {
     method: "GET",
     cache: "no-store",
   });

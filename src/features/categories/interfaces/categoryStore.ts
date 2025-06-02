@@ -1,5 +1,14 @@
 import { Category } from "@prisma/client";
 
+export interface CategorySearchParams {
+    status?: string;
+    search?: string;
+    sortBy?: string;
+    sortOrder?: string;
+    limit?: number;
+    page?: number;
+}
+
 export interface CategoryStore  {
     categories: Category[];
     categoryToUpdate: Category | null;
@@ -18,5 +27,5 @@ export interface CategoryStore  {
     isOpenInfoDrawer: boolean;
     setIsOpenInfoDrawer: (isOpen: boolean) => void;
 
-    categoriesFetch: () => Promise<void>;
+    categoriesFetch: (params?: CategorySearchParams) => Promise<void>;
 }

@@ -14,7 +14,7 @@ const ProductPage = async () => {
 
 const [res, resCategories] = await Promise.all([
   fetch(`${process.env.NEXT_PUBLIC_URL}/api/products?status=ALL`, { method: "GET", cache: "no-store" }),
-  fetch(`${process.env.NEXT_PUBLIC_URL}/api/categories`, { method: "GET", cache: "no-store" }),
+  fetch(`${process.env.NEXT_PUBLIC_URL}/api/categories?status=ALL`, { method: "GET", cache: "no-store" }),
 ]);
  
 

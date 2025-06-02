@@ -4,7 +4,7 @@ import { categorySchema } from "@/features/categories/schemas/categorySchema";
 import { z } from "zod";
 import { requireAuth } from "@/libs/auth/auth";
 import { saveImage } from "@/libs/media/image-handler";
-import { CategoryStatus } from "@prisma/client";
+import { CategoryStatus, Prisma } from "@prisma/client";
 
 export async function POST(request: NextRequest) {
   try {
@@ -70,17 +70,57 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET() {
-
+export async function GET(request: NextRequest) {
   try {
+    // Get query parameters for filtering
+    const searchParams = request.nextUrl.searchParams;
+    const status = searchParams.get('status') || 'ACTIVE';
+    const search = searchParams.get('search');
+    const sortBy = searchParams.get('sortBy') || 'createdAt';
+    const sortOrder = searchParams.get('sortOrder') || 'desc';
+    const limit = parseInt(searchParams.get('limit') || '0');
+    const page = parseInt(searchParams.get('page') || '1');
+
+    // Build filtering conditions
+    const where: Prisma.CategoryWhereInput = {
+      NOT: {
+        status: 'DELETED',
+      }
+    };
+
+    // Apply status filter (unless status is 'ALL')
+    if (status !== 'ALL') {
+      where.status = status as CategoryStatus;
+    }
+
+    // Apply search filter
+    if (search) {
+      where.OR = [
+        { name: { contains: search } },
+        { description: { contains: search } }
+      ];
+    }
+
+    // Get categories with filtering, sorting, and pagination
     const categories = await prisma.category.findMany({
+      where,
       orderBy: {
-        createdAt: "desc",
+        [sortBy]: sortOrder,
       },
-      where: {
-        status: {
-          not: "DELETED",
-        },
+      take: limit || undefined,
+      skip: limit ? (page - 1) * limit : undefined,
+      include: {
+        _count: {
+          select: {
+            products: {
+              where: {
+                status: {
+                  not: 'DELETED'
+                }
+              }
+            }
+          }
+        }
       }
     });
 
