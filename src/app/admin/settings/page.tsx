@@ -14,6 +14,7 @@ import { Settings, User, Key, ExternalLink, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
+import { useSession } from "next-auth/react";
 
 interface UserProfile {
   id: string;
@@ -28,8 +29,8 @@ interface UserProfile {
 }
 
 export default function SettingsPage() {
+  const { data: session, update } = useSession();
   const [user, setUser] = useState<UserProfile | null>(null);
-  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -53,12 +54,9 @@ export default function SettingsPage() {
         });
       } else {
         toast.error("Error al cargar el perfil");
-      }
-    } catch (error) {
+      }    } catch (error) {
       console.error("Error:", error);
       toast.error("Error al cargar el perfil");
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -73,11 +71,20 @@ export default function SettingsPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(formData),
-      });
-
-      if (response.ok) {
+      });      if (response.ok) {
         const updatedUser = await response.json();
         setUser(updatedUser);
+        
+        // Actualizar la sesión con los nuevos datos
+        await update({
+          ...session,
+          user: {
+            ...session?.user,
+            name: updatedUser.name,
+            username: updatedUser.username,
+          }
+        });
+        
         toast.success("Perfil actualizado correctamente");
       } else {
         const error = await response.json();

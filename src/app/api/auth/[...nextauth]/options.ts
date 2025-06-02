@@ -36,24 +36,28 @@ export const authOptions: NextAuthOptions = {
 
         if (!isPasswordValid) {
           throw new Error("la contraseña es incorrecta");
-        }
-
-        return {
+        }        return {
           id: user.id,
           email: user.email,
           name: user.name,
+          username: user.username || undefined, // Convert null to undefined
           role: user.role,
           image: user.image || undefined // Convert null to undefined
         };
       }
     })
-  ],
-  callbacks: {
-    async session({ session, user, token }) {
+  ],  callbacks: {
+    async session({ session, user, token, trigger, newSession }) {
+      // Manejar actualizaciones de sesión
+      if (trigger === "update" && newSession) {
+        session.user.name = newSession.user?.name || session.user.name;
+        session.user.username = newSession.user?.username || session.user.username;
+      }
      
       if (user) {
         session.user.id = user.id;
         session.user.role = user.role;
+        session.user.username = user.username;
         // Asegurándonos de pasar la imagen si existe
         if (user.image) {
           session.user.image = user.image;
@@ -62,6 +66,7 @@ export const authOptions: NextAuthOptions = {
       else if (token) {
         session.user.id = token.sub as string;
         session.user.role = token.role as string;
+        session.user.username = token.username as string;
         // Pasando la imagen del token si existe
         if (token.picture) {
           session.user.image = token.picture as string;
@@ -70,15 +75,21 @@ export const authOptions: NextAuthOptions = {
         }
       }
       return session;
-    },
-    async jwt({ token, user, account, profile }) {
+    },    async jwt({ token, user, account, profile, trigger, session }) {
       if (user) {
         token.role = user.role as Role;
         token.id = user.id;
+        token.username = user.username;
         // Guardando la imagen en el token si existe
         if (user.image) {
           token.image = user.image;
         }
+      }
+      
+      // Manejar actualizaciones del token
+      if (trigger === "update" && session) {
+        token.name = session.user?.name || token.name;
+        token.username = session.user?.username || token.username;
       }
       
       // Para proveedores OAuth como Google, la imagen viene en profile

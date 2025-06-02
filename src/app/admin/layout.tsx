@@ -1,6 +1,7 @@
 
 import { SidebarProvider } from "@/components/ui/sidebar";
 import AdminLayout from "@/features/admin/components/AdminLayout";
+import { AuthProvider } from "@/app/providers";
 
 export default function AdminDashboardLayout({
   children,
@@ -8,8 +9,10 @@ export default function AdminDashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <SidebarProvider>
-      <AdminLayout>{children}</AdminLayout>
-    </SidebarProvider>
+    <AuthProvider>
+      <SidebarProvider>
+        <AdminLayout>{children}</AdminLayout>
+      </SidebarProvider>
+    </AuthProvider>
   );
 }
