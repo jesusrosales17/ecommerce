@@ -2,10 +2,12 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
+import { useCategoryStore } from '../store/useCategoryStore';
 
 export const useCategoryActions = () => {
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
   const router = useRouter();
+  const { deleteCategory: deleteCategoryFromStore } = useCategoryStore();
 
   const deleteCategory = async (categoryId: string) => {
     try {
@@ -22,12 +24,10 @@ export const useCategoryActions = () => {
 
       if (!response.ok) {
         throw new Error(result.error || 'Error al eliminar la categoría');
-      }
-
-      toast.success('Categoría eliminada correctamente');
+      }      toast.success('Categoría eliminada correctamente');
       
-      // Refrescar la página para actualizar la lista
-      router.refresh();
+      // Eliminar la categoría del store local
+      deleteCategoryFromStore(categoryId);
       
       return { success: true };
     } catch (error) {

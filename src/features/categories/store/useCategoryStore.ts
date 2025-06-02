@@ -24,12 +24,17 @@ export const useCategoryStore = create<CategoryStore>()((set, get) => ({
             isOpenDrawer: false,
         })
 
-    },
-    updateCategory: (category: Category) => {
+    },    updateCategory: (category: Category) => {
         const updatedCategories = get().categories.map((cat) => cat.id === category.id ? category : cat);
         set({
             categories: updatedCategories,
             isOpenDrawer: false,
+        })
+    },
+    deleteCategory: (categoryId: string) => {
+        const filteredCategories = get().categories.filter((cat) => cat.id !== categoryId);
+        set({
+            categories: filteredCategories,
         })
     },
     setCategoryToShow: (category) => {
