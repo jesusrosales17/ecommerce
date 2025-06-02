@@ -12,6 +12,7 @@ interface Props {
     isOnSale: boolean;
     stock: number;
     category?: string;
+    status: string;
   };
 }
 
@@ -20,9 +21,7 @@ export const ProductInfo = ({ product }: Props) => {
     <>
       <div>
         <h1 className="text-2xl font-bolkd text-gray-900">{product.name}</h1>
-        <Badge className="mt-2">
-            {product.category || "Sin categoría"}
-        </Badge>
+        <Badge className="mt-2">{product.category || "Sin categoría"}</Badge>
         {/* Rating y reviews */}
         {/* {product.reviews?.length > 0 && (
                 <div className="flex items-center mt-2">
@@ -86,10 +85,17 @@ export const ProductInfo = ({ product }: Props) => {
               : "Agotado"}
           </p>
         </div>
-      </div>        {/* Botones de acción */}
+      </div>{" "}
+      {/* Botones de acción */}
       <div className="space-y-4">
         {/* Utilizamos el componente BuyNowButton y AddToCartButton */}
-        <div className="flex items-end gap-3">
+        {product.status !== "ACTIVE" && (
+          <p className="text-sm text-red-600">
+            Este producto no está disponible para la compra.
+          </p>
+        )}
+        {product.stock > 0 ? (
+          <div className="flex items-end gap-3">
             <BuyNowButton
               productId={product.id}
               maxStock={product.stock}
@@ -100,7 +106,10 @@ export const ProductInfo = ({ product }: Props) => {
             <div>
               <ButtonsCardProduct productId={product.id} />
             </div>
-        </div>
+          </div>
+        ) : (
+          <p className="text-sm text-red-600">Este producto está agotado.</p>
+        )}
       </div>
     </>
   );

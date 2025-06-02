@@ -53,6 +53,7 @@ const ProductPage = async ({ params }: Props) => {
               salePrice: product.salePrice || 0,
               stock: product.stock || 0,
               category: product.category?.name || "Sin categoría",
+              status: product.status,
             }} 
           />
 
