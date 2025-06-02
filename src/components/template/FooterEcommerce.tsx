@@ -101,13 +101,11 @@ export async function FooterEcommerce() {
               reservados.
             </p>
             <div className="flex space-x-4 mt-4 md:mt-0">
-              <Link href="#" className="hover:text-white transition-colors">
+              <Link href="https://www.facebook.com/jesus.rosales.896571/" target="_blank" className="hover:text-white transition-colors">
                 <Facebook className="h-5 w-5" />
               </Link>
-              <Link href="#" className="hover:text-white transition-colors">
-                <Instagram className="h-5 w-5" />
-              </Link>
-              <Link href="#" className="hover:text-white transition-colors">
+           
+              <Link href="https://wa.me/7714175156" target="_blank" className="hover:text-white transition-colors">
                 <IoLogoWhatsapp className="h-5 w-5" />
               </Link>
             </div>
