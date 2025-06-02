@@ -31,7 +31,7 @@ const demoSlides: Slide[] = [
     title: "Ofertas exclusivas",
     description: "¡Gran variedad de ofetas en los productos!",
     ctaText: "Ver ofertas",
-    ctaLink: "/descuentos",
+    ctaLink: "/sales",
   },
   {
     id: "3",
@@ -39,7 +39,7 @@ const demoSlides: Slide[] = [
     title: "Productos destacados",
     description: "Encuentra los productos destacados de la tienda",
     ctaText: "Ver top ventas",
-    ctaLink: "/destacados",
+    ctaLink: "/featured",
   },
 ]
 
