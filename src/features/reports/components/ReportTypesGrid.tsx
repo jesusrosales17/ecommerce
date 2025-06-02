@@ -109,12 +109,10 @@ export const ReportTypesGrid = ({
                       className="w-full bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors inline-flex items-center justify-center text-sm font-medium"
                     >
                       <Eye className="w-4 h-4 mr-2" />
-                      Vista Previa
-                    </button>
-                    
-                    {/* Botones de descarga */}
+                      Ver reporte
+                    </button>                    {/* Botones de descarga */}
                     <div className="flex gap-4 mt-3">
-                      <button
+                      {/* <button
                         onClick={() => onDownloadReport(report.id, 'pdf')}
                         disabled={isDownloading === `${report.id}-pdf`}
                         className={`flex-1 bg-red-600 text-white px-3 py-2 rounded-lg hover:bg-red-700 transition-colors inline-flex items-center justify-center text-xs font-medium ${
@@ -147,7 +145,7 @@ export const ReportTypesGrid = ({
                             Excel
                           </>
                         )}
-                      </button>
+                      </button> */}
                       
                       {/* <button
                         onClick={() => onDownloadReport(report.id, 'csv')}

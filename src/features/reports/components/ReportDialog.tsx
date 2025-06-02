@@ -673,8 +673,7 @@ export function ReportDialog({
               <Download className="h-4 w-4" />
               {isDownloading === 'csv' ? 'Descargando...' : 'CSV'}
             </Button>
-            
-            <Button
+              {/* <Button
               variant="outline"
               onClick={() => onDownload('excel')}
               disabled={isDownloading === 'excel'}
@@ -691,7 +690,7 @@ export function ReportDialog({
             >
               <Download className="h-4 w-4" />
               {isDownloading === 'pdf' ? 'Descargando...' : 'PDF'}
-            </Button>
+            </Button> */}
           </div>
         </DialogFooter>
       </DialogContent>

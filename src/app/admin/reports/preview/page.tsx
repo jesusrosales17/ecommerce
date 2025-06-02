@@ -230,9 +230,7 @@ export default function ReportPreviewPage() {
                 <Printer className="h-4 w-4 mr-2" />
                 <span className="hidden sm:inline">Imprimir</span>
                 <span className="sm:hidden">Print</span>
-              </Button>
-
-              <Button
+              </Button>              {/* <Button
                 variant="outline"
                 onClick={() => handleDownload("excel")}
                 size="sm"
@@ -251,7 +249,7 @@ export default function ReportPreviewPage() {
                 <Download className="h-4 w-4 mr-2" />
                 <span className="hidden sm:inline">PDF</span>
                 <span className="sm:hidden">PDF</span>
-              </Button>
+              </Button> */}
             </div>
           </div>
         </div>

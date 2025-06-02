@@ -115,9 +115,9 @@ export default async function OrdersPage() {
           </CardContent>
         </Card>
       ) : (
-        <div className="space-y-6">
+        <div className="flex flex-col gap-4">
           {orders.map((order) => (
-            <Link href={`/orders/${order.id}`} key={order.id}>
+            <Link href={`/orders/${order.id}`} className="mb-4" key={order.id}>
               <Card>
                 <CardHeader>
                   <div className="flex justify-between items-start">
