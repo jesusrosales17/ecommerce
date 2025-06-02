@@ -1,5 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { formattedPrice } from "@/utils/price";
+import ButtonsCardProduct from "./ButtonsCardProduct";
+import { BuyNowButton } from "@/features/checkout/components/BuyNowButton";
 
 interface Props {
   product: {
@@ -12,8 +14,6 @@ interface Props {
     category?: string;
   };
 }
-import { Button } from "@/components/ui/button";
-import ButtonsCardProduct from "./ButtonsCardProduct";
 
 export const ProductInfo = ({ product }: Props) => {
   return (
@@ -86,15 +86,16 @@ export const ProductInfo = ({ product }: Props) => {
               : "Agotado"}
           </p>
         </div>
-      </div>                {/* Botones de acción */}
+      </div>        {/* Botones de acción */}
       <div className="space-y-4">
-        {/* Utilizamos el componente AddToCartButton */}
-        <div className="flex gap-3">
-            <Button
-            className="flex-1"
-            >
-              Comprar
-            </Button>
+        {/* Utilizamos el componente BuyNowButton y AddToCartButton */}
+        <div className="flex items-end gap-3">
+            <BuyNowButton
+              productId={product.id}
+              maxStock={product.stock}
+              className="flex-1 w-full"
+              showQuantitySelector={true}
+            />
 
             <div>
               <ButtonsCardProduct productId={product.id} />

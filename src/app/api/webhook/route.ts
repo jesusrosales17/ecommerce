@@ -49,75 +49,149 @@ export async function POST(req: NextRequest) {
     switch (event.type) {
       case "checkout.session.completed":
         const checkoutSession = event.data.object as Stripe.Checkout.Session;
-        
-        // Retrieve session metadata
+          // Retrieve session metadata
         const userId = checkoutSession.metadata?.userId;
-        const cartId = checkoutSession.metadata?.cartId;
         const addressId = checkoutSession.metadata?.addressId;
+        const type = checkoutSession.metadata?.type;
 
-        if (!userId || !cartId || !addressId) {
+        if (!userId || !addressId) {
           console.error("Missing metadata in checkout session");
           return new NextResponse("Missing session metadata", { status: 400 });
         }
 
         try {
-          // 1. Get cart data
-          const cart = await prisma.cart.findUnique({
-            where: { id: cartId },
-            include: {
-              items: {
-                include: {
-                  Product: {
-                    include: {
-                      images: true,
+          if (type === "buy_now") {
+            // Handle "Buy Now" checkout (single product)
+            const productId = checkoutSession.metadata?.productId;
+            const quantity = parseInt(checkoutSession.metadata?.quantity || "1");
+
+            if (!productId) {
+              throw new Error("Missing productId for buy_now checkout");
+            }
+
+            // Get product data
+            const product = await prisma.product.findUnique({
+              where: { id: productId },
+            });
+
+            if (!product) {
+              throw new Error(`Product ${productId} not found`);
+            }
+
+            // Calculate total
+            const price = product.isOnSale && product.salePrice
+              ? Number(product.salePrice)
+              : Number(product.price);
+            const orderTotal = price * quantity;
+
+            // Create order for single product
+            const order = await prisma.order.create({
+              data: {
+                userId,
+                addressId,
+                total: orderTotal,
+                paymentId: checkoutSession.id,
+                paymentStatus: checkoutSession.payment_status,
+                items: {
+                  create: [{
+                    productId: productId,
+                    name: product.name,
+                    price: price,
+                    quantity: quantity,
+                  }],
+                },
+              },
+            });
+
+            // Update product stock
+            await prisma.product.update({
+              where: { id: productId },
+              data: {
+                stock: {
+                  decrement: quantity,
+                },
+              },
+            });
+
+            console.log(`Buy Now Order ${order.id} created successfully for user ${userId}`);
+          } else {
+            // Handle regular cart checkout
+            const cartId = checkoutSession.metadata?.cartId;
+
+            if (!cartId) {
+              throw new Error("Missing cartId for cart checkout");
+            }
+
+            // 1. Get cart data
+            const cart = await prisma.cart.findUnique({
+              where: { id: cartId },
+              include: {
+                items: {
+                  include: {
+                    Product: {
+                      include: {
+                        images: true,
+                      },
                     },
                   },
                 },
               },
-            },
-          }) as Cart | null;
+            }) as Cart | null;
 
-          if (!cart) {
-            throw new Error(`Cart ${cartId} not found`);
-          }
+            if (!cart) {
+              throw new Error(`Cart ${cartId} not found`);
+            }
 
-          // 2. Calculate total
-          const orderTotal = cart.items.reduce((total: number, item: CartItemWithProduct) => {
-            const price = item.Product?.isOnSale && item.Product.salePrice
-              ? Number(item.Product.salePrice)
-              : Number(item.Product?.price);
-            return total + price * item.quantity;
-          }, 0);
+            // 2. Calculate total
+            const orderTotal = cart.items.reduce((total: number, item: CartItemWithProduct) => {
+              const price = item.Product?.isOnSale && item.Product.salePrice
+                ? Number(item.Product.salePrice)
+                : Number(item.Product?.price);
+              return total + price * item.quantity;
+            }, 0);
 
-          // 3. Create order
-          const order = await prisma.order.create({
-            data: {
-              userId,
-              addressId,
-              total: orderTotal,
-              paymentId: checkoutSession.id,
-              paymentStatus: checkoutSession.payment_status,
-              items: {
-                create: cart.items.map(item => ({
-                  productId: item.productId,
-                  name: item.Product?.name || "Producto",
-                  price: item.Product?.isOnSale && item.Product.salePrice
-                    ? item.Product.salePrice
-                    : item.Product!.price,
-                  quantity: item.quantity,
-                })),
+            // 3. Create order
+            const order = await prisma.order.create({
+              data: {
+                userId,
+                addressId,
+                total: orderTotal,
+                paymentId: checkoutSession.id,
+                paymentStatus: checkoutSession.payment_status,
+                items: {
+                  create: cart.items.map(item => ({
+                    productId: item.productId,
+                    name: item.Product?.name || "Producto",
+                    price: item.Product?.isOnSale && item.Product.salePrice
+                      ? item.Product.salePrice
+                      : item.Product!.price,
+                    quantity: item.quantity,
+                  })),
+                },
               },
-            },
-          });
+            });
 
-          // 4. Clear cart
-          await prisma.cartItem.deleteMany({
-            where: { cartId },
-          });
+            // 4. Update product stock for each item
+            for (const item of cart.items) {
+              await prisma.product.update({
+                where: { id: item.productId },
+                data: {
+                  stock: {
+                    decrement: item.quantity,
+                  },
+                },
+              });
+            }
 
-          console.log(`Order ${order.id} created successfully for user ${userId}`);
+            // 5. Clear cart
+            await prisma.cartItem.deleteMany({
+              where: { cartId },
+            });
+
+            console.log(`Cart Order ${order.id} created successfully for user ${userId}`);
+          }
           
-          // 5. TODO: Send order confirmation email
+          // TODO: Send order confirmation email
           
         } catch (error) {
           console.error("Error creating order:", error);
