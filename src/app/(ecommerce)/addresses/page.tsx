@@ -28,7 +28,7 @@ export default async function AddressesPage({
   const isFromCheckout = (await searchParams).checkout === "true";
 
   return (
-    <div className="container py-8 mx-auto h-dvh">
+    <div className="container py-8 mx-auto h-dvh px-4 2xl:px-0">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold">Mis direcciones</h1>
         {isFromCheckout && (
