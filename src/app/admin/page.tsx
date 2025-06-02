@@ -65,11 +65,7 @@ export default function AdminDashboard() {
                 <RefreshCw className="w-4 h-4 mr-1 sm:mr-2" />
                 <span className="hidden sm:inline">Actualizar</span>
               </button>
-              
-              <button className="bg-blue-600 text-white rounded-lg px-3 py-2 sm:px-4 hover:bg-blue-700 transition-colors inline-flex items-center text-sm">
-                <Settings className="w-4 h-4 mr-1 sm:mr-2" />
-                <span className="hidden sm:inline">Configurar</span>
-              </button>
+            
             </div>
           </div>
         </div>
