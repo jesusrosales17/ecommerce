@@ -1,13 +1,22 @@
 import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
-import { CartItem, Product, ProductImage } from "@prisma/client";
+import { CartItem, Product, ProductImage, Cart as PrismaCart } from "@prisma/client";
 
 import stripe from "@/libs/stripe";
 import prisma from "@/libs/prisma";
 
 // This is your Stripe webhook secret for testing your endpoint locally.
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+// Type for Prisma query result
+type PrismaCartResult = PrismaCart & {
+  items: (CartItem & {
+    Product: (Product & {
+      images: ProductImage[];
+    }) | null;
+  })[];
+};
 
 interface CartItemWithProduct extends CartItem {
   Product?: Product & {
@@ -120,9 +129,7 @@ export async function POST(req: NextRequest) {
 
             if (!cartId) {
               throw new Error("Missing cartId for cart checkout");
-            }
-
-            // 1. Get cart data
+            }            // 1. Get cart data
             const cart = await prisma.cart.findUnique({
               where: { id: cartId },
               include: {
@@ -136,14 +143,12 @@ export async function POST(req: NextRequest) {
                   },
                 },
               },
-            }) as Cart | null;
+            }) as PrismaCartResult | null;
 
             if (!cart) {
               throw new Error(`Cart ${cartId} not found`);
-            }
-
-            // 2. Calculate total
-            const orderTotal = cart.items.reduce((total: number, item: CartItemWithProduct) => {
+            }            // 2. Calculate total
+            const orderTotal = cart.items.reduce((total: number, item) => {
               const price = item.Product?.isOnSale && item.Product.salePrice
                 ? Number(item.Product.salePrice)
                 : Number(item.Product?.price);
@@ -157,14 +162,13 @@ export async function POST(req: NextRequest) {
                 addressId,
                 total: orderTotal,
                 paymentId: checkoutSession.id,
-                paymentStatus: checkoutSession.payment_status,
-                items: {
+                paymentStatus: checkoutSession.payment_status,                items: {
                   create: cart.items.map(item => ({
                     productId: item.productId,
                     name: item.Product?.name || "Producto",
                     price: item.Product?.isOnSale && item.Product.salePrice
-                      ? item.Product.salePrice
-                      : item.Product!.price,
+                      ? Number(item.Product.salePrice)
+                      : Number(item.Product?.price || 0),
                     quantity: item.quantity,
                   })),
                 },
